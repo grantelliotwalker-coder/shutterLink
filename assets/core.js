@@ -248,7 +248,7 @@ const ICONS = {
 const DEFAULTS = {
   v: 2,
   profile: {
-    name: 'Mara Ellison',
+    name: 'Grant Walker',
     bio: 'Landscapes and weddings from the Blue Mountains, NSW.',
     location: 'Katoomba, NSW',
     avatar: pic(64, 400, 400),

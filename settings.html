@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="assets/core.js?v=2.2"></script>
+<script src="assets/core.js?v=2.3"></script>
 <script>try{const t=localStorage.getItem('shutterlink:ui-theme');if(t)document.documentElement.dataset.ui=t;}catch(_){}</script>
 <style>
 :root{
@@ -261,7 +261,7 @@ select.in{appearance:none;-webkit-appearance:none;padding-right:32px;background-
 <div class="wrap">
   <main class="content" id="content" role="tabpanel"></main>
   <aside class="pv" aria-label="Live preview">
-    <div class="device" id="device"><div class="shell"><span class="island"></span><iframe id="frame" src="index.html?preview&v=2.2" title="Live preview of your link page"></iframe></div></div>
+    <div class="device" id="device"><div class="shell"><span class="island"></span><iframe id="frame" src="index.html?preview&v=2.3" title="Live preview of your link page"></iframe></div></div>
     <div class="pv-bar"><span>Live preview</span><span aria-hidden="true">·</span><a href="index.html" target="_blank" rel="noopener">Open in new tab</a></div>
   </aside>
 </div>
@@ -716,7 +716,7 @@ function fit(){ $('device').style.setProperty('--k', Math.max(.55, Math.min(1, (
 addEventListener('resize', fit); fit();
 $('frame').addEventListener('load', () => post());
 $('frame2').addEventListener('load', () => post());
-$('fab').onclick = () => { const f = $('frame2'); if (!f.getAttribute('src')) f.src = 'index.html?preview&v=2.2'; else post(); $('mpv').classList.add('open'); $('mpvClose').focus(); };
+$('fab').onclick = () => { const f = $('frame2'); if (!f.getAttribute('src')) f.src = 'index.html?preview&v=2.3'; else post(); $('mpv').classList.add('open'); $('mpvClose').focus(); };
 $('mpvClose').onclick = () => { $('mpv').classList.remove('open'); $('fab').focus(); };
 addEventListener('keydown', e => { if (e.key === 'Escape' && $('mpv').classList.contains('open')) $('mpvClose').click(); });
 // another tab changed settings (e.g. reset elsewhere)
