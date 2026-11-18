@@ -3,453 +3,731 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Link page settings — Sport Shutter</title>
-<meta name="theme-color" content="#f6f6f9">
+<title>Link page settings · Sport Shutter</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151726" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="config.js"></script>
+<script src="assets/core.js"></script>
+<script>try{const t=localStorage.getItem('shutterlink:ui-theme');if(t)document.documentElement.dataset.ui=t;}catch(_){}</script>
 <style>
 :root{
-  --blue:#2326D3;
-  --bg:#f6f6f9;
-  --panel:#ffffff;
-  --ink:#16172b;
-  --muted:#686a82;
-  --line:#e3e3ec;
-  --field:#fbfbfd;
-  --sans:"Familjen Grotesk", system-ui, sans-serif;
+  --bg:#f6f6f9;--surface:#fff;--surface-2:#f8f8fb;--surface-3:#efeff5;--border:#e3e3ec;--border-strong:#cdcedb;
+  --text:#16172b;--dim:#5b5e76;--faint:#666982;--accent:#2326D3;--accent-text:#2326D3;--accent-soft:rgba(35,38,211,.08);
+  --ok:#0b7a4f;--warn:#975c05;--danger:#bf2f3d;
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 6px 20px rgba(16,24,40,.06);
+  --font:"Familjen Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-ui=light]){
+  --bg:#0d0e18;--surface:#151726;--surface-2:#1a1c2d;--surface-3:#22253a;--border:#272a40;--border-strong:#363a56;
+  --text:#eceefa;--dim:#a3a7c3;--faint:#9195b1;--accent:#3b3fe6;--accent-text:#9a9dff;--accent-soft:rgba(110,114,255,.14);
+  --ok:#3ecf8e;--warn:#f2a93b;--danger:#f0616d;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.2);color-scheme:dark;
+}}
+:root[data-ui=dark]{
+  --bg:#0d0e18;--surface:#151726;--surface-2:#1a1c2d;--surface-3:#22253a;--border:#272a40;--border-strong:#363a56;
+  --text:#eceefa;--dim:#a3a7c3;--faint:#9195b1;--accent:#3b3fe6;--accent-text:#9a9dff;--accent-soft:rgba(110,114,255,.14);
+  --ok:#3ecf8e;--warn:#f2a93b;--danger:#f0616d;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.2);color-scheme:dark;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;font-size:15px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:0}
 a{color:inherit;text-decoration:none}
-:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
 [hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px;border-radius:6px}
+.num{font-variant-numeric:tabular-nums}
+svg{flex:none}
 
-/* Top bar */
-.bar{
-  position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
-  padding:env(safe-area-inset-top) 0 0;
+/* ---------- Top bar + tabs ---------- */
+.top{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding-top:env(safe-area-inset-top)}
+.bar{max-width:1320px;margin:0 auto;height:58px;padding:0 20px;display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:-.015em;white-space:nowrap}
+.brand .mk{width:24px;height:25px;color:var(--accent-text);display:block}
+.brand .mk svg{width:100%;height:100%;display:block}
+.crumb{color:var(--dim);font-weight:500;padding-left:12px;margin-left:2px;border-left:1px solid var(--border);white-space:nowrap}
+.sp{flex:1}
+.saved{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--faint);white-space:nowrap;margin-right:4px}
+.saved i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.saved.busy i{background:var(--accent-text);animation:pulse 1s ease infinite}
+.saved.bad{color:var(--danger)} .saved.bad i{background:var(--danger)}
+@keyframes pulse{50%{opacity:.3}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;background:var(--surface-2);border:1px solid var(--border);font-weight:600;font-size:13.5px;white-space:nowrap;transition:background-color .15s,border-color .15s,color .15s}
+.btn:hover{border-color:var(--border-strong);background:var(--surface-3)}
+.btn:disabled{opacity:.35;pointer-events:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:color-mix(in srgb,var(--accent) 85%,#000)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--dim)}
+.btn.ghost:hover{background:var(--surface-2);color:var(--text)}
+.btn.icon{width:36px;padding:0}
+.btn.sm{height:32px;padding:0 10px;font-size:12.5px}
+.btn.danger{color:var(--danger)}
+.btn svg{width:16px;height:16px}
+.tabs{max-width:1320px;margin:0 auto;padding:0 12px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{position:relative;padding:11px 12px 10px;color:var(--dim);font-weight:600;font-size:13.5px;white-space:nowrap;border-bottom:2px solid transparent}
+.tab:hover{color:var(--text)}
+.tab[aria-selected=true]{color:var(--text);border-bottom-color:var(--accent-text)}
+
+/* ---------- Layout ---------- */
+.wrap{max-width:1320px;margin:0 auto;padding:26px 20px 120px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:44px;align-items:start}
+.content{max-width:760px;width:100%}
+.pane-h h1{font-size:26px;letter-spacing:-.02em;line-height:1.15}
+.pane-h p{color:var(--dim);margin-top:6px;max-width:62ch}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-top:16px;box-shadow:var(--shadow)}
+.ph{display:flex;align-items:center;gap:10px;margin-bottom:14px;min-height:26px;flex-wrap:wrap}
+.ph h2{font-size:15.5px;font-weight:700;letter-spacing:-.005em}
+.ph .sub{color:var(--faint);font-size:12.5px}
+.ph .act{margin-left:auto;display:flex;gap:8px;align-items:center}
+.help-b{width:24px;height:24px;border-radius:50%;border:1px solid var(--border);background:var(--surface-2);color:var(--dim);font-size:12px;font-weight:700;display:inline-grid;place-items:center;flex:none}
+.help-b:hover,.help-b[aria-expanded=true]{color:var(--accent-text);border-color:var(--accent-text);background:var(--accent-soft)}
+.help{margin:-4px 0 16px;padding:12px 14px;border-radius:10px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent-text) 25%,transparent);font-size:13px;line-height:1.55}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fields{display:grid;gap:14px}
+@media (max-width:560px){ .grid2{grid-template-columns:1fr} }
+
+/* Fields */
+.f{display:grid;gap:6px;font-size:13px;font-weight:600;min-width:0}
+.f > small,.hint{font-weight:400;color:var(--faint);font-size:12.5px;line-height:1.4}
+.f .lab{display:flex;justify-content:space-between;gap:8px}
+.f .lab span{font-weight:500;color:var(--faint)}
+.in{width:100%;height:40px;padding:0 12px;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);font-size:14.5px;font-weight:400;transition:border-color .15s,box-shadow .15s,background-color .15s;min-width:0}
+textarea.in{height:auto;min-height:72px;padding:9px 12px;resize:vertical;line-height:1.45}
+select.in{appearance:none;-webkit-appearance:none;padding-right:32px;background-image:linear-gradient(45deg,transparent 50%,var(--dim) 50%),linear-gradient(135deg,var(--dim) 50%,transparent 50%);background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.in:focus{outline:none;border-color:var(--accent-text);box-shadow:0 0 0 3px var(--accent-soft);background:var(--surface)}
+.in[aria-invalid=true]{border-color:var(--danger)}
+.ferr{font-size:12px;font-weight:500;color:var(--danger)}
+.fok{font-size:12.5px;font-weight:600;color:var(--ok)}
+
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:3px;gap:2px;flex-wrap:wrap;justify-self:start}
+.seg button{padding:6px 12px;border-radius:7px;font-size:13px;font-weight:600;color:var(--dim);white-space:nowrap}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed=true]{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+
+.range{display:flex;align-items:center;gap:12px}
+.range input{flex:1;accent-color:var(--accent);height:24px;min-width:0}
+.range output{min-width:46px;text-align:right;font-size:13px;color:var(--dim);font-weight:600}
+
+.tg{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--border)}
+.tg:last-child{border-bottom:0;padding-bottom:0}
+.tg:first-child{padding-top:0}
+.tg b{display:block;font-weight:600}
+.tg span{font-size:12.5px;color:var(--faint)}
+.sw{position:relative;width:42px;height:26px;flex:none}
+.sw input{position:absolute;inset:0;opacity:0;cursor:pointer;margin:0;z-index:1}
+.sw i{position:absolute;inset:0;border-radius:13px;background:var(--border-strong);transition:background-color .2s}
+.sw i::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.sw input:checked + i{background:var(--accent)}
+.sw input:checked + i::after{transform:translateX(16px)}
+.sw input:focus-visible + i{outline:2px solid var(--accent-text);outline-offset:2px}
+
+/* Image field */
+.img-f{display:flex;gap:8px;align-items:center}
+.thumb{width:44px;height:44px;border-radius:8px;flex:none;background:var(--surface-3) center/cover no-repeat;border:1px solid var(--border)}
+.thumb.lg{width:64px;height:64px;border-radius:10px}
+.img-f .in{flex:1}
+.up{position:relative;overflow:hidden;cursor:pointer}
+.up input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.up:focus-within{outline:2px solid var(--accent-text);outline-offset:2px}
+
+/* Lists */
+.list{list-style:none;display:grid;gap:8px}
+.row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:start;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2)}
+.row.off > :not(.tools):not(.sw){opacity:.5}
+.row .fields{gap:8px}
+.row .in{height:36px;font-size:14px;background:var(--surface)}
+.tools{display:flex;flex-direction:column;gap:2px}
+.tool{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;color:var(--faint)}
+.tool:hover{background:var(--surface-3);color:var(--text)}
+.tool.del:hover{color:var(--danger)}
+.tool:disabled{opacity:.25;pointer-events:none}
+.tool svg{width:15px;height:15px}
+.add{margin-top:10px;height:42px;width:100%;border:1.5px dashed var(--border-strong);border-radius:12px;color:var(--accent-text);font-weight:600;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:8px}
+.add:hover{border-color:var(--accent-text);background:var(--accent-soft)}
+.add:disabled{opacity:.45;pointer-events:none}
+.add svg{width:15px;height:15px}
+.adds{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.adds .add{margin-top:10px}
+.empty-l{color:var(--faint);font-size:13px;padding:4px 2px}
+
+/* Theme cards */
+.themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.theme{border:1.5px solid var(--border);border-radius:12px;padding:6px;text-align:left;background:var(--surface);transition:border-color .15s}
+.theme:hover{border-color:var(--border-strong)}
+.theme[aria-pressed=true]{border-color:var(--accent-text);box-shadow:0 0 0 3px var(--accent-soft)}
+.theme .mini{height:78px;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:5px;position:relative;overflow:hidden}
+.theme .mini i{display:block;height:6px;border-radius:3px}
+.theme .mini .pill{position:absolute;right:10px;bottom:10px;width:26px;height:26px;border-radius:50%}
+.theme .mini .card{position:absolute;left:10px;right:44px;bottom:10px;height:22px;border-radius:6px}
+.theme b{display:block;font-size:12.5px;font-weight:600;padding:7px 4px 2px}
+
+.colors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:560px){ .colors{grid-template-columns:1fr} }
+.cf{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2)}
+.cf .pick{position:relative;width:38px;height:38px;border-radius:8px;overflow:hidden;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.cf .pick input{position:absolute;inset:-8px;width:54px;height:54px;border:0;padding:0;cursor:pointer}
+.cf .t{flex:1;min-width:0}
+.cf .t b{display:block;font-size:13px}
+.cf .t input{width:100%;border:0;background:none;font-size:13px;color:var(--dim);font-family:ui-monospace,"SF Mono",Menlo,monospace;padding:0;height:20px;text-transform:uppercase}
+.cf .t input:focus{outline:none;color:var(--text)}
+.checks{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.ck{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface-2);color:var(--dim)}
+.ck i{width:7px;height:7px;border-radius:50%}
+.ck.ok i{background:var(--ok)} .ck.warn i{background:var(--warn)} .ck.bad i{background:var(--danger)}
+.ck b{color:var(--text);font-weight:600}
+
+.fonts{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.font{border:1.5px solid var(--border);border-radius:12px;padding:14px;text-align:left;background:var(--surface-2)}
+.font:hover{border-color:var(--border-strong)}
+.font[aria-pressed=true]{border-color:var(--accent-text);box-shadow:0 0 0 3px var(--accent-soft);background:var(--surface)}
+.font .d{font-size:28px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.font .b{font-size:12.5px;color:var(--dim);margin-top:6px}
+
+.styles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:560px){ .styles{grid-template-columns:1fr 1fr} }
+.style{border:1.5px solid var(--border);border-radius:12px;padding:8px;text-align:left;background:var(--surface-2)}
+.style:hover{border-color:var(--border-strong)}
+.style[aria-pressed=true]{border-color:var(--accent-text);box-shadow:0 0 0 3px var(--accent-soft);background:var(--surface)}
+.style .wf{display:block;height:112px;border-radius:8px;background:var(--surface-3);position:relative;overflow:hidden}
+.style .wf i{position:absolute;display:block}
+.style b{display:block;font-size:13px;padding:8px 4px 0}
+.style > span:last-child{display:block;font-size:12px;color:var(--faint);padding:0 4px 4px}
+
+.prints{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.pr{position:relative;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;text-align:left;background:var(--surface-2)}
+.pr img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:var(--surface-3)}
+.pr b{display:block;font-size:12.5px;padding:7px 8px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pr span{display:block;font-size:11.5px;color:var(--faint);padding:0 8px 7px}
+.pr i{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.35);border:2px solid #fff;display:grid;place-items:center;color:#fff;font-style:normal;font-size:11px;font-weight:700}
+.pr[aria-pressed=true]{border-color:var(--accent-text)}
+.pr[aria-pressed=true] i{background:var(--accent)}
+
+.meter{height:8px;border-radius:4px;background:var(--surface-3);overflow:hidden;margin-top:10px}
+.meter div{height:100%;border-radius:4px;background:var(--accent);transition:width .3s}
+.meter.warn div{background:var(--warn)} .meter.bad div{background:var(--danger)}
+
+/* ---------- Preview ---------- */
+.pv{position:sticky;top:124px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.device{width:calc(400px * var(--k,1));height:calc(820px * var(--k,1));position:relative}
+.device .shell{position:absolute;top:0;left:0;width:400px;height:820px;transform:scale(var(--k,1));transform-origin:0 0;border-radius:58px;background:#0b0c12;padding:11px;box-shadow:0 0 0 1px #2a2c38,0 0 0 4px #15161d,0 30px 70px -20px rgba(16,18,40,.5)}
+.device iframe{width:100%;height:100%;border:0;border-radius:47px;display:block;background:#0f1120}
+.device .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:110px;height:31px;border-radius:16px;background:#000;z-index:2;pointer-events:none}
+.pv-bar{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--faint)}
+.pv-bar a{color:var(--accent-text);font-weight:600}
+@media (max-width:1080px){ .wrap{grid-template-columns:1fr} .pv{display:none} }
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom));z-index:31;height:48px;padding:0 22px;border-radius:24px;background:var(--text);color:var(--bg);font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.3);display:none;align-items:center;gap:8px}
+.fab svg{width:18px;height:18px}
+@media (max-width:1080px){ .fab{display:inline-flex} }
+.mpv{position:fixed;inset:0;z-index:50;background:#0b0c12;display:flex;flex-direction:column;transform:translateY(100%);visibility:hidden;transition:transform .35s cubic-bezier(.2,.8,.2,1),visibility 0s .35s}
+.mpv.open{transform:none;visibility:visible;transition-delay:0s}
+.mpv header{display:flex;align-items:center;justify-content:space-between;color:#fff;padding:calc(8px + env(safe-area-inset-top)) 14px 8px}
+.mpv header .btn{background:rgba(255,255,255,.12);border-color:transparent;color:#fff}
+.mpv iframe{flex:1;border:0;width:100%}
+
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translate(-50%,10px);z-index:60;background:var(--text);color:var(--bg);padding:10px 16px;border-radius:9px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100vw - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (min-width:1081px){ .toast{bottom:28px} }
+.toast.bad{background:var(--danger);color:#fff}
+
+@media (max-width:640px){
+  .bar{padding:0 10px;gap:4px}
+  .crumb,.saved .lbl,.hide-s{display:none}
+  .wrap{padding:18px 14px 110px}
+  .panel{padding:16px 14px}
+  .row{grid-template-columns:minmax(0,1fr) auto}
+  .row > .thumb{display:none}
 }
-.bar-in{max-width:1180px;margin:0 auto;height:60px;padding:0 20px;display:flex;align-items:center;gap:14px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:-.02em;color:var(--ink)}
-.logo .mark{color:var(--blue);width:26px;height:27px;display:block}
-.logo .mark svg{width:100%;height:100%}
-.crumb{color:var(--muted);font-weight:500;padding-left:14px;border-left:1px solid var(--line)}
-.status{margin-left:auto;font-size:13px;color:var(--muted);transition:color .2s ease}
-.status.saving{color:var(--blue)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;font-weight:600;font-size:14px;white-space:nowrap}
-.btn-blue{background:var(--blue);color:#fff}
-.btn-blue:hover{background:#1b1eb3}
-.btn-line{border:1px solid var(--line);background:var(--panel)}
-.btn-line:hover{border-color:#c9cad8}
-
-/* Layout */
-.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 120px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:48px;align-items:start}
-@media (max-width:960px){ .wrap{grid-template-columns:1fr} .preview-col{display:none} }
-.intro h1{font-size:30px;letter-spacing:-.025em;line-height:1.1}
-.intro p{color:var(--muted);margin-top:8px;max-width:56ch;line-height:1.5}
-
-/* Groups */
-.group{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:20px}
-.group > h2{font-size:18px;letter-spacing:-.01em}
-.group > .desc{color:var(--muted);font-size:14px;margin-top:4px;line-height:1.45}
-.fields{display:grid;gap:14px;margin-top:18px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media (max-width:520px){ .row2{grid-template-columns:1fr} }
-label.f{display:grid;gap:6px;font-size:13px;font-weight:600}
-label.f small{font-weight:400;color:var(--muted)}
-input[type=text],input[type=url],input[type=email],input[type=number],select,textarea{
-  width:100%;height:42px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--field);
-  font-size:15px;font-weight:400;transition:border-color .15s ease, box-shadow .15s ease;
-}
-textarea{height:auto;min-height:70px;padding:10px 12px;resize:vertical;line-height:1.4}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(35,38,211,.14);background:#fff}
-
-/* Segmented control */
-.seg{display:flex;border:1px solid var(--line);border-radius:10px;padding:3px;background:var(--field);gap:3px}
-.seg button{flex:1;height:36px;border-radius:7px;font-size:14px;font-weight:500;color:var(--muted)}
-.seg button[aria-pressed=true]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(22,23,43,.12)}
-
-.swatches{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.sw{width:34px;height:34px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
-.sw[aria-pressed=true]{box-shadow:0 0 0 2px var(--ink)}
-.sw-custom{position:relative;width:34px;height:34px;border-radius:50%;overflow:hidden;box-shadow:0 0 0 1px var(--line);background:conic-gradient(#f44,#fd4,#4d6,#4cf,#64f,#f4c,#f44)}
-.sw-custom input{position:absolute;inset:-6px;opacity:0;cursor:pointer;width:46px;height:46px}
-
-/* Repeating rows (photos, links) */
-.items{list-style:none;margin-top:16px;display:grid;gap:10px}
-.item{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:start;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--field)}
-.item.off{opacity:.55}
-.thumb{width:64px;height:64px;border-radius:9px;background:#e9e9f0 center/cover no-repeat}
-.item .fields{margin-top:0;gap:8px}
-.item input{height:38px;font-size:14px}
-.tools{display:flex;flex-direction:column;gap:4px}
-.tool{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--muted)}
-.tool:hover{background:#ececf3;color:var(--ink)}
-.tool:disabled{opacity:.3;pointer-events:none}
-.tool svg{width:16px;height:16px}
-.add{margin-top:12px;height:44px;width:100%;border:1.5px dashed #cfd0dd;border-radius:12px;color:var(--blue);font-weight:600;font-size:14px}
-.add:hover{border-color:var(--blue);background:rgba(35,38,211,.04)}
-
-/* Quick buttons */
-.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
-@media (max-width:620px){ .slots{grid-template-columns:1fr 1fr} }
-.slot{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--field);display:grid;gap:8px;align-content:start}
-.slot .ic{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#ececf3;margin:0 auto 2px}
-.slot:first-child .ic{background:var(--accent,var(--blue));color:#fff}
-.slot .ic svg{width:20px;height:20px}
-.slot select,.slot input{height:36px;font-size:13px;padding:0 9px}
-.slot .hint{font-size:12px;color:var(--muted);text-align:center;line-height:1.3}
-
-/* Toggles */
-.toggles{display:grid;gap:2px;margin-top:14px}
-.tg{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line)}
-.tg:last-child{border-bottom:0}
-.tg b{font-weight:600;display:block}
-.tg span{font-size:13px;color:var(--muted)}
-.switch{position:relative;width:46px;height:28px;flex:none}
-.switch input{position:absolute;opacity:0;inset:0;cursor:pointer;margin:0}
-.switch i{position:absolute;inset:0;border-radius:14px;background:#d6d7e2;transition:background .2s ease;pointer-events:none}
-.switch i::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s ease}
-.switch input:checked + i{background:var(--blue)}
-.switch input:checked + i::after{transform:translateX(18px)}
-.switch input:focus-visible + i{outline:2px solid var(--blue);outline-offset:2px}
-
-.danger{margin-top:28px;display:flex;justify-content:space-between;align-items:center;gap:16px;color:var(--muted);font-size:14px;flex-wrap:wrap}
-.danger button{color:#b42318;font-weight:600}
-
-/* Preview */
-.preview-col{position:sticky;top:84px}
-.phone{
-  width:390px;height:780px;margin:0 auto;border-radius:48px;padding:10px;background:#16172b;
-  box-shadow:0 30px 60px -20px rgba(22,23,43,.35);
-}
-.phone iframe{width:100%;height:100%;border:0;border-radius:38px;background:#1c2a2e;display:block}
-.preview-col p{text-align:center;font-size:13px;color:var(--muted);margin-top:14px}
-
-/* Mobile preview */
-.fab{
-  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom));z-index:6;
-  height:48px;padding:0 22px;border-radius:24px;background:var(--ink);color:#fff;font-weight:600;
-  box-shadow:0 10px 30px rgba(22,23,43,.3);display:none;align-items:center;gap:8px;
-}
-@media (max-width:960px){ .fab{display:inline-flex} }
-.sheet{position:fixed;inset:0;z-index:20;background:#16172b;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1);visibility:hidden}
-.sheet.open{transform:none;visibility:visible}
-.sheet header{display:flex;justify-content:space-between;align-items:center;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;color:#fff}
-.sheet header b{font-weight:600}
-.sheet header button{color:#fff;height:40px;padding:0 14px;border-radius:10px;background:rgba(255,255,255,.12);font-weight:600}
-.sheet iframe{flex:1;border:0;width:100%;background:#1c2a2e}
-
-.view-live span{display:inline}
-@media (max-width:560px){ .crumb,.status{display:none} .view-live{margin-left:auto} }
-@media (prefers-reduced-motion:reduce){ *{transition-duration:.01ms!important} }
+@media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
 </style>
 </head>
 <body>
-
-<header class="bar">
-  <div class="bar-in">
-    <a class="logo" href="https://sportshutter.com/" aria-label="Sport Shutter home"><span class="mark" id="mark"></span>Sport Shutter</a>
+<header class="top">
+  <div class="bar">
+    <a class="brand" href="https://sportshutter.com/" aria-label="Sport Shutter home"><span class="mk" id="mk"></span><span>Sport Shutter</span></a>
     <span class="crumb">Link page</span>
-    <span class="status" id="status" role="status">All changes saved</span>
-    <a class="btn btn-blue view-live" href="index.html">View page</a>
+    <span class="sp"></span>
+    <span class="saved" id="saved" role="status"><i></i><span class="lbl" id="savedT">All changes saved</span></span>
+    <button class="btn ghost icon" id="undo" aria-label="Undo" title="Undo (Ctrl+Z)" disabled></button>
+    <button class="btn ghost icon" id="redo" aria-label="Redo" title="Redo (Ctrl+Shift+Z)" disabled></button>
+    <button class="btn ghost icon hide-s" id="uiTheme" aria-label="Switch settings between light and dark" title="Light or dark"></button>
+    <a class="btn primary" href="index.html">View page</a>
   </div>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Settings sections"></nav>
 </header>
 
 <div class="wrap">
-  <main>
-    <div class="intro">
-      <h1>Link page settings</h1>
-      <p>This is the page people land on from your Instagram bio. Changes save as you type and show in the preview straight away.</p>
-    </div>
-
-    <section class="group" aria-labelledby="g-profile">
-      <h2 id="g-profile">Profile</h2>
-      <div class="fields">
-        <label class="f">Name<input type="text" data-k="profile.name" maxlength="40"></label>
-        <label class="f">Bio <small>One line works best. Shown under your name.</small><textarea data-k="profile.bio" maxlength="120" rows="2"></textarea></label>
-      </div>
-    </section>
-
-    <section class="group" aria-labelledby="g-look">
-      <h2 id="g-look">Look</h2>
-      <div class="fields">
-        <div class="f" style="display:grid;gap:6px;font-size:13px;font-weight:600">Background
-          <div class="seg" id="bgSeg" role="group" aria-label="Background">
-            <button data-v="photo">Match photo</button>
-            <button data-v="brand">Accent</button>
-            <button data-v="charcoal">Charcoal</button>
-          </div>
-        </div>
-        <div class="f" style="display:grid;gap:8px;font-size:13px;font-weight:600">Accent colour <small style="font-weight:400;color:var(--muted)">Used on your first button, the cart and checkout.</small>
-          <div class="swatches" id="swatches"></div>
-        </div>
-        <label class="f">Seconds per photo<input type="number" data-k="look.slideSeconds" min="2" max="15" step="1" style="max-width:120px"></label>
-      </div>
-    </section>
-
-    <section class="group" aria-labelledby="g-photos">
-      <h2 id="g-photos">Cover photos</h2>
-      <p class="desc">These play full screen behind your name, in this order. Portrait photos look best.</p>
-      <ul class="items" id="photos"></ul>
-      <button class="add" id="addPhoto">Add photo</button>
-    </section>
-
-    <section class="group" aria-labelledby="g-quick">
-      <h2 id="g-quick">Quick buttons</h2>
-      <p class="desc">The four round buttons on the first screen. The first one is highlighted.</p>
-      <div class="slots" id="slots"></div>
-    </section>
-
-    <section class="group" aria-labelledby="g-sections">
-      <h2 id="g-sections">Sections</h2>
-      <p class="desc">What appears when someone scrolls past the first screen.</p>
-      <div class="toggles">
-        <div class="tg"><div><b>Prints</b><span>From your Sport Shutter shop</span></div>
-          <div style="display:flex;align-items:center;gap:12px">
-            <select data-k="shopCount" aria-label="Number of prints to show" style="width:auto;height:36px;font-size:13px"></select>
-            <label class="switch"><input type="checkbox" data-k="sections.shop" aria-label="Show prints"><i></i></label>
-          </div></div>
-        <div class="tg"><div><b>Latest film</b><span>One featured video</span></div><label class="switch"><input type="checkbox" data-k="sections.film" aria-label="Show latest film"><i></i></label></div>
-        <div class="tg"><div><b>Links</b><span>Your list of extra links</span></div><label class="switch"><input type="checkbox" data-k="sections.links" aria-label="Show links"><i></i></label></div>
-        <div class="tg"><div><b>Social icons</b><span>At the bottom of the page</span></div><label class="switch"><input type="checkbox" data-k="sections.socials" aria-label="Show social icons"><i></i></label></div>
-      </div>
-    </section>
-
-    <section class="group" aria-labelledby="g-film">
-      <h2 id="g-film">Latest film</h2>
-      <div class="fields">
-        <label class="f">Video link<input type="url" data-k="film.url" placeholder="https://youtube.com/watch?v=…"></label>
-        <div class="row2">
-          <label class="f">Title<input type="text" data-k="film.title"></label>
-          <label class="f">Detail <small>e.g. YouTube, 12 min</small><input type="text" data-k="film.meta"></label>
-        </div>
-        <label class="f">Cover image link<input type="url" data-k="film.thumb" placeholder="https://…"></label>
-      </div>
-    </section>
-
-    <section class="group" aria-labelledby="g-links">
-      <h2 id="g-links">Links</h2>
-      <p class="desc">Anything else you want people to find. Turn one off to hide it without deleting it.</p>
-      <ul class="items" id="links"></ul>
-      <button class="add" id="addLink">Add link</button>
-    </section>
-
-    <section class="group" aria-labelledby="g-social">
-      <h2 id="g-social">Social profiles</h2>
-      <p class="desc">Leave any blank to hide that icon. Quick buttons for these networks use the same addresses.</p>
-      <div class="fields">
-        <div class="row2">
-          <label class="f">Instagram<input type="url" data-k="socials.instagram" placeholder="https://instagram.com/yourname"></label>
-          <label class="f">YouTube<input type="url" data-k="socials.youtube" placeholder="https://youtube.com/@yourname"></label>
-        </div>
-        <div class="row2">
-          <label class="f">TikTok<input type="url" data-k="socials.tiktok" placeholder="https://tiktok.com/@yourname"></label>
-          <label class="f">Email<input type="email" data-k="socials.email" placeholder="you@example.com"></label>
-        </div>
-      </div>
-    </section>
-
-    <div class="danger">
-      <span>Settings are saved in this browser for the prototype.</span>
-      <button id="reset">Reset to demo content</button>
-    </div>
-  </main>
-
-  <aside class="preview-col" aria-label="Live preview">
-    <div class="phone"><iframe id="frame" src="index.html?preview" title="Preview of your link page"></iframe></div>
-    <p>Live preview</p>
+  <main class="content" id="content" role="tabpanel"></main>
+  <aside class="pv" aria-label="Live preview">
+    <div class="device" id="device"><div class="shell"><span class="island"></span><iframe id="frame" src="index.html?preview" title="Live preview of your link page"></iframe></div></div>
+    <div class="pv-bar"><span>Live preview</span><span aria-hidden="true">·</span><a href="index.html" target="_blank" rel="noopener">Open in new tab</a></div>
   </aside>
 </div>
 
-<button class="fab" id="fab">Preview</button>
-<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Preview">
-  <header><b>Preview</b><button id="closePrev">Done</button></header>
-  <iframe id="frame2" title="Preview of your link page"></iframe>
+<button class="fab" id="fab"></button>
+<div class="mpv" id="mpv" role="dialog" aria-modal="true" aria-label="Preview">
+  <header><b>Preview</b><button class="btn sm" id="mpvClose">Done</button></header>
+  <iframe id="frame2" title="Live preview of your link page"></iframe>
 </div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
+(function(){
+'use strict';
 const $ = id => document.getElementById(id);
-let cfg = slLoad();
-$('mark').innerHTML = SL_BRAND.logo;
-
-const ICON = {
-  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 15l6-6 6 6"/></svg>',
-  down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>',
-  del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 7h14M10 7V5h4v2M7 7l1 13h8l1-13"/></svg>',
-  eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
-  eyeOff:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/></svg>',
+const esc = SL.esc, I = SL.ICONS;
+const svg = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ui = {
+  up: svg('<path d="M6 15l6-6 6 6"/>'), down: svg('<path d="M6 9l6 6 6-6"/>'),
+  del: svg('<path d="M5 7h14M10 7V5h4v2M7 7l1 13h8l1-13"/>'),
+  eye: svg('<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+  eyeOff: svg('<path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/>'),
+  plus: svg('<path d="M12 5v14M5 12h14"/>'),
+  undo: svg('<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>'),
+  redo: svg('<path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>'),
+  sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+  moon: svg('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),
+  phone: svg('<rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 18.5h3"/>'),
+  upload: svg('<path d="M12 16V4M6 10l6-6 6 6M4 20h16"/>'),
 };
+$('mk').innerHTML = SL.BRAND.logo;
+$('undo').innerHTML = ui.undo; $('redo').innerHTML = ui.redo;
+$('fab').innerHTML = ui.phone + 'Preview';
 
-/* ---------- Save + push to preview ---------- */
-let saveT;
-function changed(){
-  $('status').textContent = 'Saving…'; $('status').classList.add('saving');
-  const clean = slClone(cfg);
-  clean.photos.forEach(p => { if (p.auto) { delete p.tint; delete p.auto; } });
-  [$('frame'), $('frame2')].forEach(f => { try { f.contentWindow?.postMessage({ type:'shutterlink:config', config: slClone(clean) }, '*'); } catch(_){} });
+let cfg = SL.load();
+
+/* ---------- Paths ---------- */
+const get = (path, o=cfg) => path.split('.').reduce((a,k) => a == null ? a : a[k], o);
+function set(path, v){ const ks = path.split('.'), last = ks.pop(); ks.reduce((a,k) => a[k], cfg)[last] = v; }
+
+/* ---------- Save, preview, history ---------- */
+let saveT, histT, hist = [JSON.stringify(cfg)], hp = 0;
+function post(msg){
+  msg = msg || { type:'shutterlink:config', config: cfg };
+  [$('frame'), $('frame2')].forEach(f => { try { f.contentWindow && f.contentWindow.postMessage(msg, '*'); } catch(_){} });
+}
+function changed(opts={}){
+  post();
+  const s = $('saved'); s.className = 'saved busy'; $('savedT').textContent = 'Saving…';
   clearTimeout(saveT);
-  saveT = setTimeout(() => { slSave(clean); $('status').textContent = 'All changes saved'; $('status').classList.remove('saving'); }, 300);
+  saveT = setTimeout(() => {
+    const r = SL.save(cfg);
+    if (r.ok){ s.className = 'saved'; $('savedT').textContent = 'All changes saved'; }
+    else {
+      s.className = 'saved bad'; $('savedT').textContent = r.full ? 'Storage full' : 'Not saved';
+      toast(r.full ? 'Browser storage is full. Remove an uploaded photo or use an image link instead.' : 'Couldn’t save in this browser.', true);
+    }
+    if (current === 'advanced') renderPane('advanced', true);
+  }, 250);
+  if (!opts.noHistory){ clearTimeout(histT); histT = setTimeout(pushHist, opts.immediate ? 0 : 500); }
 }
-const getK = k => k.split('.').reduce((o,p) => o[p], cfg);
-const setK = (k,v) => { const ps = k.split('.'); const last = ps.pop(); ps.reduce((o,p) => o[p], cfg)[last] = v; };
+function pushHist(){
+  const snap = JSON.stringify(cfg);
+  if (snap === hist[hp]) return;
+  hist = hist.slice(0, hp + 1); hist.push(snap);
+  if (hist.length > 120) hist.shift();
+  hp = hist.length - 1; histButtons();
+}
+function histButtons(){ $('undo').disabled = hp <= 0; $('redo').disabled = hp >= hist.length - 1; }
+function travel(d){
+  clearTimeout(histT); pushHist();
+  const n = hp + d; if (n < 0 || n >= hist.length) return;
+  hp = n; cfg = JSON.parse(hist[hp]); histButtons();
+  renderPane(current, true); changed({ noHistory:true });
+  toast(d < 0 ? 'Undone' : 'Redone');
+}
+$('undo').onclick = () => travel(-1);
+$('redo').onclick = () => travel(1);
+addEventListener('keydown', e => {
+  if (!(e.metaKey || e.ctrlKey)) return;
+  const a = document.activeElement;
+  if (/INPUT|TEXTAREA/.test(a.tagName) && !['checkbox','range','color','file'].includes(a.type)) return; // fields keep their own undo
+  const k = e.key.toLowerCase();
+  if (k === 'z'){ e.preventDefault(); travel(e.shiftKey ? 1 : -1); }
+  if (k === 'y'){ e.preventDefault(); travel(1); }
+});
 
-/* ---------- Simple bound fields ---------- */
-function bindFields(){
-  const sel = document.querySelector('[data-k=shopCount]');
-  sel.innerHTML = SL_SHOP.map((_,i) => `<option value="${i+1}">Show ${i+1}</option>`).join('');
-  document.querySelectorAll('[data-k]').forEach(el => {
+function uiMode(){ return document.documentElement.dataset.ui || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+function uiIcon(){ $('uiTheme').innerHTML = uiMode() === 'dark' ? ui.sun : ui.moon; }
+$('uiTheme').onclick = () => { const n = uiMode() === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.ui = n; try { localStorage.setItem('shutterlink:ui-theme', n); } catch(_){} uiIcon(); };
+uiIcon();
+
+/* ---------- Building blocks ---------- */
+function field(label, path, o={}){
+  const v = get(path) ?? '';
+  const attrs = `class="in" data-k="${path}" ${o.max ? `maxlength="${o.max}"` : ''} placeholder="${esc(o.ph||'')}" ${o.check ? `data-check="${o.check}" autocomplete="off" spellcheck="false"` : ''}`;
+  const tag = o.area ? `<textarea ${attrs} rows="${o.rows||2}">${esc(v)}</textarea>` : `<input ${attrs} type="${o.type||'text'}" value="${esc(v)}">`;
+  return `<label class="f"><span class="lab">${label}${o.max ? `<span class="num" data-count="${path}">${String(v).length}/${o.max}</span>` : ''}</span>${tag}${o.hint ? `<small>${o.hint}</small>` : ''}<span class="ferr" data-err="${path}" hidden></span></label>`;
+}
+const toggle = (title, sub, path) => `<div class="tg"><div><b>${title}</b>${sub ? `<span>${sub}</span>` : ''}</div><label class="sw"><input type="checkbox" data-k="${path}" data-t="bool" ${get(path) ? 'checked' : ''} aria-label="${esc(title)}"><i></i></label></div>`;
+const seg = (path, opts, label) => `<div class="seg" role="group" aria-label="${esc(label)}">${opts.map(([v,l]) => `<button data-seg="${path}" data-v="${v}" aria-pressed="${String(get(path)) === String(v)}">${l}</button>`).join('')}</div>`;
+const range = (path, min, max, step, unit, label) => `<div class="range"><input type="range" data-k="${path}" data-t="num" data-unit="${unit}" min="${min}" max="${max}" step="${step}" value="${get(path)}" aria-label="${esc(label)}"><output class="num" data-out="${path}">${get(path)}${unit}</output></div>`;
+function imgInput(path, label, withThumb){
+  const v = get(path) || '', up = v.startsWith('data:');
+  return `<div class="img-f">${withThumb ? `<span class="thumb lg" data-thumb="${path}" style="background-image:url('${esc(SL.sized(v,160,160))}')"></span>` : ''}
+    <input class="in" data-k="${path}" data-check="url" data-img type="url" value="${up ? '' : esc(v)}" placeholder="${up ? 'Uploaded photo' : 'Paste an image link'}" autocomplete="off" spellcheck="false" aria-label="${esc(label)} link">
+    <label class="btn sm up" title="Upload from your device">${ui.upload}<span class="hide-s">Upload</span><input type="file" accept="image/*" data-upload="${path}" aria-label="Upload ${esc(label)}"></label>
+  </div><span class="ferr" data-err="${path}" hidden></span>`;
+}
+const tools = (list, i, len, extra='') => `<div class="tools">${extra}
+  <button class="tool" data-act="up" data-list="${list}" data-i="${i}" aria-label="Move up" ${i===0?'disabled':''}>${ui.up}</button>
+  <button class="tool" data-act="down" data-list="${list}" data-i="${i}" aria-label="Move down" ${i===len-1?'disabled':''}>${ui.down}</button>
+  <button class="tool del" data-act="del" data-list="${list}" data-i="${i}" aria-label="Remove">${ui.del}</button></div>`;
+let hid = 0;
+function panel(title, body, o={}){
+  const id = 'help' + (++hid);
+  return `<section class="panel"><div class="ph"><h2>${title}</h2>${o.sub ? `<span class="sub" ${o.subId ? `id="${o.subId}"` : ''}>${o.sub}</span>` : ''}${o.help ? `<button class="help-b" aria-expanded="false" aria-controls="${id}" aria-label="About ${esc(title)}">?</button>` : ''}${o.act ? `<div class="act">${o.act}</div>` : ''}</div>
+    ${o.help ? `<div class="help" id="${id}" hidden>${o.help}</div>` : ''}${body}</section>`;
+}
+const head = (t, p) => `<div class="pane-h"><h1>${t}</h1><p>${p}</p></div>`;
+function checks(){
+  const t = cfg.theme, tk = SL.tokens(t.colors);
+  const ck = (label, r, min) => `<span class="ck ${r >= min ? 'ok' : r >= 3 ? 'warn' : 'bad'}"><i></i>${label} <b class="num">${r.toFixed(1)}:1</b></span>`;
+  return ck('Text', SL.contrast(tk['--text'], tk['--bg']), 7) + ck('Secondary text', SL.contrast(tk['--text-dim'], tk['--bg']), 4.5)
+    + ck('Button label', SL.contrast(tk['--on-accent'], t.colors.accent), 4.5) + ck('Accent links', SL.contrast(tk['--accent-text'], tk['--bg']), 4.5);
+}
+
+/* ---------- Panes ---------- */
+const TABS = [['profile','Profile'],['design','Design'],['cover','Cover'],['buttons','Quick buttons'],['sections','Sections'],['shop','Prints'],['gallery','Gallery'],['film','Film'],['links','Links'],['contact','Contact'],['socials','Socials'],['advanced','Advanced']];
+const P = {};
+
+P.profile = () => head('Profile', 'Who you are. This is the first thing people see after tapping the link in your bio.') +
+  panel('About you', `<div class="fields">
+    ${field('Name', 'profile.name', { max:40 })}
+    ${field('Bio', 'profile.bio', { area:true, max:140, hint:'One or two short lines read best.' })}
+    ${field('Location', 'profile.location', { max:40, ph:'e.g. Katoomba, NSW', hint:'Leave empty to hide.' })}
+  </div>`) +
+  panel('Availability badge', `${toggle('Show badge', 'A small green badge above your name.', 'profile.status.on')}
+    <div class="fields" style="margin-top:12px">${field('Badge text', 'profile.status.text', { max:40, ph:'e.g. Booking 2027 weddings' })}</div>`) +
+  panel('Profile photo', `<div class="f">${imgInput('profile.avatar', 'Profile photo', true)}</div>`, { sub:'Used by the Minimal cover style', help:'Square photos work best. Uploads are resized automatically so the page stays fast.' });
+
+P.design = () => {
+  const t = cfg.theme;
+  SL.FONTS.forEach(f => SL.loadFont(f));
+  const presetName = t.preset === 'custom' ? 'Custom' : (SL.THEMES.find(x => x.id === t.preset) || {}).name || 'Custom';
+  return head('Design', 'Colours, type and shape. Changes show in the preview as you make them.') +
+  panel('Theme', `<div class="themes">${SL.THEMES.map(th => { const c = th.colors; return `
+      <button class="theme" data-theme="${th.id}" aria-pressed="${t.preset === th.id}">
+        <span class="mini" style="background:${c.bg}"><i style="width:60%;background:${c.text}"></i><i style="width:40%;background:${SL.mix(c.text,c.bg,.5)}"></i><span class="card" style="background:${c.surface};border:1px solid ${SL.mix(c.bg,c.text,.12)}"></span><span class="pill" style="background:${c.accent};box-shadow:0 0 0 1px ${SL.mix(c.bg,c.text,.15)}"></span></span>
+        <b>${th.name}</b></button>`; }).join('')}</div>`,
+    { help:'Pick a starting point, then fine-tune the colours below. Changing any colour switches you to a custom theme, and undo takes you back.' }) +
+  panel('Colours', `<div class="colors">${[['bg','Background'],['surface','Cards and panels'],['text','Text'],['accent','Accent']].map(([k,l]) => `
+      <div class="cf"><span class="pick" style="background:${t.colors[k]}"><input type="color" data-color="${k}" value="${t.colors[k]}" aria-label="${l} colour"></span>
+        <div class="t"><b>${l}</b><input data-hex="${k}" value="${t.colors[k]}" maxlength="7" spellcheck="false" aria-label="${l} hex code"></div></div>`).join('')}</div>
+    <div class="checks" id="checks" aria-label="Readability checks">${checks()}</div>
+    <p class="hint" style="margin-top:10px">Green means comfortable to read. If a colour would be hard to read, the page adjusts it slightly for you.</p>`,
+    { sub: presetName, subId:'presetName', act:'<button class="btn sm" data-act="swap">Flip light and dark</button>' }) +
+  panel('Photo colour', `<div class="f"><span class="lab">Blend the cover photo’s colour into the page</span>${range('theme.photoTint', 0, 100, 5, '%', 'Photo colour blend')}<small>The background gently takes on the colour of whichever cover photo is showing. Set to 0% to keep it fixed.</small></div>`) +
+  panel('Type', `<div class="fonts">${SL.FONTS.map(f => `
+      <button class="font" data-font="${f.id}" aria-pressed="${t.font === f.id}">
+        <span class="d" style="display:block;font-family:'${f.display}';font-weight:${f.dw};font-stretch:${f.stretch||'100%'};letter-spacing:${f.ls}">${esc(cfg.profile.name || 'Your name')}</span>
+        <span class="b" style="display:block;font-family:'${f.body}'">${f.name} · ${f.display === f.body ? f.display : f.display + ' and ' + f.body}</span></button>`).join('')}</div>`) +
+  panel('Shape and layout', `<div class="fields">
+      <div class="f"><span class="lab">Corner roundness</span>${range('theme.radius', 0, 32, 1, 'px', 'Corner roundness')}</div>
+      <div class="grid2">
+        <div class="f"><span>Button shape</span>${seg('theme.buttonShape', [['circle','Circle'],['rounded','Rounded square']], 'Button shape')}</div>
+        <div class="f"><span>Text alignment</span>${seg('theme.align', [['left','Left'],['center','Centre']], 'Text alignment')}</div>
+      </div>
+      <div class="f"><span>Link style</span>${seg('theme.linkStyle', [['list','List'],['cards','Cards']], 'Link style')}</div>
+    </div>`);
+};
+
+P.cover = () => {
+  const c = cfg.cover, full = c.photos.length >= 10;
+  const wf = {
+    full: '<i style="inset:0;background:linear-gradient(180deg,#8a93a8,#5b6378 55%,var(--surface-2) 92%)"></i><i style="left:10px;bottom:34px;width:46%;height:9px;border-radius:4px;background:var(--text)"></i><i style="left:10px;bottom:22px;width:30%;height:5px;border-radius:3px;background:var(--faint)"></i><i style="left:10px;bottom:6px;width:12px;height:12px;border-radius:50%;background:var(--accent)"></i><i style="left:28px;bottom:6px;width:12px;height:12px;border-radius:50%;background:var(--border-strong)"></i><i style="left:46px;bottom:6px;width:12px;height:12px;border-radius:50%;background:var(--border-strong)"></i>',
+    framed: '<i style="left:8px;right:8px;top:8px;height:58px;border-radius:6px;background:linear-gradient(180deg,#8a93a8,#5b6378)"></i><i style="left:10px;top:74px;width:46%;height:9px;border-radius:4px;background:var(--text)"></i><i style="left:10px;top:88px;width:30%;height:5px;border-radius:3px;background:var(--faint)"></i><i style="left:10px;bottom:4px;width:12px;height:12px;border-radius:50%;background:var(--accent)"></i><i style="left:28px;bottom:4px;width:12px;height:12px;border-radius:50%;background:var(--border-strong)"></i><i style="left:46px;bottom:4px;width:12px;height:12px;border-radius:50%;background:var(--border-strong)"></i>',
+    minimal: '<i style="left:50%;top:12px;width:34px;height:34px;margin-left:-17px;border-radius:50%;background:#8a93a8"></i><i style="left:27%;right:27%;top:54px;height:9px;border-radius:4px;background:var(--text)"></i><i style="left:35%;right:35%;top:69px;height:5px;border-radius:3px;background:var(--faint)"></i><i style="left:14%;right:14%;bottom:12px;height:14px;border-radius:5px;background:var(--border-strong)"></i>',
+  };
+  return head('Cover', 'The first screen. Everything here fits on a phone without scrolling.') +
+  panel('Style', `<div class="styles">${[['full','Full screen','Photos fill the screen'],['framed','Framed','Photos in a frame'],['minimal','Minimal','Profile photo and links']].map(([v,l,s]) =>
+    `<button class="style" data-seg="cover.style" data-v="${v}" aria-pressed="${c.style === v}"><span class="wf" aria-hidden="true">${wf[v]}</span><b>${l}</b><span>${s}</span></button>`).join('')}</div>`) +
+  (c.style === 'minimal' ? panel('Profile photo', `<div class="f">${imgInput('profile.avatar', 'Profile photo', true)}</div>`) :
+  panel('Photos', `<ul class="list">${c.photos.map((p,i) => `
+      <li class="row"><span class="thumb lg" data-thumb="cover.photos.${i}.url" style="background-image:url('${esc(SL.sized(p.url,160,160))}')"></span>
+        <div class="fields">${imgInput('cover.photos.' + i + '.url', 'Photo ' + (i+1), false)}
+          <input class="in" data-k="cover.photos.${i}.caption" value="${esc(p.caption)}" placeholder="Caption, e.g. where it was taken" aria-label="Photo ${i+1} caption" maxlength="60"></div>
+        ${tools('cover.photos', i, c.photos.length)}</li>`).join('') || '<li class="empty-l">No photos yet. Add at least one to fill the cover.</li>'}</ul>
+      <div class="adds">${full ? '' : `<label class="add up">${ui.upload}Upload photos<input type="file" accept="image/*" multiple data-upload-many="cover.photos" aria-label="Upload cover photos"></label>`}
+      <button class="add" data-act="add" data-list="cover.photos" ${full ? 'disabled' : ''}>${ui.plus}Add sample photo</button></div>`,
+      { sub:`${c.photos.length} of 10`, help:'Portrait photos look best. They play in this order. Visitors can tap either side or swipe to move between them, and press and hold to pause.' }) +
+  panel('Slideshow', `<div class="fields">
+      <div class="f"><span class="lab">Seconds per photo</span>${range('cover.seconds', 2, 12, 1, 's', 'Seconds per photo')}</div>
+      ${c.style === 'full' ? `<div class="f"><span class="lab">Fade behind your name</span>${range('cover.overlay', 20, 90, 5, '%', 'Fade strength')}<small>More fade makes your name easier to read over busy photos.</small></div>` : ''}
+      ${toggle('Show captions', 'Shown at the top of each photo.', 'cover.captions')}</div>`));
+};
+
+P.buttons = () => {
+  const tk = SL.tokens(cfg.theme.colors);
+  return head('Quick buttons', 'Up to four buttons on the first screen. The first one is highlighted in your accent colour.') +
+  panel('Buttons', `<ul class="list">${cfg.quick.map((q,i) => { const a = SL.ACTIONS[q.type]; return `
+    <li class="row"><span class="thumb" style="display:grid;place-items:center;background:${i===0 ? cfg.theme.colors.accent : 'var(--surface-3)'};color:${i===0 ? tk['--on-accent'] : 'var(--text)'};border-radius:${cfg.theme.buttonShape==='circle' ? '50%' : '10px'};padding:11px">${I[q.type]}</span>
+      <div class="fields"><div class="grid2">
+        <label class="f"><span>Action</span><select class="in" data-k="quick.${i}.type" data-relabel="${i}">${Object.entries(SL.ACTIONS).map(([k,v]) => `<option value="${k}" ${k===q.type?'selected':''}>${v.label}</option>`).join('')}</select></label>
+        <label class="f"><span>Label</span><input class="in" data-k="quick.${i}.label" value="${esc(q.label)}" maxlength="12"></label></div>
+        ${a.needsUrl ? field('Web address', `quick.${i}.url`, { type:'url', check:'url', ph:'https://…' }) : `<span class="hint">${a.hint}${a.social && !cfg.socials[q.type] ? '. Add it under Socials.' : '.'}</span>`}
+      </div>${tools('quick', i, cfg.quick.length)}</li>`; }).join('') || '<li class="empty-l">No quick buttons. Your name and bio will sit on their own.</li>'}</ul>
+    <button class="add" data-act="add" data-list="quick" ${cfg.quick.length >= 4 ? 'disabled' : ''}>${ui.plus}Add button</button>`, { sub:`${cfg.quick.length} of 4` });
+};
+
+const SEC_INFO = { shop:'Prints from your Sport Shutter shop', gallery:'A grid of your work with a full-screen viewer', film:'One featured video', links:'Your list of extra links', enquire:'A booking and enquiry form', newsletter:'Email signup', socials:'Icons for your social profiles' };
+P.sections = () => head('Sections', 'What appears when people scroll past the first screen, top to bottom.') +
+  panel('Order and visibility', `<ul class="list">${cfg.sections.map((s,i) => `
+    <li class="row ${s.on ? '' : 'off'}"><label class="sw" style="margin-top:5px"><input type="checkbox" data-k="sections.${i}.on" data-t="bool" ${s.on?'checked':''} aria-label="Show ${esc(SEC_INFO[s.id])}"><i></i></label>
+      <div class="fields"><input class="in" data-k="sections.${i}.title" value="${esc(s.title)}" maxlength="30" aria-label="Heading for ${esc(SEC_INFO[s.id])}"><span class="hint">${SEC_INFO[s.id]}</span></div>
+      <div class="tools"><button class="tool" data-act="up" data-list="sections" data-i="${i}" aria-label="Move up" ${i===0?'disabled':''}>${ui.up}</button><button class="tool" data-act="down" data-list="sections" data-i="${i}" aria-label="Move down" ${i===cfg.sections.length-1?'disabled':''}>${ui.down}</button></div></li>`).join('')}</ul>`,
+    { help:'Switch a section off to hide it without losing what’s in it. Rename the headings to suit how you talk.' }) +
+  panel('Page', toggle('Show settings button on the page', 'For the prototype. In your Sport Shutter account this lives in your dashboard.', 'page.showGear') + toggle('Show “Powered by Sport Shutter”', 'At the very bottom of the page.', 'page.footer'));
+
+P.shop = () => {
+  const f = cfg.shop.featured;
+  return head('Prints', 'Choose which prints from your Sport Shutter shop appear on your link page.') +
+  panel('Featured prints', `<div class="prints">${SL.SHOP.map(p => { const n = f.indexOf(p.id); return `
+      <button class="pr" data-feature="${p.id}" aria-pressed="${n >= 0}" aria-label="${esc(p.title)}${n >= 0 ? ', featured number ' + (n+1) : ''}"><img src="${SL.pic(p.pid,240,300)}" alt="" loading="lazy"><i aria-hidden="true">${n >= 0 ? n + 1 : ''}</i><b>${esc(p.title)}</b><span class="num">From ${SL.money(p.from, cfg.shop.currency)}</span></button>`; }).join('')}</div>
+      <p class="hint" style="margin-top:12px">Tap to add or remove. They appear in the order you pick them.</p>`, { sub:`${f.length} featured` }) +
+  panel('Pricing', `<div class="fields"><label class="f" style="max-width:220px"><span>Currency</span><select class="in" data-k="shop.currency">${SL.CURRENCIES.map(c => `<option ${c===cfg.shop.currency?'selected':''}>${c}</option>`).join('')}</select></label>
+    ${toggle('Show prices', 'Under each print and on the add-to-cart button.', 'shop.showPrices')}</div>`);
+};
+
+P.gallery = () => {
+  const g = cfg.gallery, full = g.photos.length >= 24;
+  return head('Gallery', 'A grid of your favourite work. Visitors can open any photo full screen and swipe through.') +
+  panel('Layout', `<div class="f"><span>Columns</span>${seg('gallery.columns', [[2,'Two'],[3,'Three']], 'Columns')}</div>`) +
+  panel('Photos', `<ul class="list">${g.photos.map((p,i) => `
+    <li class="row"><span class="thumb lg" data-thumb="gallery.photos.${i}.url" style="background-image:url('${esc(SL.sized(p.url,160,160))}')"></span>
+      <div class="fields">${imgInput('gallery.photos.' + i + '.url', 'Gallery photo ' + (i+1), false)}
+        <input class="in" data-k="gallery.photos.${i}.caption" value="${esc(p.caption)}" placeholder="Caption" aria-label="Gallery photo ${i+1} caption" maxlength="60"></div>
+      ${tools('gallery.photos', i, g.photos.length)}</li>`).join('') || '<li class="empty-l">No photos yet.</li>'}</ul>
+    ${full ? '' : `<label class="add up">${ui.upload}Upload photos<input type="file" accept="image/*" multiple data-upload-many="gallery.photos" aria-label="Upload gallery photos"></label>`}`,
+    { sub:`${g.photos.length} of 24`, help:'The grid shows square crops; the whole photo appears when someone opens it.' });
+};
+
+const ytNote = u => SL.youtubeId(u) ? ['fok','YouTube video found. It will play right on your page.'] : ['hint','Paste a YouTube link to play it on your page. Other links open in a new tab.'];
+P.film = () => { const [cls, txt] = ytNote(cfg.film.url); return head('Film', 'Feature one video. YouTube links play right on your page.') +
+  panel('Video', `<div class="fields">
+    ${field('Video link', 'film.url', { type:'url', check:'url', ph:'https://youtube.com/watch?v=…' })}
+    <span class="${cls}" id="ytNote">${txt}</span>
+    <div class="grid2">${field('Title', 'film.title', { max:60 })}${field('Detail', 'film.meta', { max:30, ph:'e.g. 12 min' })}</div>
+    <div class="f"><span>Cover image</span>${imgInput('film.thumb', 'Film cover', true)}<small>Leave empty to use the YouTube thumbnail.</small></div>
+  </div>`); };
+
+P.links = () => head('Links', 'Anything else you want people to find: portfolios, presets, workshops, gear.') +
+  panel('Your links', `<ul class="list">${cfg.links.map((l,i) => `
+    <li class="row ${l.on ? '' : 'off'}"><span class="thumb lg" data-thumb="links.${i}.thumb" style="background-image:url('${esc(SL.sized(l.thumb,160,160))}')"></span>
+      <div class="fields">
+        <div class="grid2"><input class="in" data-k="links.${i}.title" value="${esc(l.title)}" placeholder="Title" aria-label="Link ${i+1} title" maxlength="50"><input class="in" data-k="links.${i}.badge" value="${esc(l.badge)}" placeholder="Badge, e.g. New (optional)" aria-label="Link ${i+1} badge" maxlength="12"></div>
+        <input class="in" data-k="links.${i}.sub" value="${esc(l.sub)}" placeholder="Short description (optional)" aria-label="Link ${i+1} description" maxlength="70">
+        <input class="in" data-k="links.${i}.url" data-check="url" type="url" value="${esc(l.url)}" placeholder="https://…" aria-label="Link ${i+1} address" autocomplete="off" spellcheck="false"><span class="ferr" data-err="links.${i}.url" hidden></span>
+        ${imgInput('links.' + i + '.thumb', 'Link ' + (i+1) + ' image', false)}
+      </div>${tools('links', i, cfg.links.length, `<button class="tool" data-act="vis" data-list="links" data-i="${i}" aria-label="${l.on ? 'Hide' : 'Show'} link" aria-pressed="${!l.on}">${l.on ? ui.eye : ui.eyeOff}</button>`)}</li>`).join('') || '<li class="empty-l">No links yet.</li>'}</ul>
+    <button class="add" data-act="add" data-list="links" ${cfg.links.length >= 20 ? 'disabled' : ''}>${ui.plus}Add link</button>`,
+  { sub:`${cfg.links.filter(l => l.on).length} showing`, help:'Use the eye to hide a link and keep it for later. Links without an address show a prototype message for now.' });
+
+P.contact = () => head('Contact', 'Your enquiry form and newsletter signup.') +
+  panel('Enquiry form', `<div class="fields">
+    ${field('Intro', 'enquire.intro', { area:true, max:200 })}
+    ${field('Types of shoot', 'enquire.types', { hint:'Separate with commas. Leave empty to hide the dropdown.' })}
+    ${field('Reply note', 'enquire.reply', { max:80, ph:'e.g. I usually reply within two days.' })}
+    ${field('Send enquiries to', 'enquire.to', { type:'email', check:'email', ph:'you@example.com', hint:'For the prototype, visitors get a button to send it from their own email app.' })}
+  </div>`) +
+  panel('Newsletter', `<div class="fields">${field('Description', 'newsletter.blurb', { area:true, max:160 })}${field('Button label', 'newsletter.button', { max:16 })}</div>`);
+
+P.socials = () => head('Socials', 'Leave any blank to hide that icon. Quick buttons for these networks use the same addresses.') +
+  panel('Profiles', `<div class="grid2">${Object.entries(SL.SOCIALS).map(([k,s]) => field(s.label, 'socials.' + k, { type: k === 'email' ? 'email' : 'url', check: k === 'email' ? 'email' : 'url', ph:s.ph })).join('')}</div>`,
+  { help:'Until you add at least one, the page shows sample icons so you can see the layout.' });
+
+P.advanced = () => {
+  const used = SL.bytes(cfg), cap = 5 * 1024 * 1024, pct = Math.min(100, used / cap * 100);
+  const kb = n => n > 1048576 ? (n/1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n/1024)) + ' KB';
+  return head('Advanced', 'Back up, restore or start again.') +
+  panel('Storage', `<div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;flex-wrap:wrap"><span>Used by your settings and uploads</span><b class="num">${kb(used)} of about ${kb(cap)}</b></div>
+    <div class="meter ${pct > 90 ? 'bad' : pct > 70 ? 'warn' : ''}" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct)}" aria-label="Storage used"><div style="width:${Math.max(1,pct).toFixed(1)}%"></div></div>
+    <p class="hint" style="margin-top:10px">For the prototype everything is saved in this browser. Uploaded photos use the most space; image links use almost none.</p>`) +
+  panel('Backup', `<p class="hint" style="margin-bottom:14px">Download your settings as a file, or load a file you saved earlier.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-act="export">Download settings</button>
+    <label class="btn up">Load settings file<input type="file" accept="application/json,.json" id="importFile" aria-label="Load settings file"></label></div>`) +
+  panel('Start again', `<p class="hint" style="margin-bottom:14px">Replace everything with the demo content. You can undo this.</p><button class="btn danger" data-act="reset">Reset to demo content</button>`);
+};
+
+/* ---------- Tabs ---------- */
+const fromHash = () => { const h = location.hash.slice(1); return TABS.some(t => t[0] === h) ? h : 'profile'; };
+let current = fromHash();
+$('tabs').innerHTML = TABS.map(([id,l]) => `<button class="tab" role="tab" id="tab-${id}" aria-controls="content" data-tab="${id}">${l}</button>`).join('');
+function renderPane(id, keep){
+  const y = scrollY, a = document.activeElement, focusKey = a && a.dataset ? (a.dataset.k || null) : null;
+  current = id;
+  $('content').innerHTML = P[id]();
+  $('content').setAttribute('aria-labelledby', 'tab-' + id);
+  document.querySelectorAll('.tab').forEach(t => { const s = t.dataset.tab === id; t.setAttribute('aria-selected', s); t.tabIndex = s ? 0 : -1; });
+  if (keep){ scrollTo(0, y); if (focusKey){ const el = $('content').querySelector(`[data-k="${CSS.escape(focusKey)}"]`); if (el) el.focus({ preventScroll:true }); } }
+  $('content').querySelectorAll('[data-check]').forEach(el => { if (el.value) validate(el); });
+}
+function go(id){
+  if (id === current) return;
+  history.replaceState(null, '', '#' + id);
+  renderPane(id); scrollTo({ top:0 });
+  $('tab-' + id).scrollIntoView({ block:'nearest', inline:'nearest' });
+  post({ type:'shutterlink:focus', tab: id === 'contact' ? 'enquire' : id });
+}
+$('tabs').onclick = e => { const t = e.target.closest('.tab'); if (t) go(t.dataset.tab); };
+$('tabs').onkeydown = e => {
+  const i = TABS.findIndex(t => t[0] === current);
+  const n = { ArrowRight:i+1, ArrowLeft:i-1, Home:0, End:TABS.length-1 }[e.key];
+  if (n === undefined) return; e.preventDefault();
+  const id = TABS[(n + TABS.length) % TABS.length][0]; go(id); $('tab-' + id).focus();
+};
+addEventListener('hashchange', () => go(fromHash()));
+
+/* ---------- Validation ---------- */
+function validate(el){
+  const kind = el.dataset.check; if (!kind) return true;
+  const v = el.value.trim();
+  let msg = '';
+  if (v && kind === 'url' && !/^https?:\/\//i.test(SL.href(v))) msg = 'Enter a full web address, like https://example.com';
+  if (v && kind === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) msg = 'Enter an email address, like you@example.com';
+  el.setAttribute('aria-invalid', msg ? 'true' : 'false');
+  const er = $('content').querySelector(`[data-err="${CSS.escape(el.dataset.k)}"]`);
+  if (er){ er.textContent = msg; er.hidden = !msg; }
+  return !msg;
+}
+
+/* ---------- Events ---------- */
+const content = $('content');
+content.addEventListener('input', e => {
+  const el = e.target;
+  if (el.dataset.k){
     const k = el.dataset.k;
-    if (el.type === 'checkbox') el.checked = !!getK(k); else el.value = getK(k) ?? '';
-    el.oninput = el.onchange = () => {
-      let v = el.type === 'checkbox' ? el.checked : el.value;
-      if (el.type === 'number' || k === 'shopCount') v = Math.max(+el.min || 1, Math.min(+el.max || 99, +v || 1));
-      setK(k, v); changed();
-    };
-  });
-  // number field: clamp on blur so a half-typed value isn't left in the box
-  document.querySelector('[data-k="look.slideSeconds"]').onblur = e => { e.target.value = cfg.look.slideSeconds; };
+    let v = el.dataset.t === 'bool' ? el.checked : el.dataset.t === 'num' ? +el.value : el.value;
+    if (el.dataset.img !== undefined && !v.trim() && String(get(k) || '').startsWith('data:')) return; // empty link field keeps the upload
+    set(k, v);
+    const out = content.querySelector(`[data-out="${CSS.escape(k)}"]`); if (out) out.textContent = el.value + (el.dataset.unit || '');
+    const cnt = content.querySelector(`[data-count="${CSS.escape(k)}"]`); if (cnt) cnt.textContent = `${el.value.length}/${el.maxLength}`;
+    const th = content.querySelector(`[data-thumb="${CSS.escape(k)}"]`); if (th) th.style.backgroundImage = `url('${SL.sized(el.value,160,160)}')`;
+    if (el.getAttribute('aria-invalid') === 'true') validate(el);
+    if (k === 'film.url'){ const [c, t] = ytNote(el.value), n = $('ytNote'); n.className = c; n.textContent = t; }
+    if (el.type === 'checkbox' && el.closest('.row')) el.closest('.row').classList.toggle('off', !el.checked);
+    if (el.dataset.relabel !== undefined){
+      const q = cfg.quick[+el.dataset.relabel];
+      if (!q.label.trim() || Object.values(SL.ACTIONS).some(a => a.label === q.label)) q.label = SL.ACTIONS[q.type].label;
+      changed({ immediate:true }); renderPane(current, true); return;
+    }
+    if (k === 'profile.name' && current === 'design') return changed();
+    changed({ immediate: el.type === 'checkbox' || el.tagName === 'SELECT' });
+    return;
+  }
+  if (el.dataset.color || el.dataset.hex){
+    const key = el.dataset.color || el.dataset.hex;
+    let v = el.value.trim(); if (!v.startsWith('#')) v = '#' + v;
+    if (!SL.isHex(v)) { el.setAttribute('aria-invalid', 'true'); return; }
+    el.removeAttribute('aria-invalid');
+    if (v.length === 4) v = '#' + v.slice(1).split('').map(c => c + c).join('');
+    cfg.theme.colors[key] = v.toLowerCase(); cfg.theme.preset = 'custom';
+    const pick = content.querySelector(`[data-color="${key}"]`), hex = content.querySelector(`[data-hex="${key}"]`);
+    if (el !== pick && pick) pick.value = v.toLowerCase();
+    if (el !== hex && hex) hex.value = v.toLowerCase();
+    if (pick) pick.parentElement.style.background = v;
+    $('checks').innerHTML = checks();
+    content.querySelectorAll('.theme').forEach(b => b.setAttribute('aria-pressed', 'false'));
+    $('presetName').textContent = 'Custom';
+    changed();
+  }
+});
+content.addEventListener('change', e => {
+  const el = e.target;
+  if (el.dataset.check) validate(el);
+  if (el.dataset.upload) upload(el.files[0], el.dataset.upload);
+  if (el.dataset.uploadMany) uploadMany(el.files, el.dataset.uploadMany);
+  if (el.id === 'importFile') importFile(el.files[0]);
+  if (el.dataset.hex){ const k = el.dataset.hex; el.value = cfg.theme.colors[k]; el.removeAttribute('aria-invalid'); }
+});
+content.addEventListener('focusout', e => { if (e.target.dataset && e.target.dataset.check) validate(e.target); });
+
+content.addEventListener('click', e => {
+  const t = e.target;
+  const help = t.closest('.help-b');
+  if (help){ const h = $(help.getAttribute('aria-controls')); h.hidden = !h.hidden; help.setAttribute('aria-expanded', String(!h.hidden)); return; }
+  const sg = t.closest('[data-seg]');
+  if (sg){ let v = sg.dataset.v; if (sg.dataset.seg === 'gallery.columns') v = +v; set(sg.dataset.seg, v); changed({ immediate:true }); renderPane(current, true); return; }
+  const th = t.closest('[data-theme]');
+  if (th){ const p = SL.THEMES.find(x => x.id === th.dataset.theme); cfg.theme.preset = p.id; cfg.theme.colors = { ...p.colors }; changed({ immediate:true }); renderPane('design', true); return; }
+  const fo = t.closest('[data-font]');
+  if (fo){ cfg.theme.font = fo.dataset.font; changed({ immediate:true }); renderPane('design', true); return; }
+  const fe = t.closest('[data-feature]');
+  if (fe){ const f = cfg.shop.featured, i = f.indexOf(fe.dataset.feature); if (i >= 0) f.splice(i, 1); else f.push(fe.dataset.feature); changed({ immediate:true }); renderPane('shop', true); return; }
+  const a = t.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act;
+  if (act === 'swap'){
+    const c = cfg.theme.colors, dark = SL.isDark(c.bg);
+    cfg.theme.colors = dark
+      ? { bg: SL.mix(c.text, '#ffffff', .55), surface:'#ffffff', text: SL.mix(c.bg, '#000000', .25), accent: c.accent }
+      : { bg: SL.mix(c.text, '#000000', .3), surface: SL.mix(c.text, '#000000', .12), text: SL.mix(c.bg, '#ffffff', .5), accent: c.accent };
+    cfg.theme.preset = 'custom'; changed({ immediate:true }); renderPane('design', true); return;
+  }
+  if (act === 'export'){
+    const u = URL.createObjectURL(new Blob([JSON.stringify(cfg, null, 2)], { type:'application/json' }));
+    const l = document.createElement('a'); l.href = u; l.download = 'shutterlink-settings.json';
+    document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(u), 1000);
+    toast('Settings downloaded'); return;
+  }
+  if (act === 'reset'){ cfg = SL.clone(SL.DEFAULTS); changed({ immediate:true }); renderPane(current, true); toast('Reset to demo content. Undo brings yours back.'); return; }
+  const list = a.dataset.list; if (!list) return;
+  const arr = get(list), i = +a.dataset.i;
+  if (act === 'up' && i > 0) [arr[i-1], arr[i]] = [arr[i], arr[i-1]];
+  if (act === 'down' && i < arr.length - 1) [arr[i+1], arr[i]] = [arr[i], arr[i+1]];
+  if (act === 'del'){ arr.splice(i, 1); toast('Removed. Undo brings it back.'); }
+  if (act === 'vis') arr[i].on = !arr[i].on;
+  if (act === 'add'){
+    if (list === 'links') arr.push({ title:'', sub:'', url:'', thumb:'', on:true, badge:'' });
+    if (list === 'quick'){ const used = new Set(arr.map(q => q.type)); const type = Object.keys(SL.ACTIONS).find(k => !used.has(k)) || 'link'; arr.push({ type, label:SL.ACTIONS[type].label, url:'' }); }
+    if (list === 'cover.photos'){ const ids = [1019,1022,1025,1040,1047,1053,1057,1067,1069,1074]; arr.push({ url: SL.pic(ids[arr.length % ids.length], 1080, 1350), caption:'' }); }
+  }
+  changed({ immediate:true }); renderPane(current, true);
+  const ni = act === 'up' ? i - 1 : act === 'down' ? i + 1 : i;
+  const again = content.querySelector(`[data-act="${act}"][data-list="${list}"][data-i="${ni}"]`);
+  if (act === 'add'){ const rows = content.querySelectorAll('.list > .row'); const inp = rows[rows.length - 1]?.querySelector('input.in, select.in'); if (inp) inp.focus(); }
+  else if (again && !again.disabled) again.focus();
+});
+
+/* ---------- Uploads & import ---------- */
+async function upload(file, path){
+  if (!file) return;
+  try { set(path, await SL.readImage(file, /thumb|avatar/.test(path) ? 600 : 1600)); changed({ immediate:true }); renderPane(current, true); toast('Photo added'); }
+  catch(err){ toast(err.message, true); }
+}
+async function uploadMany(files, list){
+  const arr = get(list), cap = list === 'cover.photos' ? 10 : 24;
+  const pick = [...files].slice(0, Math.max(0, cap - arr.length));
+  if (!pick.length){ toast(`You can have up to ${cap} photos here.`, true); return; }
+  let n = 0;
+  for (const f of pick){ try { arr.push({ url: await SL.readImage(f, 1600), caption:'' }); n++; } catch(err){ toast(err.message, true); } }
+  if (n) toast(files.length > pick.length ? `Added ${n}. That’s the limit of ${cap}.` : `Added ${n} photo${n > 1 ? 's' : ''}`);
+  changed({ immediate:true }); renderPane(current, true);
+}
+async function importFile(file){
+  if (!file) return;
+  try { cfg = SL.fromJSON(await file.text()); changed({ immediate:true }); renderPane(current, true); toast('Settings loaded'); }
+  catch(_){ toast('That file isn’t a Shutterlink settings file.', true); }
 }
 
-/* ---------- Look ---------- */
-function renderLook(){
-  document.querySelectorAll('#bgSeg button').forEach(b => {
-    b.setAttribute('aria-pressed', b.dataset.v === cfg.look.background);
-    b.onclick = () => { cfg.look.background = b.dataset.v; renderLook(); changed(); };
-  });
-  const presets = [SL_BRAND.blue, '#e4572e', '#1f8a70', '#c9a227', '#f3f4f1'];
-  const names = ['Sport Shutter blue','Flare orange','Pine green','Gold','Paper white'];
-  const isPreset = presets.some(c => c.toLowerCase() === cfg.look.accent.toLowerCase());
-  $('swatches').innerHTML = presets.map((c,i) =>
-    `<button class="sw" style="background:${c}" data-c="${c}" aria-label="${names[i]}" aria-pressed="${c.toLowerCase()===cfg.look.accent.toLowerCase()}"></button>`).join('') +
-    `<label class="sw-custom" aria-label="Custom colour" style="${isPreset ? '' : `box-shadow:0 0 0 2px var(--ink);background:${cfg.look.accent}`}"><input type="color" value="${cfg.look.accent}"></label>`;
-  $('swatches').querySelectorAll('.sw').forEach(b => b.onclick = () => { cfg.look.accent = b.dataset.c; renderLook(); renderSlots(); changed(); });
-  const ci = $('swatches').querySelector('input');
-  ci.oninput = () => { cfg.look.accent = ci.value; ci.parentElement.style.background = ci.value; document.body.style.setProperty('--accent', ci.value); changed(); };
-  ci.onchange = () => { renderLook(); renderSlots(); };
-  document.body.style.setProperty('--accent', cfg.look.accent);
-}
+/* ---------- Preview ---------- */
+function fit(){ $('device').style.setProperty('--k', Math.max(.55, Math.min(1, (innerHeight - 180) / 820)).toFixed(3)); }
+addEventListener('resize', fit); fit();
+$('frame').addEventListener('load', () => post());
+$('frame2').addEventListener('load', () => post());
+$('fab').onclick = () => { const f = $('frame2'); if (!f.getAttribute('src')) f.src = 'index.html?preview'; else post(); $('mpv').classList.add('open'); $('mpvClose').focus(); };
+$('mpvClose').onclick = () => { $('mpv').classList.remove('open'); $('fab').focus(); };
+addEventListener('keydown', e => { if (e.key === 'Escape' && $('mpv').classList.contains('open')) $('mpvClose').click(); });
+// another tab changed settings (e.g. reset elsewhere)
+addEventListener('storage', e => { if (e.key === SL.KEY){ cfg = SL.load(); renderPane(current, true); post(); } });
 
-/* ---------- Repeating lists ---------- */
-function listTools(arr, i, rerender, extra=''){
-  return `<div class="tools">${extra}
-    <button class="tool" data-a="up" aria-label="Move up" ${i===0?'disabled':''}>${ICON.up}</button>
-    <button class="tool" data-a="down" aria-label="Move down" ${i===arr.length-1?'disabled':''}>${ICON.down}</button>
-    <button class="tool" data-a="del" aria-label="Remove">${ICON.del}</button></div>`;
-}
-function wireList(ul, arr, rerender, onField){
-  ul.onclick = e => {
-    const b = e.target.closest('.tool'); if (!b) return;
-    const i = +b.closest('.item').dataset.i, a = b.dataset.a;
-    if (a==='up') [arr[i-1],arr[i]] = [arr[i],arr[i-1]];
-    if (a==='down') [arr[i+1],arr[i]] = [arr[i],arr[i+1]];
-    if (a==='del') arr.splice(i,1);
-    if (a==='vis') arr[i].on = !arr[i].on;
-    rerender(); changed();
-    const again = ul.querySelector(`.item[data-i="${Math.max(0, a==='up'?i-1:a==='down'?i+1:i)}"] .tool[data-a="${a}"]`);
-    again && !again.disabled && again.focus();
-  };
-  ul.oninput = e => {
-    const el = e.target.closest('[data-f]'); if (!el) return;
-    const li = el.closest('.item'), i = +li.dataset.i;
-    arr[i][el.dataset.f] = el.value; onField && onField(li, arr[i], el.dataset.f); changed();
-  };
-}
+let tt;
+function toast(m, bad){ const el = $('toast'); el.textContent = m; el.classList.toggle('bad', !!bad); el.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), bad ? 4500 : 2400); }
 
-function renderPhotos(){
-  const ul = $('photos'), arr = cfg.photos;
-  ul.innerHTML = arr.map((p,i) => `
-    <li class="item" data-i="${i}">
-      <div class="thumb" style="background-image:url('${slEsc(p.url)}')"></div>
-      <div class="fields">
-        <input type="url" data-f="url" value="${slEsc(p.url)}" placeholder="Photo link (https://…)" aria-label="Photo ${i+1} link">
-        <input type="text" data-f="caption" value="${slEsc(p.caption)}" placeholder="Caption, e.g. where it was taken" aria-label="Photo ${i+1} caption">
-      </div>
-      ${listTools(arr, i)}
-    </li>`).join('') || '<li style="color:var(--muted);font-size:14px;padding:6px 2px">No photos yet. Add one to fill the first screen.</li>';
-}
-$('addPhoto').onclick = () => {
-  const n = [1019,1022,1025,1040,1047,1053][cfg.photos.length % 6];
-  cfg.photos.push({ url: pic(n,920,1150), caption:'' });
-  renderPhotos(); changed();
-  $('photos').querySelector('.item:last-child input[data-f=caption]').focus();
-};
-
-function renderLinks(){
-  const ul = $('links'), arr = cfg.links;
-  ul.innerHTML = arr.map((l,i) => `
-    <li class="item ${l.on ? '' : 'off'}" data-i="${i}">
-      <div class="thumb" style="background-image:url('${slEsc(l.thumb)}')"></div>
-      <div class="fields">
-        <input type="text" data-f="title" value="${slEsc(l.title)}" placeholder="Title" aria-label="Link ${i+1} title">
-        <input type="text" data-f="sub" value="${slEsc(l.sub)}" placeholder="Short description (optional)" aria-label="Link ${i+1} description">
-        <input type="url" data-f="url" value="${slEsc(l.url)}" placeholder="https://…" aria-label="Link ${i+1} address">
-        <input type="url" data-f="thumb" value="${slEsc(l.thumb)}" placeholder="Image link (optional)" aria-label="Link ${i+1} image">
-      </div>
-      ${listTools(arr, i, null, `<button class="tool" data-a="vis" aria-label="${l.on ? 'Hide' : 'Show'} link" aria-pressed="${!l.on}">${l.on ? ICON.eye : ICON.eyeOff}</button>`)}
-    </li>`).join('') || '<li style="color:var(--muted);font-size:14px;padding:6px 2px">No links yet.</li>';
-}
-$('addLink').onclick = () => {
-  cfg.links.push({ title:'', sub:'', url:'', thumb:'', on:true });
-  renderLinks(); changed();
-  $('links').querySelector('.item:last-child input[data-f=title]').focus();
-};
-
-/* ---------- Quick buttons ---------- */
-function renderSlots(){
-  $('slots').innerHTML = cfg.quick.map((q,i) => {
-    const a = SL_ACTIONS[q.type];
-    return `<div class="slot" data-i="${i}">
-      <div class="ic">${SL_ICONS[q.type]}</div>
-      <select data-q="type" aria-label="Button ${i+1} action">
-        ${Object.entries(SL_ACTIONS).map(([k,v]) => `<option value="${k}" ${k===q.type?'selected':''}>${v.label}</option>`).join('')}
-      </select>
-      <input type="text" data-q="label" value="${slEsc(q.label)}" maxlength="10" placeholder="Label" aria-label="Button ${i+1} label">
-      ${a.needsUrl ? `<input type="url" data-q="url" value="${slEsc(q.url)}" placeholder="https://…" aria-label="Button ${i+1} address">` : ''}
-      <span class="hint">${a.hint}</span>
-    </div>`;
-  }).join('');
-}
-$('slots').oninput = e => {
-  const el = e.target.closest('[data-q]'); if (!el) return;
-  const i = +el.closest('.slot').dataset.i, q = cfg.quick[i];
-  if (el.dataset.q === 'type') {
-    const wasDefault = !q.label || q.label === SL_ACTIONS[q.type].label;
-    q.type = el.value; if (wasDefault) q.label = SL_ACTIONS[q.type].label;
-    renderSlots(); $('slots').querySelector(`.slot[data-i="${i}"] select`).focus();
-  } else q[el.dataset.q] = el.value;
-  changed();
-};
-
-/* ---------- Mobile preview ---------- */
-$('fab').onclick = () => {
-  const f = $('frame2'); if (!f.src) f.src = 'index.html?preview';
-  $('sheet').classList.add('open'); $('closePrev').focus();
-};
-$('closePrev').onclick = () => { $('sheet').classList.remove('open'); $('fab').focus(); };
-addEventListener('keydown', e => { if (e.key === 'Escape' && $('sheet').classList.contains('open')) $('closePrev').click(); });
-
-/* ---------- Reset ---------- */
-$('reset').onclick = () => {
-  if (!confirm('Replace your link page settings with the demo content?')) return;
-  cfg = slReset(); renderAll(); changed();
-};
-
-function renderAll(){
-  bindFields(); renderLook(); renderPhotos(); renderLinks(); renderSlots();
-  wireList($('photos'), cfg.photos, renderPhotos, (li, p, f) => {
-    if (f === 'url') { li.querySelector('.thumb').style.backgroundImage = `url('${p.url}')`; delete p.tint; }
-  });
-  wireList($('links'), cfg.links, renderLinks, (li, l, f) => {
-    if (f === 'thumb') li.querySelector('.thumb').style.backgroundImage = `url('${l.thumb}')`;
-  });
-}
-renderAll();
+renderPane(current);
+histButtons();
+})();
 </script>
 </body>
 </html>

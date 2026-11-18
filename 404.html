@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Page not found · Shutterlink</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/shutterLink/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{min-height:100vh;display:grid;place-items:center;padding:24px;font-family:"Familjen Grotesk",system-ui,sans-serif;background:#0f1120;color:#eef0fb;text-align:center;-webkit-font-smoothing:antialiased}
+.mk{width:56px;height:56px;border-radius:15px;background:#fff;color:#2326D3;display:grid;place-items:center;margin:0 auto 28px}
+.mk svg{width:30px;height:32px}
+h1{font-size:34px;letter-spacing:-.03em;line-height:1.1}
+p{color:#a3a7c3;margin-top:10px;max-width:34ch;margin-left:auto;margin-right:auto;line-height:1.5}
+a{display:inline-flex;align-items:center;height:48px;padding:0 22px;border-radius:12px;background:#2326D3;color:#fff;font-weight:600;text-decoration:none;margin-top:26px}
+a:focus-visible{outline:2px solid #9a9dff;outline-offset:3px}
+</style>
+</head>
+<body>
+<main>
+  <div class="mk"><svg viewBox="0 0 86 90" aria-hidden="true"><g fill="currentColor"><path d="M28.5 0V58H0V28.5A28.5 28.5 0 0 1 28.5 0Z"/><path d="M0 62H28.5V90A28.5 28.5 0 0 1 0 62Z"/><path d="M57.5 0A28.5 28.5 0 0 1 86 28.5H57.5Z"/><path d="M57.5 32H86V61.5A28.5 28.5 0 0 1 57.5 90Z"/><circle cx="43" cy="45" r="13.5"/></g></svg></div>
+  <h1>This page isn’t here</h1>
+  <p>The link may be out of date, or the page has moved.</p>
+  <a id="home" href="/shutterLink/">Go to the link page</a>
+</main>
+<script>
+  // work out the site root on GitHub Pages (/repo/) or a custom domain (/)
+  var seg = location.pathname.split('/').filter(Boolean)[0];
+  if (location.hostname.endsWith('github.io') && seg) document.getElementById('home').href = '/' + seg + '/';
+  else document.getElementById('home').href = '/';
+</script>
+</body>
+</html>
