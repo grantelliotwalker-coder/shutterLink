@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Link page settings · Sport Shutter</title>
+<title>ShutterLink settings · Sport Shutter</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#151726" media="(prefers-color-scheme: dark)">
@@ -246,8 +246,8 @@ select.in{appearance:none;-webkit-appearance:none;padding-right:32px;background-
 <body>
 <header class="top">
   <div class="bar">
-    <a class="brand" href="https://sportshutter.com/" aria-label="Sport Shutter home"><span class="mk" id="mk"></span><span>Sport Shutter</span></a>
-    <span class="crumb">Link page</span>
+    <a class="brand" href="https://sportshutter.com/" aria-label="ShutterLink by Sport Shutter, go to the Sport Shutter home page"><span class="mk" id="mk"></span><span>ShutterLink</span></a>
+    <span class="crumb">Settings</span>
     <span class="sp"></span>
     <span class="saved" id="saved" role="status"><i></i><span class="lbl" id="savedT">All changes saved</span></span>
     <button class="btn ghost icon" id="undo" aria-label="Undo" title="Undo (Ctrl+Z)" disabled></button>
@@ -708,7 +708,7 @@ async function uploadMany(files, list){
 async function importFile(file){
   if (!file) return;
   try { cfg = SL.fromJSON(await file.text()); changed({ immediate:true }); renderPane(current, true); toast('Settings loaded'); }
-  catch(_){ toast('That file isn’t a Shutterlink settings file.', true); }
+  catch(_){ toast('That file isn’t a ShutterLink settings file.', true); }
 }
 
 /* ---------- Preview ---------- */

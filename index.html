@@ -365,7 +365,7 @@ select.in{background-image:linear-gradient(45deg,transparent 50%,var(--text-dim)
 <div class="backdrop" id="backdrop" aria-hidden="true"></div>
 
 <header class="topbar" id="topbar">
-  <a class="logo" id="logo" href="https://sportshutter.com/"><span class="mark" id="mark"></span><span>Sport Shutter</span></a>
+  <a class="logo" id="logo" href="https://sportshutter.com/"><span class="mark" id="mark"></span><span id="product">ShutterLink</span></a>
   <button class="ib" id="shareBtn" aria-label="Share this page"></button>
   <button class="ib" id="cartBtn" aria-label="Cart, empty"><span class="badge-n num" id="cartN">0</span></button>
   <a class="ib gear" id="gear" href="settings.html" aria-label="Page settings"></a>
@@ -416,7 +416,8 @@ const tintCache = new Map();
 
 /* static chrome */
 $('mark').innerHTML = SL.BRAND.logo;
-$('logo').setAttribute('aria-label', SL.BRAND.name + ' home');
+$('product').textContent = SL.BRAND.product;
+$('logo').setAttribute('aria-label', `${SL.BRAND.product} by ${SL.BRAND.name}, go to the ${SL.BRAND.name} home page`);
 $('shareBtn').innerHTML = I.share;
 $('cartBtn').insertAdjacentHTML('afterbegin', I.bag);
 $('gear').innerHTML = I.gear;

@@ -1,6 +1,8 @@
-# Shutterlink
+# ShutterLink
 
-A link-in-bio page for photographers, built to replace Linktree with something that lives on Sport Shutter and sells prints directly.
+A Sport Shutter feature: a link-in-bio page any photographer can use to showcase their work, sell prints and take bookings, instead of Linktree.
+
+Branding: the top bar shows the Sport Shutter mark with the ShutterLink name and links to sportshutter.com; the footer reads “Powered by Sport Shutter”.
 
 **Live prototype:** `index.html` is the public page; `settings.html` controls it (the gear in the page's top bar opens it).
 

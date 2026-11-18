@@ -1,4 +1,4 @@
-/* Shutterlink core — shared by the link page and settings.
+/* ShutterLink core — shared by the link page and settings.
    Everything the page shows comes from one config object. In this prototype
    it is saved in the browser; as a Sport Shutter plugin, SL.load / SL.save
    become calls to the account API and nothing else needs to change. */
@@ -10,6 +10,7 @@ const KEY = 'shutterlink:v2';
 /* ---------- Brand (host site) ---------- */
 const BRAND = {
   name: 'Sport Shutter',
+  product: 'ShutterLink',          // this feature's name; the mark stays Sport Shutter's
   home: 'https://sportshutter.com/',
   blue: '#2326D3',
   logo: '<svg viewBox="0 0 86 90" aria-hidden="true"><g fill="currentColor"><path d="M28.5 0V58H0V28.5A28.5 28.5 0 0 1 28.5 0Z"/><path d="M0 62H28.5V90A28.5 28.5 0 0 1 0 62Z"/><path d="M57.5 0A28.5 28.5 0 0 1 86 28.5H57.5Z"/><path d="M57.5 32H86V61.5A28.5 28.5 0 0 1 57.5 90Z"/><circle cx="43" cy="45" r="13.5"/></g></svg>',

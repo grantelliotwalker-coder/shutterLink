@@ -1,6 +1,6 @@
 {
-  "name": "Shutterlink by Sport Shutter",
-  "short_name": "Shutterlink",
+  "name": "ShutterLink by Sport Shutter",
+  "short_name": "ShutterLink",
   "description": "Your photography link page: prints, bookings, films and links in one place.",
   "start_url": "./",
   "display": "standalone",
