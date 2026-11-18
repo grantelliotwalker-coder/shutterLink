@@ -13,6 +13,7 @@
 /* ---------- Tokens (swap these for real branding later) ---------- */
 :root{
   --tint: #1c2a2e;          /* set per hero photo by JS */
+  --accent: #2326D3;        /* from settings */
   --paper: #f3f4f1;
   --ink: #15191a;
   --mist: #9aa5a6;
@@ -94,8 +95,12 @@ img{display:block;max-width:100%}
 }
 @media (min-width:600px){ .topbar{top:24px;border-radius:var(--radius-lg) var(--radius-lg) 0 0} }
 .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px;letter-spacing:-.02em;height:44px}
-.logo svg{width:24px;height:24px}
+.logo .mark{width:30px;height:30px;border-radius:8px;background:#fff;color:#2326D3;display:grid;place-items:center}
+.logo svg{width:18px;height:19px}
 .bar-actions{display:flex;gap:6px}
+.icon-btn.gear{display:flex}
+.preview .gear{display:none}
+[hidden]{display:none!important}
 .icon-btn{
   position:relative;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
   background:rgba(0,0,0,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
@@ -103,7 +108,7 @@ img{display:block;max-width:100%}
 .icon-btn svg{width:18px;height:18px}
 .cart-count{
   position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;padding:0 4px;
-  border-radius:9px;background:var(--paper);color:var(--ink);
+  border-radius:9px;background:var(--accent);color:#fff;
   font-size:11px;font-weight:700;display:none;place-items:center;
 }
 .cart-count.show{display:grid}
@@ -120,9 +125,9 @@ html{scroll-snap-type:y proximity;scroll-behavior:smooth}
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   transition:transform .15s ease, background .2s ease;
 }
-.quick a:first-child i{background:var(--paper);color:var(--tint);border-color:transparent}
+.quick a:first-child i{background:var(--accent);color:#fff;border-color:transparent}
 .quick a:hover i{background:rgba(243,244,241,.2)}
-.quick a:first-child:hover i{background:#fff}
+.quick a:first-child:hover i{background:color-mix(in srgb,var(--accent) 85%,#fff)}
 .quick a:active i{transform:scale(.92)}
 .quick svg{width:23px;height:23px}
 .more{display:grid;place-items:center;width:44px;height:36px;margin:14px auto 0;opacity:.6}
@@ -235,8 +240,8 @@ h2{font-size:15px;font-weight:600;color:var(--mist);margin:34px 4px 12px;letter-
 }
 .size b{display:block;font-size:15px;font-weight:600}
 .size span{font-size:13px;color:#636b6c}
-.size[aria-pressed="true"]{border-color:var(--ink);background:#fff}
-.sheet .btn-solid{width:100%;margin-top:18px;background:var(--tint);color:var(--paper)}
+.size[aria-pressed="true"]{border-color:var(--accent);background:#fff}
+.sheet .btn-solid{width:100%;margin-top:18px;background:var(--accent);color:#fff}
 .sheet .fine{font-size:13px;color:#636b6c;text-align:center;margin-top:10px}
 
 .cart-list{list-style:none;margin-top:6px}
@@ -265,54 +270,39 @@ h2{font-size:15px;font-weight:600;color:var(--mist);margin:34px 4px 12px;letter-
   html{scroll-behavior:auto}
 }
 </style>
+<script src="config.js"></script>
 </head>
 <body>
 <div class="backdrop" id="backdrop"></div>
 
 <header class="topbar" id="topbar">
-  <a class="logo" href="https://sportshutter.com/" aria-label="Sport Shutter home">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83M16.62 12l-5.74 9.94"/></svg>
+  <a class="logo" id="logo" href="https://sportshutter.com/">
+    <span class="mark"></span>
     <span>Sport Shutter</span>
   </a>
-    <div class="bar-actions">
-      <button class="icon-btn" id="shareBtn" aria-label="Share this page">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
-      </button>
-      <button class="icon-btn" id="cartBtn" aria-label="Open cart">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
-        <span class="cart-count" id="cartCount">0</span>
-      </button>
-    </div>
+  <div class="bar-actions">
+    <button class="icon-btn" id="shareBtn" aria-label="Share this page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
+    </button>
+    <button class="icon-btn" id="cartBtn" aria-label="Open cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+    <a class="icon-btn gear" href="settings.html" aria-label="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </a>
+  </div>
 </header>
 
 <main class="page">
-  <!-- Hero: recent work, stories-style. Tap sides to step through. -->
   <section class="hero" id="hero" aria-roledescription="slideshow" aria-label="Recent work">
     <div class="ticks" id="ticks"></div>
     <button class="tap prev" id="prev" aria-label="Previous photo"></button>
     <button class="tap next" id="next" aria-label="Next photo"></button>
-
     <div class="id">
-      <h1 class="name">Mara<br>Ellison</h1>
-      <p class="bio">Landscapes and weddings from the Blue Mountains, NSW.</p>
-      <nav class="quick" aria-label="Quick links">
-        <a href="#shop">
-          <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><rect x="7" y="6" width="10" height="9"/><path d="M7 13l3-3 2 2 2-2 3 3"/></svg></i>
-          <span>Prints</span>
-        </a>
-        <a href="#" data-demo="Booking calendar">
-          <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></i>
-          <span>Book</span>
-        </a>
-        <a href="#film">
-          <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M8 5.5v13l10.5-6.5z"/></svg></i>
-          <span>Watch</span>
-        </a>
-        <a href="#" data-demo="Instagram">
-          <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></svg></i>
-          <span>Instagram</span>
-        </a>
-      </nav>
+      <h1 class="name" id="name"></h1>
+      <p class="bio" id="bio"></p>
+      <nav class="quick" id="quick" aria-label="Quick links"></nav>
       <a class="more" href="#detail" aria-label="Scroll for prints, films and more">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
       </a>
@@ -321,60 +311,33 @@ h2{font-size:15px;font-weight:600;color:var(--mist);margin:34px 4px 12px;letter-
   </section>
 
   <div class="body" id="detail">
-
     <section id="shop" aria-labelledby="shop-h">
       <div class="shop-head">
         <h2 id="shop-h">Prints</h2>
-        <a href="#" data-demo="Full shop">See all 24</a>
+        <a href="#" data-demo="Full shop" id="seeAll"></a>
       </div>
       <div class="strip" id="strip"></div>
     </section>
 
     <section id="film" aria-labelledby="film-h">
       <h2 id="film-h">Latest film</h2>
-      <a class="film" href="#" data-demo="YouTube">
-        <img src="https://picsum.photos/id/1036/920/518" alt="" loading="lazy">
+      <a class="film" id="filmCard" href="#">
+        <img id="filmThumb" src="" alt="" loading="lazy">
         <div class="play">
           <i><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></i>
-          <div><b>Chasing first snow at Kosciuszko</b><span>YouTube, 12 min</span></div>
+          <div><b id="filmTitle"></b><span id="filmMeta"></span></div>
         </div>
       </a>
     </section>
 
-    <section aria-labelledby="links-h">
+    <section id="linksSec" aria-labelledby="links-h">
       <h2 id="links-h">More from me</h2>
-      <ul class="links">
-        <li><a href="#" data-demo="Wedding portfolio">
-          <img src="https://picsum.photos/id/1062/120/120" alt="">
-          <div class="t"><b>Wedding portfolio</b><span>Now booking autumn 2027</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
-        </a></li>
-        <li><a href="#" data-demo="Preset store">
-          <img src="https://picsum.photos/id/1043/120/120" alt="">
-          <div class="t"><b>Lightroom presets</b><span>The Mountain Light pack, 12 looks</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
-        </a></li>
-        <li><a href="#" data-demo="Workshop page">
-          <img src="https://picsum.photos/id/1039/120/120" alt="">
-          <div class="t"><b>Sunrise workshop, Feb 14</b><span>6 spots left at Govetts Leap</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
-        </a></li>
-        <li><a href="#" data-demo="Newsletter signup">
-          <img src="https://picsum.photos/id/1011/120/120" alt="">
-          <div class="t"><b>Monthly field notes</b><span>Where I shot and what I used</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
-        </a></li>
-      </ul>
+      <ul class="links" id="links"></ul>
     </section>
 
-    <nav class="social" aria-label="Social profiles">
-      <a href="#" data-demo="Instagram" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></svg></a>
-      <a href="#" data-demo="YouTube" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="M10 9.5v5l4.5-2.5z" fill="currentColor"/></svg></a>
-      <a href="#" data-demo="TikTok" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.5 2.8 2.3 4.5 5 4.8"/></svg></a>
-      <a href="#" data-demo="Email" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7l8.5 6 8.5-6"/></svg></a>
-    </nav>
+    <nav class="social" id="social" aria-label="Social profiles"></nav>
 
-    <p class="foot">Made with <b>Shutterlink</b></p>
+    <p class="foot">Made with <b>Shutterlink</b> for <b>Sport Shutter</b></p>
   </div>
 </main>
 
@@ -383,91 +346,161 @@ h2{font-size:15px;font-weight:600;color:var(--mist);margin:34px 4px 12px;letter-
 <div class="toast" id="toast" role="status"></div>
 
 <script>
-/* ---------- Demo data (would come from the photographer's site/plugin) ---------- */
-const FRAMES = [
-  { id:1018, tint:"#1f2b33", caption:"Grose Valley, last light" },
-  { id:1015, tint:"#1c2c2a", caption:"Coxs River after rain" },
-  { id:1016, tint:"#3a2a22", caption:"Red earth, Flinders Ranges" },
-  { id:1050, tint:"#22303a", caption:"Bondi, 5:42am" },
-  { id:1044, tint:"#2b2824", caption:"Ceremony at Leura" },
-];
-const PRINTS = [
-  { id:1018, title:"Grose Valley", blurb:"Last light over the escarpment, shot from Pulpit Rock.", from:65 },
-  { id:1015, title:"After the Rain", blurb:"Coxs River running high the morning after a storm.", from:65 },
-  { id:1016, title:"Red Earth", blurb:"Late afternoon on the ridge line, Flinders Ranges.", from:80 },
-  { id:1050, title:"Bondi Blue", blurb:"The first swimmers out before sunrise.", from:55 },
-  { id:1039, title:"Wentworth Falls", blurb:"A long exposure from the base of the falls.", from:80 },
-];
-const SIZES = [ { label:"A4", mult:1 }, { label:"A3", mult:1.6 }, { label:"A2", mult:2.5 } ];
-const img = (id,w,h) => `https://picsum.photos/id/${id}/${w}/${h}`;
+const $ = id => document.getElementById(id);
+const PREVIEW = new URLSearchParams(location.search).has('preview');
+if (PREVIEW) document.documentElement.classList.add('preview');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SIZES = [ { label:'A4', mult:1 }, { label:'A3', mult:1.6 }, { label:'A2', mult:2.5 } ];
+const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>';
+let cfg = slLoad();
+let PRINTS = [];
+
+$('logo').querySelector('.mark').innerHTML = SL_BRAND.logo;
+$('logo').setAttribute('aria-label', SL_BRAND.name + ' home');
+
+/* Turn a config destination into an href, or a demo toast when it's empty. */
+function linkAttrs(url, demoName){
+  if (url && url.trim()) {
+    const u = url.includes('@') && !url.startsWith('http') ? 'mailto:' + url.trim() : url.trim();
+    return `href="${slEsc(u)}" target="_blank" rel="noopener"`;
+  }
+  return `href="#" data-demo="${slEsc(demoName)}"`;
+}
+function quickHref(q){
+  if (q.type === 'shop') return 'href="#shop"';
+  if (q.type === 'film') return 'href="#film"';
+  if (SL_ACTIONS[q.type]?.social) return linkAttrs(cfg.socials[q.type], SL_ACTIONS[q.type].label);
+  return linkAttrs(q.url, q.label || 'that link');
+}
+
+/* ---------- Render everything from cfg ---------- */
+function render(){
+  document.title = `${cfg.profile.name} — Photography`;
+  document.documentElement.style.setProperty('--accent', cfg.look.accent);
+  const parts = cfg.profile.name.trim().split(/\s+/);
+  $('name').innerHTML = parts.length > 1
+    ? slEsc(parts.slice(0, Math.ceil(parts.length/2)).join(' ')) + '<br>' + slEsc(parts.slice(Math.ceil(parts.length/2)).join(' '))
+    : slEsc(cfg.profile.name);
+  $('bio').textContent = cfg.profile.bio;
+
+  $('quick').innerHTML = cfg.quick.filter(q => q.type).slice(0,4).map(q =>
+    `<a ${quickHref(q)}><i>${SL_ICONS[q.type] || SL_ICONS.link}</i><span>${slEsc(q.label || SL_ACTIONS[q.type]?.label)}</span></a>`).join('');
+
+  // prints
+  PRINTS = SL_SHOP.slice(0, cfg.shopCount);
+  $('shop').hidden = !cfg.sections.shop;
+  $('seeAll').textContent = `See all ${SL_SHOP.length}`;
+  $('strip').innerHTML = PRINTS.map((p,i) => `
+    <button class="print" data-i="${i}">
+      <div class="ph"><img src="${pic(p.id,400,500)}" alt="" loading="lazy"></div>
+      <b>${slEsc(p.title)}</b><span>From $${p.from}</span>
+    </button>`).join('');
+
+  // film
+  $('film').hidden = !cfg.sections.film;
+  $('filmTitle').textContent = cfg.film.title;
+  $('filmMeta').textContent = cfg.film.meta;
+  $('filmThumb').src = cfg.film.thumb || '';
+  const fc = $('filmCard'); fc.removeAttribute('data-demo'); fc.removeAttribute('target');
+  fc.outerHTML = fc.outerHTML.replace(/^<a[^>]*>/, `<a class="film" id="filmCard" ${linkAttrs(cfg.film.url, 'the video')}>`);
+
+  // links
+  const links = cfg.links.filter(l => l.on && l.title);
+  $('linksSec').hidden = !cfg.sections.links || !links.length;
+  $('links').innerHTML = links.map(l => `
+    <li><a ${linkAttrs(l.url, l.title)}>
+      ${l.thumb ? `<img src="${slEsc(l.thumb)}" alt="">` : ''}
+      <div class="t"><b>${slEsc(l.title)}</b>${l.sub ? `<span>${slEsc(l.sub)}</span>` : ''}</div>
+      ${chevron}</a></li>`).join('');
+
+  // socials: show each network that has an address, or all four as demos if none are set
+  const nets = ['instagram','youtube','tiktok','email'];
+  const anySet = nets.some(n => cfg.socials[n]);
+  $('social').hidden = !cfg.sections.socials;
+  $('social').innerHTML = nets.filter(n => !anySet || cfg.socials[n]).map(n =>
+    `<a ${linkAttrs(cfg.socials[n], SL_ACTIONS[n].label)} aria-label="${SL_ACTIONS[n].label}">${SL_ICONS[n]}</a>`).join('');
+
+  renderHero();
+}
 
 /* ---------- Hero slideshow ---------- */
-const hero = document.getElementById('hero');
-const ticks = document.getElementById('ticks');
-const caption = document.getElementById('caption');
-const backdrop = document.getElementById('backdrop');
-const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-let idx = 0, timer;
+const hero = $('hero'), ticks = $('ticks'), caption = $('caption'), backdrop = $('backdrop');
+let idx = 0, timer, frames = [], tickEls = [];
 
-FRAMES.forEach((f,i) => {
-  const im = new Image();
-  im.className = 'frame'; im.alt = f.caption; im.src = img(f.id,920,1150);
-  if (i) im.loading = 'lazy';
-  hero.insertBefore(im, ticks);
-  ticks.insertAdjacentHTML('beforeend','<div class="tick"><i></i></div>');
-});
-const frames = hero.querySelectorAll('.frame');
-const tickEls = ticks.querySelectorAll('.tick');
-
-function show(n){
-  idx = (n + FRAMES.length) % FRAMES.length;
+function tintFrom(im, fallback){
+  try {
+    const c = document.createElement('canvas'); c.width = c.height = 8;
+    const x = c.getContext('2d'); x.drawImage(im, 0, 0, 8, 8);
+    const d = x.getImageData(0, 0, 8, 8).data; let r=0,g=0,b=0;
+    for (let i=0;i<d.length;i+=4){ r+=d[i]; g+=d[i+1]; b+=d[i+2]; }
+    const hex = '#' + [r,g,b].map(v => Math.round(v/64).toString(16).padStart(2,'0')).join('');
+    return slMix(hex, '#101214', .62);
+  } catch(_) { return fallback; }
+}
+function bgFor(f){
+  if (cfg.look.background === 'brand') return slMix(cfg.look.accent, '#07081a', .72);
+  if (cfg.look.background === 'charcoal') return '#1b1d20';
+  return f.tint || '#1c2a2e';
+}
+function renderHero(){
+  hero.querySelectorAll('.frame').forEach(e => e.remove());
+  ticks.innerHTML = '';
+  const photos = cfg.photos.filter(f => f.url);
+  frames = photos.map((f,i) => {
+    const im = new Image();
+    im.className = 'frame'; im.alt = f.caption || ''; im.src = f.url;
+    if (!f.tint || f.auto) { // sample a colour from photos added in settings
+      const probe = new Image(); probe.crossOrigin = 'anonymous';
+      probe.onload = () => { f.tint = tintFrom(probe, f.tint); f.auto = true; if (i===idx) show(idx, true); };
+      probe.src = f.url;
+    }
+    hero.insertBefore(im, ticks);
+    ticks.insertAdjacentHTML('beforeend','<div class="tick"><i></i></div>');
+    im._f = f; return im;
+  });
+  tickEls = ticks.querySelectorAll('.tick');
+  ticks.hidden = frames.length < 2;
+  ticks.style.setProperty('--dur', cfg.look.slideSeconds + 's');
+  show(Math.min(idx, Math.max(frames.length-1, 0)));
+}
+function show(n, keepTimer){
+  if (!frames.length){ setTint(bgFor({})); caption.textContent=''; return; }
+  idx = (n + frames.length) % frames.length;
+  const f = frames[idx]._f;
+  setTint(bgFor(f));
+  if (keepTimer) return;
   frames.forEach((el,i) => el.classList.toggle('on', i===idx));
   tickEls.forEach((t,i) => {
     t.className = 'tick' + (i<idx ? ' done' : i===idx ? ' now' : '');
-    // restart animation
     const bar = t.firstChild; bar.style.animation='none'; bar.offsetWidth; bar.style.animation='';
   });
-  const f = FRAMES[idx];
-  caption.textContent = f.caption;
-  document.documentElement.style.setProperty('--tint', f.tint);
-  document.querySelector('meta[name=theme-color]').content = f.tint;
-  backdrop.style.backgroundImage = `url(${img(f.id,400,500)})`;
+  caption.textContent = f.caption || '';
+  backdrop.style.backgroundImage = `url("${f.url}")`;
   clearTimeout(timer);
-  if (!reduce) timer = setTimeout(() => show(idx+1), 5000);
+  if (!reduce && frames.length > 1) timer = setTimeout(() => show(idx+1), cfg.look.slideSeconds*1000);
 }
-document.getElementById('prev').onclick = () => show(idx-1);
-document.getElementById('next').onclick = () => show(idx+1);
-// hold to pause, like stories
-hero.addEventListener('pointerdown', () => { hero.classList.add('paused'); clearTimeout(timer); });
+function setTint(t){
+  document.documentElement.style.setProperty('--tint', t);
+  document.querySelector('meta[name=theme-color]').content = t;
+}
+$('prev').onclick = () => show(idx-1);
+$('next').onclick = () => show(idx+1);
+hero.addEventListener('pointerdown', e => { if (e.target.closest('.quick,.more')) return; hero.classList.add('paused'); clearTimeout(timer); });
 ['pointerup','pointerleave'].forEach(e => hero.addEventListener(e, () => {
   if (!hero.classList.contains('paused')) return;
   hero.classList.remove('paused');
-  if (!reduce) timer = setTimeout(() => show(idx+1), 2500);
+  if (!reduce && frames.length > 1) timer = setTimeout(() => show(idx+1), 2500);
 }));
-show(0);
 
 /* ---------- Top bar ---------- */
-const topbar = document.getElementById('topbar');
+const topbar = $('topbar');
 const onScroll = () => topbar.classList.toggle('solid', scrollY > hero.offsetHeight * 0.5);
 addEventListener('scroll', onScroll, {passive:true}); onScroll();
 
-/* ---------- Shop strip ---------- */
-const strip = document.getElementById('strip');
-PRINTS.forEach((p,i) => {
-  strip.insertAdjacentHTML('beforeend', `
-    <button class="print" data-i="${i}">
-      <div class="ph"><img src="${img(p.id,400,500)}" alt="" loading="lazy"></div>
-      <b>${p.title}</b><span>From $${p.from}</span>
-    </button>`);
-});
-strip.addEventListener('click', e => {
-  const b = e.target.closest('.print'); if (b) openPrint(+b.dataset.i);
-});
+/* ---------- Shop ---------- */
+$('strip').addEventListener('click', e => { const b = e.target.closest('.print'); if (b) openPrint(+b.dataset.i); });
 
-/* ---------- Sheet ---------- */
-const sheet = document.getElementById('sheet');
-const scrim = document.getElementById('scrim');
-let lastFocus;
+const sheet = $('sheet'), scrim = $('scrim'); let lastFocus;
 function openSheet(html, label){
   lastFocus = document.activeElement;
   sheet.innerHTML = '<div class="grab"></div>' + html;
@@ -475,13 +508,9 @@ function openSheet(html, label){
   sheet.classList.add('open'); scrim.classList.add('open');
   setTimeout(() => (sheet.querySelector('button') || sheet).focus(), 50);
 }
-function closeSheet(){
-  sheet.classList.remove('open'); scrim.classList.remove('open');
-  lastFocus && lastFocus.focus();
-}
+function closeSheet(){ sheet.classList.remove('open'); scrim.classList.remove('open'); lastFocus && lastFocus.focus(); }
 scrim.onclick = closeSheet;
 addEventListener('keydown', e => { if (e.key==='Escape') closeSheet(); });
-// swipe down to dismiss
 let y0=null;
 sheet.addEventListener('touchstart', e => { if (sheet.scrollTop===0) y0 = e.touches[0].clientY; }, {passive:true});
 sheet.addEventListener('touchend', e => { if (y0!==null && e.changedTouches[0].clientY - y0 > 80) closeSheet(); y0=null; });
@@ -490,47 +519,39 @@ function openPrint(i){
   const p = PRINTS[i]; let s = 0;
   const price = k => Math.round(p.from * SIZES[k].mult);
   openSheet(`
-    <div class="ph"><img src="${img(p.id,900,600)}" alt="${p.title}"></div>
-    <h3>${p.title}</h3>
-    <p>${p.blurb}</p>
+    <div class="ph"><img src="${pic(p.id,900,600)}" alt="${slEsc(p.title)}"></div>
+    <h3>${slEsc(p.title)}</h3><p>${slEsc(p.blurb)}</p>
     <div class="sizes" role="group" aria-label="Print size">
       ${SIZES.map((z,k)=>`<button class="size" data-k="${k}" aria-pressed="${k===0}"><b>${z.label}</b><span>$${price(k)}</span></button>`).join('')}
     </div>
     <button class="btn btn-solid" id="addBtn">Add to cart, $${price(0)}</button>
-    <p class="fine">Giclée on cotton rag paper. Ships in 5 days.</p>
-  `, p.title);
+    <p class="fine">Giclée on cotton rag paper. Ships in 5 days.</p>`, p.title);
   sheet.querySelector('.sizes').onclick = e => {
     const b = e.target.closest('.size'); if (!b) return;
     s = +b.dataset.k;
     sheet.querySelectorAll('.size').forEach(x => x.setAttribute('aria-pressed', x===b));
-    sheet.querySelector('#addBtn').textContent = `Add to cart, $${price(s)}`;
+    $('addBtn').textContent = `Add to cart, $${price(s)}`;
   };
-  sheet.querySelector('#addBtn').onclick = () => {
-    cart.push({ i, s, price: price(s) });
-    updateCart(); closeSheet();
+  $('addBtn').onclick = () => {
+    cart.push({ p, s, price: price(s) }); updateCart(); closeSheet();
     toast(`Added ${p.title} (${SIZES[s].label}) to cart`);
   };
 }
 
-/* ---------- Cart ---------- */
 const cart = [];
-const cartCount = document.getElementById('cartCount');
-function updateCart(){
-  cartCount.textContent = cart.length;
-  cartCount.classList.toggle('show', cart.length > 0);
-}
+function updateCart(){ $('cartCount').textContent = cart.length; $('cartCount').classList.toggle('show', cart.length > 0); }
 function openCart(){
   if (!cart.length){
     openSheet(`<h3>Cart</h3><p class="empty">Your cart is empty. Pick a print to get started.</p>
       <button class="btn btn-solid" id="browse">Browse prints</button>`, 'Cart');
-    sheet.querySelector('#browse').onclick = () => { closeSheet(); document.getElementById('shop').scrollIntoView({behavior: reduce?'auto':'smooth'}); };
+    $('browse').onclick = () => { closeSheet(); $('shop').scrollIntoView(); };
     return;
   }
   const total = cart.reduce((a,c) => a + c.price, 0);
   openSheet(`<h3>Cart</h3>
     <ul class="cart-list">${cart.map((c,n) => `
-      <li><img src="${img(PRINTS[c.i].id,120,120)}" alt="">
-        <div class="t"><b>${PRINTS[c.i].title}</b><span>${SIZES[c.s].label} print</span></div>
+      <li><img src="${pic(c.p.id,120,120)}" alt="">
+        <div class="t"><b>${slEsc(c.p.title)}</b><span>${SIZES[c.s].label} print</span></div>
         <div style="text-align:right"><b>$${c.price}</b><button data-n="${n}">Remove</button></div></li>`).join('')}
     </ul>
     <div class="total"><span>Total</span><span>$${total} AUD</span></div>
@@ -540,21 +561,18 @@ function openCart(){
     const b = e.target.closest('button[data-n]'); if (!b) return;
     cart.splice(+b.dataset.n, 1); updateCart(); openCart();
   };
-  sheet.querySelector('#checkout').onclick = () => { closeSheet(); toast('Prototype: this would open checkout'); };
+  $('checkout').onclick = () => { closeSheet(); toast('Prototype: this would open Sport Shutter checkout'); };
 }
-document.getElementById('cartBtn').onclick = openCart;
+$('cartBtn').onclick = openCart;
 
-/* ---------- Share ---------- */
-document.getElementById('shareBtn').onclick = async () => {
-  const data = { title: document.title, url: location.href };
+$('shareBtn').onclick = async () => {
   try {
-    if (navigator.share) await navigator.share(data);
-    else { await navigator.clipboard.writeText(location.href); toast('Link copied'); }
+    if (navigator.share) await navigator.share({ title: document.title, url: location.href.split('?')[0] });
+    else { await navigator.clipboard.writeText(location.href.split('?')[0]); toast('Link copied'); }
   } catch(_) {}
 };
 
-/* ---------- Demo links + toast ---------- */
-const toastEl = document.getElementById('toast'); let tt;
+const toastEl = $('toast'); let tt;
 function toast(msg){
   toastEl.textContent = msg; toastEl.classList.add('show');
   clearTimeout(tt); tt = setTimeout(() => toastEl.classList.remove('show'), 2400);
@@ -563,6 +581,19 @@ document.addEventListener('click', e => {
   const a = e.target.closest('[data-demo]'); if (!a) return;
   e.preventDefault(); toast(`Prototype: this would open ${a.dataset.demo}`);
 });
+if (PREVIEW) document.addEventListener('click', e => {
+  const a = e.target.closest('a[target=_blank], .logo'); if (!a) return;
+  e.preventDefault(); toast('Links open on the live page');
+});
+
+/* ---------- Live updates from settings ---------- */
+addEventListener('message', e => {
+  if (e.origin !== location.origin && location.origin !== 'null') return;
+  if (e.data?.type === 'shutterlink:config') { cfg = e.data.config; render(); }
+});
+addEventListener('storage', e => { if (e.key === SL_KEY) { cfg = slLoad(); render(); } });
+
+render();
 </script>
 </body>
 </html>
