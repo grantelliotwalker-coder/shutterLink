@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="assets/core.js?v=2.3"></script>
+<script src="assets/core.js?v=2.4"></script>
 <script>try{const t=localStorage.getItem('shutterlink:ui-theme');if(t)document.documentElement.dataset.ui=t;}catch(_){}</script>
 <style>
 :root{
@@ -205,6 +205,40 @@ select.in{appearance:none;-webkit-appearance:none;padding-right:32px;background-
 .pr[aria-pressed=true]{border-color:var(--accent-text)}
 .pr[aria-pressed=true] i{background:var(--accent)}
 
+.igc{display:flex;align-items:center;gap:12px}
+.igc .av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-text);flex:none}
+.igc .av svg{width:22px;height:22px}
+.igc b{display:block;font-size:15px}
+.igc span{font-size:12.5px;color:var(--faint)}
+.pill{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:11px;font-size:11.5px;font-weight:700;background:var(--surface-3);color:var(--dim);margin-left:6px;vertical-align:1px}
+.pill.ok{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.btn.lg{height:46px;padding:0 20px;font-size:14.5px}
+.posts{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.post{position:relative;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;text-align:left;background:var(--surface-2)}
+.post img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:var(--surface-3)}
+.post p{font-size:12px;line-height:1.35;color:var(--dim);margin:7px 8px 8px;height:calc(1.35em * 2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.post i{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.35);border:2px solid #fff;display:grid;place-items:center;color:#fff;font-style:normal;font-size:11px;font-weight:700}
+.post[aria-pressed=true]{border-color:var(--accent-text);box-shadow:0 0 0 3px var(--accent-soft)}
+.post[aria-pressed=true] i{background:var(--accent)}
+.post:disabled{opacity:.45}
+.modal{position:fixed;inset:0;z-index:70;background:rgba(10,12,24,.55);display:grid;place-items:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal.open{opacity:1;pointer-events:auto}
+.modal .box{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.35);transform:translateY(8px);transition:transform .2s}
+.modal.open .box{transform:none}
+.modal h3{font-size:19px;letter-spacing:-.01em;margin-top:14px}
+.modal .who{display:flex;align-items:center;gap:10px}
+.modal .who .a{width:40px;height:40px;border-radius:12px;display:grid;place-items:center}
+.modal .who .a svg{width:22px;height:22px}
+.modal .who .x{color:var(--faint)}
+.modal ul{list-style:none;margin-top:14px;display:grid;gap:10px;font-size:14px}
+.modal li{display:flex;gap:10px;align-items:flex-start}
+.modal li svg{width:18px;height:18px;color:var(--ok);margin-top:1px}
+.modal li.no svg{color:var(--faint)}
+.modal .row-b{display:flex;gap:10px;margin-top:22px}
+.modal .row-b .btn{flex:1;height:44px}
+.modal .note{font-size:12px;color:var(--faint);margin-top:14px;line-height:1.45}
+.spin{width:18px;height:18px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:rot .8s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
 .meter{height:8px;border-radius:4px;background:var(--surface-3);overflow:hidden;margin-top:10px}
 .meter div{height:100%;border-radius:4px;background:var(--accent);transition:width .3s}
 .meter.warn div{background:var(--warn)} .meter.bad div{background:var(--danger)}
@@ -261,7 +295,7 @@ select.in{appearance:none;-webkit-appearance:none;padding-right:32px;background-
 <div class="wrap">
   <main class="content" id="content" role="tabpanel"></main>
   <aside class="pv" aria-label="Live preview">
-    <div class="device" id="device"><div class="shell"><span class="island"></span><iframe id="frame" src="index.html?preview&v=2.3" title="Live preview of your link page"></iframe></div></div>
+    <div class="device" id="device"><div class="shell"><span class="island"></span><iframe id="frame" src="index.html?preview&v=2.4" title="Live preview of your link page"></iframe></div></div>
     <div class="pv-bar"><span>Live preview</span><span aria-hidden="true">·</span><a href="index.html" target="_blank" rel="noopener">Open in new tab</a></div>
   </aside>
 </div>
@@ -390,7 +424,7 @@ function checks(){
 }
 
 /* ---------- Panes ---------- */
-const TABS = [['profile','Profile'],['design','Design'],['cover','Cover'],['buttons','Quick buttons'],['sections','Sections'],['shop','Prints'],['gallery','Gallery'],['film','Film'],['links','Links'],['contact','Contact'],['socials','Socials'],['advanced','Advanced']];
+const TABS = [['profile','Profile'],['design','Design'],['cover','Cover'],['buttons','Quick buttons'],['sections','Sections'],['shop','Prints'],['gallery','Gallery'],['instagram','Instagram'],['film','Film'],['links','Links'],['contact','Contact'],['socials','Socials'],['advanced','Advanced']];
 const P = {};
 
 P.profile = () => head('Profile', 'Who you are. This is the first thing people see after tapping the link in your bio.') +
@@ -472,7 +506,7 @@ P.buttons = () => {
     <button class="add" data-act="add" data-list="quick" ${cfg.quick.length >= 4 ? 'disabled' : ''}>${ui.plus}Add button</button>`, { sub:`${cfg.quick.length} of 4` });
 };
 
-const SEC_INFO = { shop:'Prints from your Sport Shutter shop', gallery:'A grid of your work with a full-screen viewer', film:'One featured video', links:'Your list of extra links', enquire:'A booking and enquiry form', newsletter:'Email signup', socials:'Icons for your social profiles' };
+const SEC_INFO = { shop:'Prints from your Sport Shutter shop', instagram:'Posts you chose from Instagram', gallery:'A grid of your work with a full-screen viewer', film:'One featured video', links:'Your list of extra links', enquire:'A booking and enquiry form', newsletter:'Email signup', socials:'Icons for your social profiles' };
 P.sections = () => head('Sections', 'What appears when people scroll past the first screen, top to bottom.') +
   panel('Order and visibility', `<ul class="list">${cfg.sections.map((s,i) => `
     <li class="row ${s.on ? '' : 'off'}"><label class="sw" style="margin-top:5px"><input type="checkbox" data-k="sections.${i}.on" data-t="bool" ${s.on?'checked':''} aria-label="Show ${esc(SEC_INFO[s.id])}"><i></i></label>
@@ -504,6 +538,112 @@ P.gallery = () => {
     { sub:`${g.photos.length} of 24`, help:'The grid shows square crops; the whole photo appears when someone opens it.' });
 };
 
+/* ---------- Instagram ---------- */
+const IGK = { lib:'shutterlink:ig-library', token:'shutterlink:ig-token' };
+const igLib = () => { try { return JSON.parse(localStorage.getItem(IGK.lib) || 'null'); } catch(_) { return null; } };
+const igSetLib = v => { try { v ? localStorage.setItem(IGK.lib, JSON.stringify(v)) : localStorage.removeItem(IGK.lib); } catch(_) {} };
+const igToken = v => { try { if (v === undefined) return localStorage.getItem(IGK.token) || ''; v ? localStorage.setItem(IGK.token, v) : localStorage.removeItem(IGK.token); } catch(_) { return ''; } };
+const IG_MAX = 12;
+P.instagram = () => {
+  const ig = cfg.instagram, lib = igLib(), acct = ig.account;
+  const intro = head('Instagram', 'Pick posts from your Instagram. Each one becomes a tile on your page with its photo and caption.');
+  if (!acct || !lib) return intro +
+    panel('Connect your account', `<p class="hint" style="font-size:13.5px;margin-bottom:16px">You choose exactly which posts appear. ShutterLink can only read your posts; it can’t post, message or see your password.</p>
+      <button class="btn primary lg" data-act="ig-connect">${I.instagram}Connect Instagram</button>
+      <p class="hint" style="margin-top:12px">Prototype: this connects a demo account so you can try the whole flow. In Sport Shutter it opens Instagram’s own sign-in.</p>
+      ${ig.posts.length ? `<p class="hint" style="margin-top:12px">${ig.posts.length} post${ig.posts.length > 1 ? 's are' : ' is'} still on your page from before. Reconnect to change them.</p>` : ''}`) +
+    panel('Use your real posts now', `<div class="fields">
+        ${''}<label class="f"><span>Access token</span><input class="in" id="igTok" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your Instagram access token"><small>Saved only in this browser, never on your page or in backups.</small></label>
+        <div><button class="btn" data-act="ig-token">Connect with token</button></div>
+        <span class="ferr" id="igErr" hidden></span></div>`,
+      { sub:'For a professional account', help:`Works with Instagram professional (business or creator) accounts. In Meta for Developers, create an app, add Instagram, add your account as a tester, then open <b>Instagram › API setup with Instagram login</b> and choose <b>Generate token</b>. Tokens from the dashboard last 60 days.` });
+  const chosen = new Map(ig.posts.map((p,i) => [p.id, i]));
+  return intro +
+  panel('Account', `<div class="igc"><span class="av">${I.instagram}</span><div><b>@${esc(acct.username)}${acct.mode === 'demo' ? '<span class="pill">Demo account</span>' : '<span class="pill ok">Connected</span>'}</b>
+      <span>${lib.posts.length} posts loaded${lib.fetched ? ' · ' + new Date(lib.fetched).toLocaleString('en-AU', { day:'numeric', month:'short', hour:'numeric', minute:'2-digit' }) : ''}</span></div></div>`,
+    { act:`${acct.mode === 'token' ? '<button class="btn sm" data-act="ig-refresh">Refresh posts</button>' : ''}<button class="btn sm ghost" data-act="ig-disconnect">Disconnect</button>` }) +
+  panel('Choose posts', `<div class="posts">${lib.posts.map(p => { const n = chosen.has(p.id) ? chosen.get(p.id) + 1 : 0; return `
+      <button class="post" data-igpick="${esc(p.id)}" aria-pressed="${!!n}" ${!n && ig.posts.length >= IG_MAX ? 'disabled' : ''} aria-label="${esc((p.caption || 'Post').slice(0,60))}${n ? ', tile ' + n : ''}">
+        <img src="${esc(SL.sized(p.image,300,300))}" alt="" loading="lazy"><i aria-hidden="true">${n || ''}</i><p>${esc(p.caption || 'No caption')}</p></button>`; }).join('')}</div>
+      <p class="hint" style="margin-top:12px">Tap to add or remove. Tiles appear in the order you pick them.</p>`,
+    { sub:`${ig.posts.length} of ${IG_MAX} chosen` }) +
+  (ig.posts.length ? panel('Your tiles', `<ul class="list">${ig.posts.map((p,i) => `
+    <li class="row"><span class="thumb lg" style="background-image:url('${esc(SL.sized(p.image,160,160))}')"></span>
+      <div class="fields">
+        <textarea class="in" data-k="instagram.posts.${i}.caption" rows="2" maxlength="300" aria-label="Tile ${i+1} caption">${esc(p.caption)}</textarea>
+        <div class="grid2"><input class="in" data-k="instagram.posts.${i}.link" data-check="url" type="url" value="${esc(p.link || '')}" placeholder="Button link (optional)" aria-label="Tile ${i+1} button link" autocomplete="off" spellcheck="false">
+          <input class="in" data-k="instagram.posts.${i}.linkLabel" value="${esc(p.linkLabel || '')}" placeholder="Button label, e.g. Buy this print" aria-label="Tile ${i+1} button label" maxlength="24"></div>
+        <span class="ferr" data-err="instagram.posts.${i}.link" hidden></span>
+      </div>${tools('instagram.posts', i, ig.posts.length)}</li>`).join('')}</ul>`,
+    { help:'Captions start as your Instagram caption; edit them here to shorten or change them for your page. Add a button link to send people somewhere, such as the print in your shop or your booking page.' }) : '') +
+  panel('Layout', `<div class="fields"><div class="f"><span>Columns</span>${seg('instagram.columns', [[2,'Two'],[3,'Three']], 'Columns')}</div>
+    ${toggle('Show captions under tiles', 'With two columns. Full captions always show when a tile is opened.', 'instagram.captions')}</div>`);
+};
+function igModal(){
+  return new Promise(res => {
+    const m = document.createElement('div'); m.className = 'modal';
+    m.innerHTML = `<div class="box" role="dialog" aria-modal="true" aria-labelledby="igmH">
+      <div class="who"><span class="a" style="background:#fff;color:${SL.BRAND.blue};box-shadow:inset 0 0 0 1px var(--border)">${SL.BRAND.logo.replace('<svg', '<svg style="width:20px;height:21px"')}</span><span class="x">${ui.plus.replace('<path d="M12 5v14M5 12h14"/>','<path d="M7 12h10M13 8l4 4-4 4"/>')}</span><span class="a" style="background:var(--surface-3)">${I.instagram}</span><span class="pill" style="margin-left:auto">Demo</span></div>
+      <h3 id="igmH">Let ShutterLink use your Instagram?</h3>
+      <ul><li>${I.check}<span>See your profile name</span></li><li>${I.check}<span>See your photos, videos and captions</span></li><li class="no">${I.close}<span>It can’t post, message, or see your password</span></li></ul>
+      <div class="row-b"><button class="btn" data-r="0">Cancel</button><button class="btn primary" data-r="1">Allow</button></div>
+      <p class="note">In the live version, this step happens on Instagram’s own sign-in page. Here it connects a demo account.</p></div>`;
+    document.body.appendChild(m); requestAnimationFrame(() => m.classList.add('open'));
+    const last = document.activeElement; m.querySelector('[data-r="1"]').focus();
+    const done = v => { m.classList.remove('open'); setTimeout(() => m.remove(), 220); last && last.focus(); res(v); removeEventListener('keydown', key); };
+    const key = e => { if (e.key === 'Escape') done(false); if (e.key === 'Tab'){ const b = [...m.querySelectorAll('button')]; if (e.shiftKey && document.activeElement === b[0]){ e.preventDefault(); b[b.length-1].focus(); } else if (!e.shiftKey && document.activeElement === b[b.length-1]){ e.preventDefault(); b[0].focus(); } } };
+    addEventListener('keydown', key);
+    m.onclick = e => { const b = e.target.closest('[data-r]'); if (b) done(b.dataset.r === '1'); else if (e.target === m) done(false); };
+  });
+}
+function busy(btn, label){ btn.disabled = true; btn.innerHTML = `<span class="spin"></span>${label}`; }
+async function igConnect(mode, btn){
+  if (mode === 'demo'){
+    if (!(await igModal())) return;
+    if (btn) busy(btn, 'Connecting…');
+    await new Promise(r => setTimeout(r, 700));
+    igSetLib({ username: SL.IG_DEMO.username, mode:'demo', posts: SL.IG_DEMO.posts, fetched: Date.now() });
+    cfg.instagram.account = { username: SL.IG_DEMO.username, mode:'demo' };
+  } else {
+    const tok = (mode === 'refresh' ? igToken() : ($('igTok') || {}).value || '').trim();
+    const err = $('igErr');
+    if (!tok){ if (err){ err.textContent = 'Paste your access token first.'; err.hidden = false; } return; }
+    if (btn) busy(btn, mode === 'refresh' ? 'Refreshing…' : 'Connecting…');
+    try {
+      const r = await SL.igFetch(tok);
+      igToken(tok);
+      igSetLib({ username: r.username, mode:'token', posts: r.posts, fetched: Date.now() });
+      cfg.instagram.account = { username: r.username, mode:'token' };
+      if (!r.posts.length) toast('Connected, but there are no photo posts to show yet.');
+    } catch(e){
+      const msg = /fetch|network/i.test(e.message) ? 'Couldn’t connect to Instagram. Check the token is complete and hasn’t expired, and that you’re online.' : e.message;
+      if (mode === 'refresh'){ toast(msg, true); renderPane('instagram', true); return; }
+      if (err){ err.textContent = msg; err.hidden = false; }
+      if (btn){ btn.disabled = false; btn.textContent = 'Connect with token'; }
+      return;
+    }
+  }
+  changed({ immediate:true }); renderPane('instagram', true);
+  if (mode !== 'refresh') toast(`Connected @${cfg.instagram.account.username}. Pick the posts you want.`);
+  else toast('Posts refreshed');
+}
+async function igToggle(id){
+  const lib = igLib(), ig = cfg.instagram; if (!lib) return;
+  const i = ig.posts.findIndex(p => p.id === id);
+  if (i >= 0){ ig.posts.splice(i, 1); changed({ immediate:true }); renderPane('instagram', true); return; }
+  if (ig.posts.length >= IG_MAX){ toast(`You can show up to ${IG_MAX} posts.`, true); return; }
+  const p = lib.posts.find(x => x.id === id); if (!p) return;
+  const tile = { id:p.id, image:p.image, caption:p.caption, permalink:p.permalink, type:p.type, date:p.date, link:'', linkLabel:'' };
+  ig.posts.push(tile);
+  const sec = cfg.sections.find(s => s.id === 'instagram');
+  const first = !sec.on; if (first) sec.on = true;
+  changed({ immediate:true }); renderPane('instagram', true);
+  const btn = content.querySelector(`[data-igpick="${CSS.escape(id)}"]`); if (btn) btn.focus({ preventScroll:true });
+  if (first) toast(`Added. Your posts now show under “${sec.title}”.`);
+  post({ type:'shutterlink:focus', tab:'instagram' });
+  // Instagram image links expire, so keep a copy where Instagram allows it
+  if (lib.mode === 'token' && !/^data:/.test(p.image)){ const kept = await SL.keepImage(p.image); if (kept !== p.image){ tile.image = kept; changed({ noHistory:true }); } }
+}
 const ytNote = u => SL.youtubeId(u) ? ['fok','YouTube video found. It will play right on your page.'] : ['hint','Paste a YouTube link to play it on your page. Other links open in a new tab.'];
 P.film = () => { const [cls, txt] = ytNote(cfg.film.url); return head('Film', 'Feature one video. YouTube links play right on your page.') +
   panel('Video', `<div class="fields">
@@ -649,11 +789,12 @@ content.addEventListener('click', e => {
   const help = t.closest('.help-b');
   if (help){ const h = $(help.getAttribute('aria-controls')); h.hidden = !h.hidden; help.setAttribute('aria-expanded', String(!h.hidden)); return; }
   const sg = t.closest('[data-seg]');
-  if (sg){ let v = sg.dataset.v; if (sg.dataset.seg === 'gallery.columns') v = +v; set(sg.dataset.seg, v); changed({ immediate:true }); renderPane(current, true); return; }
+  if (sg){ let v = sg.dataset.v; if (/columns$/.test(sg.dataset.seg)) v = +v; set(sg.dataset.seg, v); changed({ immediate:true }); renderPane(current, true); return; }
   const th = t.closest('[data-theme]');
   if (th){ const p = SL.THEMES.find(x => x.id === th.dataset.theme); cfg.theme.preset = p.id; cfg.theme.colors = { ...p.colors }; changed({ immediate:true }); renderPane('design', true); return; }
   const fo = t.closest('[data-font]');
   if (fo){ cfg.theme.font = fo.dataset.font; changed({ immediate:true }); renderPane('design', true); return; }
+  const ip = t.closest('[data-igpick]'); if (ip){ igToggle(ip.dataset.igpick); return; }
   const fe = t.closest('[data-feature]');
   if (fe){ const f = cfg.shop.featured, i = f.indexOf(fe.dataset.feature); if (i >= 0) f.splice(i, 1); else f.push(fe.dataset.feature); changed({ immediate:true }); renderPane('shop', true); return; }
   const a = t.closest('[data-act]'); if (!a) return;
@@ -665,6 +806,10 @@ content.addEventListener('click', e => {
       : { bg: SL.mix(c.text, '#000000', .3), surface: SL.mix(c.text, '#000000', .12), text: SL.mix(c.bg, '#ffffff', .5), accent: c.accent };
     cfg.theme.preset = 'custom'; changed({ immediate:true }); renderPane('design', true); return;
   }
+  if (act === 'ig-connect'){ igConnect('demo', a); return; }
+  if (act === 'ig-token'){ igConnect('token', a); return; }
+  if (act === 'ig-refresh'){ igConnect('refresh', a); return; }
+  if (act === 'ig-disconnect'){ cfg.instagram.account = null; igSetLib(null); igToken(null); changed({ immediate:true }); renderPane('instagram', true); toast('Disconnected. Posts you chose stay on your page until you remove them.'); return; }
   if (act === 'export'){
     const u = URL.createObjectURL(new Blob([JSON.stringify(cfg, null, 2)], { type:'application/json' }));
     const l = document.createElement('a'); l.href = u; l.download = 'shutterlink-settings.json';
@@ -716,7 +861,7 @@ function fit(){ $('device').style.setProperty('--k', Math.max(.55, Math.min(1, (
 addEventListener('resize', fit); fit();
 $('frame').addEventListener('load', () => post());
 $('frame2').addEventListener('load', () => post());
-$('fab').onclick = () => { const f = $('frame2'); if (!f.getAttribute('src')) f.src = 'index.html?preview&v=2.3'; else post(); $('mpv').classList.add('open'); $('mpvClose').focus(); };
+$('fab').onclick = () => { const f = $('frame2'); if (!f.getAttribute('src')) f.src = 'index.html?preview&v=2.4'; else post(); $('mpv').classList.add('open'); $('mpvClose').focus(); };
 $('mpvClose').onclick = () => { $('mpv').classList.remove('open'); $('fab').focus(); };
 addEventListener('keydown', e => { if (e.key === 'Escape' && $('mpv').classList.contains('open')) $('mpvClose').click(); });
 // another tab changed settings (e.g. reset elsewhere)

@@ -198,6 +198,7 @@ const ACTIONS = {
   film:       { label:'Watch',      hint:'Plays your latest film' },
   enquire:    { label:'Enquire',    hint:'Jumps to your enquiry form' },
   newsletter: { label:'Subscribe',  hint:'Jumps to your newsletter signup' },
+  posts:      { label:'Posts',      hint:'Jumps to your chosen Instagram posts' },
   instagram:  { label:'Instagram',  hint:'Uses your Instagram address', social:true },
   tiktok:     { label:'TikTok',     hint:'Uses your TikTok address', social:true },
   youtube:    { label:'YouTube',    hint:'Uses your YouTube address', social:true },
@@ -229,6 +230,9 @@ const ICONS = {
   pinterest: s('<circle cx="12" cy="12" r="9"/><path d="M10.5 20l1.6-7.2M11 14.5c.6 1.1 3.4 1.5 4.6-1.4 1.1-2.8-.6-5.6-3.6-5.6-3.3 0-5 2.3-4.5 4.8"/>'),
   website: s('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.8 3.8 5.8 3.8 9s-1.2 6.2-3.8 9c-2.6-2.8-3.8-5.8-3.8-9S9.4 5.8 12 3z"/>'),
   email: s('<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7l8.5 6 8.5-6"/>'),
+  posts: s('<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M3 9h18M9 3v18"/>'),
+  video: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>',
+  stack: s('<rect x="7" y="7" width="13" height="13" rx="2.5"/><path d="M4 16V6a2 2 0 0 1 2-2h10"/>'),
   link: s('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'),
   share: s('<path d="M12 3v13M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/>', 'stroke-width="2"'),
   bag: s('<path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/>', 'stroke-width="2"'),
@@ -273,6 +277,7 @@ const DEFAULTS = {
   ],
   sections: [
     { id:'shop',       on:true,  title:'Prints' },
+    { id:'instagram',  on:false, title:'From Instagram' },
     { id:'gallery',    on:true,  title:'Recent work' },
     { id:'film',       on:true,  title:'Latest film' },
     { id:'links',      on:true,  title:'More from me' },
@@ -292,6 +297,7 @@ const DEFAULTS = {
   enquire: { intro:'Tell me a little about your day or project and I’ll get back to you with availability and pricing.', types:'Wedding, Elopement, Portrait, Print commission', reply:'I usually reply within two days.', to:'' },
   newsletter: { blurb:'One email a month: where I shot, what I used, and first look at new prints.', button:'Subscribe' },
   socials: { instagram:'', tiktok:'', youtube:'', vimeo:'', facebook:'', pinterest:'', website:'', email:'' },
+  instagram: { account:null, posts:[], columns:2, captions:true },
   page: { showGear:true, footer:true },
 };
 
@@ -345,7 +351,60 @@ function youtubeId(u){
   return m ? m[1] : null;
 }
 
-window.SL = { KEY, BRAND, THEMES, FONTS, SHOP, PRINT_OPTIONS, CURRENCIES, ACTIONS, SOCIALS, ICONS, DEFAULTS,
+/* ---------- Instagram ----------
+   Live version: Sport Shutter runs Instagram's Business Login, swaps the code
+   for a long-lived token on its server and refreshes it. The prototype has two
+   paths: a demo account, and a token pasted from the Meta App Dashboard. */
+const IG_DEMO = {
+  username: 'grantwalker.photo',
+  posts: [
+    [1018,'Last light over the valley. Waited two hours for the cloud to break and it gave me about four minutes.'],
+    [1015,'The river after a week of rain. Shot handheld at 1/8s, held my breath.'],
+    [1016,'Red earth and long shadows. Prints of this one are now in the shop.'],
+    [1050,'5:42am at Bondi. The swimmers were out before me.'],
+    [1039,'Long exposure at the base of the falls. Wet boots, worth it.'],
+    [1043,'Fog pooling in the valley at sunrise. Swipe for the before and after.'],
+    [1036,'First snow of the season. Booking alpine elopements for winter 2027.'],
+    [1053,'Low tide and a slow shutter on the south coast.'],
+    [1044,'A quiet moment before the ceremony.'],
+    [1062,'Behind the scenes from Saturday’s wedding. What a day.'],
+    [1011,'New gear day. Full review coming in field notes this month.'],
+    [1040,'Golden hour from the lookout. Same spot, every season.'],
+  ].map(([id, caption], i) => ({ id:'demo-' + id, image:pic(id,800,800), caption, permalink:'', type: i === 5 ? 'CAROUSEL_ALBUM' : i === 9 ? 'VIDEO' : 'IMAGE', date: new Date(Date.UTC(2026, 10, 18 - i * 4)).toISOString() })),
+};
+async function igFetch(token){
+  const base = 'https://graph.instagram.com';
+  const q = (path, fields) => fetch(`${base}${path}?fields=${fields}&access_token=${encodeURIComponent(token)}`).then(async r => {
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.error) throw new Error((j.error && j.error.message) || 'Instagram didn’t accept that token.');
+    return j;
+  });
+  const me = await q('/me', 'username');
+  let page = await q('/me/media', 'id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=50');
+  const posts = (page.data || []).map(m => ({
+    id: m.id, caption: m.caption || '', permalink: m.permalink || '', type: m.media_type, date: m.timestamp,
+    image: m.media_type === 'VIDEO' ? (m.thumbnail_url || '') : (m.media_url || m.thumbnail_url || ''),
+  })).filter(p => p.image);
+  return { username: me.username, posts };
+}
+/* Keep a copy of an image (Instagram image links expire). Falls back to the link if the copy isn't allowed. */
+function keepImage(url, max=900){
+  return new Promise(res => {
+    const im = new Image(); im.crossOrigin = 'anonymous';
+    im.onload = () => {
+      try {
+        const k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement('canvas');
+        c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+        res(c.toDataURL('image/jpeg', .82));
+      } catch(_) { res(url); }
+    };
+    im.onerror = () => res(url);
+    im.src = url;
+  });
+}
+
+window.SL = { IG_DEMO, igFetch, keepImage, KEY, BRAND, THEMES, FONTS, SHOP, PRINT_OPTIONS, CURRENCIES, ACTIONS, SOCIALS, ICONS, DEFAULTS,
   rgb, hex, mix, lum, contrast, isDark, legible, isHex, tokens, applyTheme, loadFont, fontUrl,
   pic, sized, readImage, sampleColour, money, load, save, reset, clone, fromJSON, bytes, esc, href, youtubeId, normalise };
 })();

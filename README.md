@@ -24,6 +24,13 @@ Branding: the top bar shows the Sport Shutter mark with the ShutterLink name and
 - Live phone preview that follows the tab you're on; full-screen preview on mobile
 - Light and dark mode for the settings app itself
 
+## Instagram posts
+
+Settings → Instagram: connect, tap the posts you want (up to 12), and each becomes a tile with its photo and caption. Captions can be edited, and each tile can carry a button link (for example, to the print in the shop).
+
+- **Prototype:** “Connect Instagram” connects a demo account so the whole flow can be tried. “Use your real posts now” accepts a token generated in the Meta App Dashboard (Instagram › API setup with Instagram login › Generate token; professional accounts only, valid 60 days). The token is kept only in that browser.
+- **Live version:** Sport Shutter runs Instagram’s Business Login, exchanges the code for a long-lived token on its server, refreshes it before it expires, and stores copies of chosen images (Instagram image links expire). `SL.igFetch` shows the calls: `GET graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp`.
+
 ## How it fits together
 
 - `assets/core.js` holds everything shared: the colour system (four colours in, a full accessible palette out), themes, fonts, default content, the shop catalogue and storage.
