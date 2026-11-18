@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://picsum.photos">
-<script src="assets/core.js"></script>
+<script src="assets/core.js?v=2.2"></script>
 <script>
   /* Paint the saved theme before first render so there's no flash of the wrong colours. */
   try { SL.applyTheme(SL.load()); } catch(_) {}
@@ -102,7 +102,7 @@ img.broken{opacity:0!important}
 .ticks{position:absolute;z-index:3;left:14px;right:14px;top:calc(60px + var(--sat));display:flex;gap:4px}
 .tick{flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.32);overflow:hidden}
 .tick i{display:block;height:100%;width:0;background:#fff}
-.tick.done i{width:100%}
+.tick.sent i{width:100%}
 .tick.now i{animation:fill var(--dur,5s) linear forwards}
 .paused .tick.now i{animation-play-state:paused}
 @keyframes fill{to{width:100%}}
@@ -244,11 +244,11 @@ select.in{background-image:linear-gradient(45deg,transparent 50%,var(--text-dim)
 .in[aria-invalid=true]{border-color:#e5484d}
 .err{font-size:12.5px;font-weight:500;color:#e5484d;min-height:0}
 .fine{font-size:12.5px;color:var(--text-faint);line-height:1.45}
-.done{display:flex;gap:14px;align-items:flex-start;margin-top:16px;padding:14px;border-radius:var(--radius-sm);background:var(--accent-soft)}
-.done i{width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;flex:none}
-.done i svg{width:16px;height:16px}
-.done b{display:block}
-.done span{font-size:13.5px;color:var(--text-dim)}
+.sent{display:flex;gap:14px;align-items:flex-start;margin-top:16px;padding:14px;border-radius:var(--radius-sm);background:var(--accent-soft)}
+.sent i{width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;flex:none}
+.sent i svg{width:16px;height:16px}
+.sent b{display:block}
+.sent span{font-size:13.5px;color:var(--text-dim)}
 .inline{display:flex;gap:8px;margin-top:16px}
 .inline .in{flex:1;min-width:0}
 
@@ -416,7 +416,7 @@ const tintCache = new Map();
 
 /* static chrome */
 $('mark').innerHTML = SL.BRAND.logo;
-$('product').textContent = SL.BRAND.product;
+$('product').textContent = SL.BRAND.product || 'ShutterLink';
 $('logo').setAttribute('aria-label', `${SL.BRAND.product} by ${SL.BRAND.name}, go to the ${SL.BRAND.name} home page`);
 $('shareBtn').innerHTML = I.share;
 $('cartBtn').insertAdjacentHTML('afterbegin', I.bag);
@@ -884,7 +884,7 @@ function wireForms(){
       const first = d.name.trim().split(/\s+/)[0];
       const to = SL.href(cfg.enquire.to);
       const mail = to.startsWith('mailto:') ? `${to}?subject=${encodeURIComponent((d.type || 'Enquiry') + ' enquiry from ' + d.name)}&body=${encodeURIComponent(`${d.msg}\n\n${d.date ? 'Date: ' + d.date + '\n' : ''}Reply to: ${d.email}`)}` : '';
-      f.outerHTML = `<div class="done" tabindex="-1" id="enqDone"><i>${I.check}</i><div><b>Thanks, ${esc(first)}. Your enquiry is ready.</b>
+      f.outerHTML = `<div class="sent" tabindex="-1" id="enqDone"><i>${I.check}</i><div><b>Thanks, ${esc(first)}. Your enquiry is ready.</b>
         <span>${esc(cfg.enquire.reply || '')} ${mail ? `<a href="${esc(mail)}" style="color:var(--accent-text);font-weight:600">Open it in your email app</a>` : 'Prototype: enquiries will arrive in your Sport Shutter inbox.'}</span></div></div>`;
       $('enqDone').focus();
     };
@@ -895,7 +895,7 @@ function wireForms(){
       e.preventDefault();
       const v = $('nlEmail').value;
       if (!emailOk(v)){ $('nlEmail').setAttribute('aria-invalid', 'true'); $('nlErr').hidden = false; $('nlEmail').focus(); return; }
-      n.outerHTML = `<div class="done" tabindex="-1" id="nlDone"><i>${I.check}</i><div><b>You’re on the list.</b><span>Look out for the next issue at ${esc(v.trim())}.</span></div></div>`;
+      n.outerHTML = `<div class="sent" tabindex="-1" id="nlDone"><i>${I.check}</i><div><b>You’re on the list.</b><span>Look out for the next issue at ${esc(v.trim())}.</span></div></div>`;
       $('nlErr').hidden = true; $('nlDone').focus();
     };
     $('nlEmail').oninput = () => { $('nlEmail').removeAttribute('aria-invalid'); $('nlErr').hidden = true; };
