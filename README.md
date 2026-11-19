@@ -33,6 +33,10 @@ Branding: the top bar shows the Sport Shutter mark with the ShutterLink name and
 
 Placeholder photos come from picsum.photos. The demo photographer is fictional.
 
+## Putting it on sportshutter.com
+
+See [DEPLOY.md](DEPLOY.md): either a subdomain (`shutterlink.sportshutter.com`) or a path (`sportshutter.com/shutterlink/`) through a reverse proxy, with ready-to-use settings for Nginx, Cloudflare, Vercel and Netlify.
+
 ## Viewing
 
 GitHub Pages: Settings → Pages → Deploy from branch → `main` / root.

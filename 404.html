@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Page not found · ShutterLink</title>
 <meta name="robots" content="noindex">
-<link rel="icon" href="/shutterLink/favicon.svg" type="image/svg+xml">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%232326D3%27/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
@@ -25,13 +25,14 @@ a:focus-visible{outline:2px solid #9a9dff;outline-offset:3px}
   <div class="mk"><svg viewBox="0 0 86 90" aria-hidden="true"><g fill="currentColor"><path d="M28.5 0V58H0V28.5A28.5 28.5 0 0 1 28.5 0Z"/><path d="M0 62H28.5V90A28.5 28.5 0 0 1 0 62Z"/><path d="M57.5 0A28.5 28.5 0 0 1 86 28.5H57.5Z"/><path d="M57.5 32H86V61.5A28.5 28.5 0 0 1 57.5 90Z"/><circle cx="43" cy="45" r="13.5"/></g></svg></div>
   <h1>This page isn’t here</h1>
   <p>The link may be out of date, or the page has moved.</p>
-  <a id="home" href="/shutterLink/">Go to the link page</a>
+  <a id="home" href="./">Go to the link page</a>
 </main>
 <script>
-  // work out the site root on GitHub Pages (/repo/) or a custom domain (/)
-  var seg = location.pathname.split('/').filter(Boolean)[0];
-  if (location.hostname.endsWith('github.io') && seg) document.getElementById('home').href = '/' + seg + '/';
-  else document.getElementById('home').href = '/';
+  // Find the app's home whether it's on GitHub Pages (/shutterLink/), behind a proxy
+  // (/shutterlink/ on sportshutter.com) or on its own subdomain (/).
+  var seg = location.pathname.split('/').filter(Boolean)[0] || '';
+  var home = (location.hostname.endsWith('github.io') || /^shutter-?link$/i.test(seg)) && seg ? '/' + seg + '/' : '/';
+  document.getElementById('home').href = home;
 </script>
 </body>
 </html>

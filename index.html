@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>
+  /* Served from a sub-path (e.g. sportshutter.com/shutterlink)? Make sure the address ends in "/"
+     so relative files load from this app, not the main site. Runs before anything else loads. */
+  (function(l){ if (!/\/$|\.[a-z0-9]+$/i.test(l.pathname)) l.replace(l.pathname + '/' + l.search + l.hash); })(location);
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Grant Walker · Photography</title>
 <meta name="description" content="Prints, bookings, films and links from Grant Walker, landscape and wedding photographer in the Blue Mountains.">
