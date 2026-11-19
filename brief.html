@@ -481,7 +481,8 @@ location ~ ^/@[a-z0-9._-]+/?$ {
 
     <section class="ch">
       <h2 id="try">11. Try it</h2>
-      <p>The <a href="simulator.html">simulator</a> runs <code>server/shutterlink-api.js</code> in the browser against a pretend database, with the real settings page and the real public page connected to it. Every request appears in its log.</p>
+      <p>The <a href="simulator.html">simulator</a> runs <code>server/shutterlink-api.js</code> in the browser against a pretend database. It has two views.</p>
+      <ul><li><b>Code flow.</b> Pick one of 12 calls and press Run. It steps through the page code that makes the call, the request, the login check, the lines of <code>shutterlink-api.js</code> that decide the result, the database calls and what changed, the events, the response, and what the person sees. Edit the input and run it again.</li><li><b>Live pages.</b> The real settings page and public page connected to the same pretend server, with every request in a log. The steps below use this view.</li></ul>
       <ol class="steps">
         <li><div><b>Change your name in the settings.</b><span>Watch the <code>PUT</code> appear in Requests and the visitor’s page update a moment later.</span></div></li>
         <li><div><b>Switch to Mia Chen.</b><span>The settings reload with her page: each account only sees its own.</span></div></li>

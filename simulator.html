@@ -10,11 +10,67 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>window.SHUTTERLINK_BACKEND = 'sim';</script>
-<script src="assets/core.js?v=3.1"></script>
-<script src="assets/data.js?v=3.1"></script>
+<script src="assets/core.js?v=3.2"></script>
+<script src="assets/data.js?v=3.2"></script>
 <script>try{const t=localStorage.getItem('shutterlink:ui-theme');if(t)document.documentElement.dataset.ui=t;}catch(_){}</script>
 <link rel="stylesheet" href="assets/dev.css?v=3.0">
 <style>
+.sim-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.flow-bar{display:flex;align-items:center;gap:12px;margin-top:18px;flex-wrap:wrap}
+.f.inline{display:flex;align-items:center;gap:10px}
+.f.inline select{width:auto;min-width:200px}
+.flow{display:grid;grid-template-columns:270px minmax(0,1fr);gap:20px;margin-top:14px;align-items:start}
+@media (max-width:900px){ .flow{grid-template-columns:1fr} }
+.scen{position:sticky;top:76px;display:grid;gap:4px}
+.scen h3{font-size:12px;font-weight:700;color:var(--faint);margin:12px 8px 4px}
+.scen h3:first-child{margin-top:0}
+.scen button{display:grid;gap:1px;text-align:left;padding:9px 11px;border-radius:10px;border:1px solid transparent}
+.scen button b{font-size:13.5px;font-weight:600}
+.scen button span{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.scen button:hover{background:var(--surface-2)}
+.scen button[aria-current=true]{background:var(--surface);border-color:var(--accent-text);box-shadow:0 0 0 3px var(--accent-soft)}
+@media (max-width:900px){ .scen{position:static;display:flex;overflow-x:auto;gap:6px;padding-bottom:4px} .scen h3{display:none} .scen button{flex:none;border-color:var(--border);background:var(--surface)} }
+.inp .ph{margin-bottom:4px}
+.inp .ph .sub{font-family:var(--mono);font-size:12px;color:var(--faint)}
+textarea.mono{font-family:var(--mono);font-size:12.5px;line-height:1.5}
+.runbar{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.tg.mini{gap:8px;font-size:12.5px;color:var(--dim);font-weight:500}
+.result{margin-left:auto;font-family:var(--mono);font-size:12.5px;font-weight:600}
+.steps-f{list-style:none;margin-top:16px;position:relative;display:grid;gap:12px}
+.steps-f::before{content:"";position:absolute;left:17px;top:14px;bottom:14px;width:2px;background:var(--border)}
+.stp{position:relative;display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;animation:in .3s ease both}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.stp .dot{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:var(--surface);border:2px solid var(--a,var(--border-strong));color:var(--a,var(--dim));z-index:1}
+.stp .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;min-width:0}
+.stp .hd{display:flex;align-items:center;gap:10px;padding:10px 14px;flex-wrap:wrap}
+.stp .hd b{font-size:14.5px}
+.who-c{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:7px;background:color-mix(in srgb,var(--a) 14%,transparent);color:var(--a)}
+.stp .hd .file{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-left:auto}
+.stp .ex{padding:0 14px 10px;color:var(--dim);font-size:13.5px}
+.a-page{--a:var(--ok)} .a-net{--a:var(--dim)} .a-ss{--a:var(--accent-text)} .a-db{--a:var(--warn)}
+.fcode{margin:0;border-top:1px solid var(--border);background:var(--surface-2);font-family:var(--mono);font-size:12px;line-height:1.6;overflow:auto;max-height:420px;padding:8px 0}
+.fcode .ln{display:grid;grid-template-columns:44px 1fr;padding-right:14px}
+.fcode .ln i{font-style:normal;color:var(--faint);text-align:right;padding-right:12px;user-select:none;opacity:.7}
+.fcode .ln span{white-space:pre}
+.fcode .ln.hit{background:color-mix(in srgb,var(--a,var(--accent-text)) 16%,transparent);box-shadow:inset 3px 0 0 var(--a,var(--accent-text))}
+.fcode.plain{padding:10px 14px;white-space:pre-wrap;word-break:break-word}
+.k{color:var(--accent-text)} .s{color:var(--ok)} .c{color:var(--faint);font-style:italic} .n{color:var(--warn)}
+.diff{border-top:1px solid var(--border);font-size:12.5px}
+.diff table{width:100%;border-collapse:collapse}
+.diff td{padding:7px 14px;border-bottom:1px solid var(--border);vertical-align:top;font-family:var(--mono);font-size:12px;word-break:break-word}
+.diff td:first-child{color:var(--faint);width:42%}
+.diff .was{color:var(--danger);text-decoration:line-through;opacity:.8}
+.diff .now{color:var(--ok)}
+.calls{border-top:1px solid var(--border);padding:10px 14px;display:grid;gap:8px}
+.call{font-family:var(--mono);font-size:12px;line-height:1.55;word-break:break-word}
+.call .ret{color:var(--faint)}
+details.sql{border-top:1px solid var(--border)}
+details.sql summary{padding:8px 14px;cursor:pointer;font-size:12.5px;color:var(--dim);font-weight:600}
+.status{display:inline-block;padding:1px 7px;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:700}
+.status.s2{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.status.s3{background:var(--surface-3);color:var(--dim)}
+.status.s4{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.status.s5{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)}
 .sim{max-width:1520px;margin:0 auto;padding:22px 20px 60px}
 .sim-grid{display:grid;grid-template-columns:290px minmax(0,1fr) 412px;gap:16px;align-items:start;margin-top:18px}
 @media (max-width:1280px){ .sim-grid{grid-template-columns:290px minmax(0,1fr)} .col-page{grid-column:1 / -1;justify-self:center} }
@@ -108,11 +164,35 @@ pre.code{margin:0;font-family:var(--mono);font-size:12px;line-height:1.55;backgr
 </header>
 
 <main class="sim">
-  <div class="pane-h">
-    <h1>Simulator</h1>
-    <p>Sport Shutter’s side of ShutterLink, running in your browser. The settings and the public page below talk to it exactly as they would to the real server: the same requests, handled by the same file, <code>server/shutterlink-api.js</code>, with a pretend database and pretend logins.</p>
+  <div class="pane-h sim-head">
+    <div>
+      <h1>Simulator</h1>
+      <p>Sport Shutter’s side of ShutterLink, running in your browser: the real <code>server/shutterlink-api.js</code> with a pretend database and pretend logins.</p>
+    </div>
+    <nav class="seg" aria-label="Simulator view"><button data-view="flow" aria-pressed="true">Code flow</button><button data-view="live" aria-pressed="false">Live pages</button></nav>
   </div>
 
+  <div id="viewFlow">
+    <div class="flow-bar">
+      <label class="f inline">Signed in as <select class="in" id="fWho" aria-label="Signed in as"></select></label>
+      <span class="sp"></span>
+      <button class="btn" id="fReset">Reset the pretend database</button>
+    </div>
+    <div class="flow">
+      <nav class="scen" id="scen" aria-label="Scenarios"></nav>
+      <div class="run">
+        <section class="panel inp">
+          <div class="ph"><h2 id="sTitle"></h2><span class="sub" id="sSub"></span></div>
+          <p class="hint" id="sWhat"></p>
+          <div id="inWrap" class="fields" style="margin-top:12px"><label class="f"><span class="lab">Input<span>Edit it and run again</span></span><textarea class="in mono" id="sIn" rows="5" spellcheck="false" aria-label="Input for this scenario"></textarea></label><span class="ferr" id="inErr" hidden></span></div>
+          <div class="runbar"><button class="btn primary" id="runBtn">Run</button><button class="btn" id="stepBtn">Step through</button><label class="tg mini"><span>Show every step at once</span><span class="sw"><input type="checkbox" id="instant" aria-label="Show every step at once"><i></i></span></label><span class="result" id="result"></span></div>
+        </section>
+        <ol class="steps-f" id="steps" aria-live="polite"></ol>
+      </div>
+    </div>
+  </div>
+
+  <div id="viewLive" hidden>
   <div class="sim-grid">
     <div class="ctl">
       <section class="panel">
@@ -157,10 +237,13 @@ pre.code{margin:0;font-family:var(--mono);font-size:12px;line-height:1.55;backgr
     </nav>
     <div class="pane" id="pane"></div>
   </section>
+  </div>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="assets/dev.js?v=3.0"></script>
+<script src="assets/dev.js?v=3.2"></script>
+<script src="server/shutterlink-api.js?v=3.2"></script>
+<script src="server/memory-store.js?v=3.2"></script>
 <script>
 (function(){
 'use strict';
@@ -197,7 +280,6 @@ $('elsewhere').onclick = () => {
 $('reset').onclick = () => { sim.reset(); reqs.length = 0; events.length = 0; renderWho(); fillHandles(); loadPage(); render(); toast('Pretend database reset'); };
 
 /* ---------- Frames ---------- */
-$('setFrame').src = 'settings.html?backend=sim&embed#profile';
 function fillHandles(){
   const st = sim.state(), cur = $('handleSel').value;
   const hs = Object.values(st.profiles).map(p => p.handle).filter(Boolean);
@@ -210,7 +292,8 @@ function loadPage(){
   $('pageFrame').src = u; $('openPage').href = u;
 }
 $('handleSel').onchange = loadPage;
-fillHandles(); loadPage();
+let live = false;
+window.startLive = () => { if (live) return; live = true; $('setFrame').src = 'settings.html?backend=sim&embed#profile'; fillHandles(); loadPage(); renderWho(); };
 
 /* ---------- Live feed from the pages ---------- */
 D.channel.onmessage = e => {
@@ -298,5 +381,6 @@ function render(){ ({ reqs:renderReqs, db:renderDb, events:renderEvents, inbox:r
 renderWho(); render(); refreshDb();
 })();
 </script>
+<script src="assets/flow.js?v=3.2"></script>
 </body>
 </html>
