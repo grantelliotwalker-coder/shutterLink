@@ -95,4 +95,5 @@ select.in{padding-right:28px}
   .bar .btn:not(.icon){padding:0 10px}
 }
 @media (max-width:520px){ .devnav a{padding:6px 8px} .bar > .btn:last-child{display:none} }
+@media (max-width:360px){ .bar{padding:0 8px;gap:4px} .devnav a{padding:6px 5px;font-size:12.5px} .crumb, .brand > span:last-child{display:none} }
 @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important;scroll-behavior:auto!important} }
