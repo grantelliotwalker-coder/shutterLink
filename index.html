@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://picsum.photos">
-<script src="assets/core.js?v=2.4"></script>
+<script src="assets/core.js?v=2.5"></script>
 <script>
   /* Paint the saved theme before first render so there's no flash of the wrong colours. */
   try { SL.applyTheme(SL.load()); } catch(_) {}
@@ -185,7 +185,6 @@ img.broken{opacity:0!important}
 .btn-line:hover{background:var(--surface-2)}
 .btn[disabled]{opacity:.5;pointer-events:none}
 .btn-block{width:100%}
-.btn svg{width:18px;height:18px;flex:none}
 
 /* Prints */
 .strip{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 18px;margin:0 -18px;padding:0 18px 6px;scrollbar-width:none}
@@ -202,22 +201,6 @@ img.broken{opacity:0!important}
 .grid button{aspect-ratio:1;overflow:hidden;background:var(--surface-2)}
 .grid img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease,opacity .5s ease}
 .grid button:hover img{transform:scale(1.05)}
-
-/* Instagram posts */
-.ig{display:grid;grid-template-columns:repeat(var(--cols,2),1fr);gap:12px 10px}
-.ig button{text-align:left;min-width:0}
-.ig .ph{position:relative;aspect-ratio:1;border-radius:var(--radius-sm);overflow:hidden;background:var(--surface-2)}
-.ig img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease,opacity .5s ease}
-.ig button:hover img{transform:scale(1.04)}
-.ig .kind{position:absolute;top:8px;right:8px;width:24px;height:24px;display:grid;place-items:center;color:#fff;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5))}
-.ig .kind svg{width:18px;height:18px}
-.ig p{margin-top:8px;font-size:13px;line-height:1.4;color:var(--text-dim);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.ig.c3 p{display:none}
-.post-img{border-radius:var(--radius-sm);overflow:hidden;background:var(--surface-2);margin:8px 0 14px}
-.post-img img{width:100%;max-height:60vh;object-fit:contain;background:#000}
-.post-cap{white-space:pre-line;font-size:15px;line-height:1.5}
-.post-date{font-size:12.5px;color:var(--text-faint);margin-top:8px}
-.post-act{display:grid;gap:10px;margin-top:18px}
 
 /* Film */
 .film{display:block;position:relative;width:100%;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;background:var(--surface-2);text-align:left}
@@ -449,7 +432,7 @@ function ext(url, demo){
   return `href="#" data-demo="${esc(demo)}"`;
 }
 function quickAttrs(q){
-  const jump = { shop:'shop', gallery:'gallery', enquire:'enquire', newsletter:'newsletter', posts:'instagram' }[q.type];
+  const jump = { shop:'shop', gallery:'gallery', enquire:'enquire', newsletter:'newsletter' }[q.type];
   if (jump) return on(jump) ? `href="#sec-${jump}"` : `href="#" data-demo="${esc(SL.ACTIONS[q.type].label)} (section is turned off)"`;
   if (q.type === 'film') return `href="#sec-film" data-film`;
   if (SL.ACTIONS[q.type].social) return ext(cfg.socials[q.type], SL.ACTIONS[q.type].label);
@@ -524,31 +507,6 @@ S.gallery = () => {
     <div class="grid" style="--cols:${cfg.gallery.columns}">${ph.map((g,i) => `
       <button data-lb="${i}" aria-label="Open photo ${i+1}${g.caption ? ': ' + esc(g.caption) : ''}"><img class="fade" src="${esc(SL.sized(g.url,400,400))}" alt="" loading="lazy" decoding="async"></button>`).join('')}</div>`;
 };
-S.instagram = () => {
-  const ig = cfg.instagram, posts = ig.posts.filter(p => p.image);
-  if (!posts.length) return '';
-  const user = ig.account && ig.account.username;
-  const profile = cfg.socials.instagram || (user && ig.account.mode === 'token' ? 'https://instagram.com/' + user : '');
-  return `<div class="sec-h"><h2>${title('instagram')}</h2>${user ? `<a ${ext(profile, 'Instagram')}>@${esc(user)}</a>` : ''}</div>
-    <div class="ig ${ig.columns === 3 || !ig.captions ? 'c3' : ''}" style="--cols:${ig.columns}">${posts.map((p,i) => `
-      <button data-post="${i}" aria-label="${esc((p.caption || 'Instagram post').slice(0, 80))}">
-        <div class="ph"><img class="fade" src="${esc(SL.sized(p.image,500,500))}" alt="" loading="lazy" decoding="async">${p.type === 'VIDEO' ? `<span class="kind">${I.video}</span>` : p.type === 'CAROUSEL_ALBUM' ? `<span class="kind">${I.stack}</span>` : ''}</div>
-        ${ig.captions && p.caption ? `<p>${esc(p.caption)}</p>` : ''}
-      </button>`).join('')}</div>`;
-};
-function openPost(i){
-  const p = cfg.instagram.posts.filter(x => x.image)[i]; if (!p) return;
-  const link = SL.href(p.link), perma = SL.href(p.permalink);
-  const d = p.date ? new Date(p.date) : null;
-  openSheet(`<div class="sh-head"><h3>${esc(cfg.profile.name)}</h3><button class="x" data-close aria-label="Close"></button></div>
-    <div class="post-img"><img class="fade" src="${esc(SL.sized(p.image,1200,1200))}" alt=""></div>
-    ${p.caption ? `<p class="post-cap">${esc(p.caption)}</p>` : ''}
-    ${d && !isNaN(d) ? `<p class="post-date">${d.toLocaleDateString('en-AU', { day:'numeric', month:'long', year:'numeric' })}</p>` : ''}
-    <div class="post-act">
-      ${link ? `<a class="btn btn-accent btn-block" ${ext(p.link, p.linkLabel || 'that link')} data-focus>${esc(p.linkLabel || 'Open link')}</a>` : ''}
-      <a class="btn ${link ? 'btn-line' : 'btn-accent'} btn-block" ${ext(perma, 'this post on Instagram')} ${link ? '' : 'data-focus'}>${I.instagram}View on Instagram</a>
-    </div>`, 'Instagram post');
-}
 S.film = () => {
   const f = cfg.film, yt = SL.youtubeId(f.url);
   const thumb = f.thumb || (yt ? `https://i.ytimg.com/vi/${yt}/hqdefault.jpg` : '');
@@ -966,7 +924,6 @@ document.addEventListener('click', e => {
   if (t.closest('[data-film]')){ e.preventDefault(); playFilm(); return; }
   const pr = t.closest('[data-print]'); if (pr){ openPrint(pr.dataset.print); return; }
   const g = t.closest('[data-lb]'); if (g){ openLb(+g.dataset.lb); return; }
-  const po = t.closest('[data-post]'); if (po){ openPost(+po.dataset.post); return; }
   if (PREVIEW){
     const a = t.closest('a[href]');
     if (a && !a.getAttribute('href').startsWith('#')){ e.preventDefault(); toast('Links open on the live page'); }
@@ -984,7 +941,6 @@ addEventListener('message', e => {
   }
   if (e.data.type === 'shutterlink:focus'){
     const map = { profile:'cover', design:'cover', cover:'cover', buttons:'cover' };
-    if (e.data.tab === 'instagram' && !$('sec-instagram')) return;
     const el = $(map[e.data.tab] || 'sec-' + e.data.tab);
     if (el) (map[e.data.tab] ? scrollTo({ top:0, behavior: reduce ? 'auto' : 'smooth' }) : el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block:'start' }));
   }
