@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://picsum.photos">
-<script src="assets/core.js?v=2.6"></script>
+<script src="assets/core.js?v=2.8"></script>
 <script>
   /* Paint the saved theme before first render so there's no flash of the wrong colours. */
   try { SL.applyTheme(SL.load()); } catch(_) {}
@@ -496,12 +496,12 @@ function longestWord(n){
 /* ---------- Sections ---------- */
 const S = {};
 S.shop = () => {
-  const items = cfg.shop.featured.map(id => SL.SHOP.find(p => p.id === id)).filter(Boolean);
+  const all = SL.shopItems(cfg), items = cfg.shop.featured.map(id => all.find(p => p.id === id)).filter(Boolean);
   if (!items.length) return '';
   return `<div class="sec-h"><h2>${title('shop')}</h2><a href="#" data-demo="your full Sport Shutter shop">Shop all</a></div>
     <div class="strip">${items.map(p => `
       <button class="print" data-print="${p.id}" aria-label="${esc(p.title)}${cfg.shop.showPrices ? ', from ' + SL.money(p.from, cfg.shop.currency) : ''}">
-        <div class="ph"><img class="fade" src="${SL.pic(p.pid,440,550)}" alt="" loading="lazy" decoding="async"></div>
+        <div class="ph"><img class="fade" src="${esc(SL.sized(p.img,440,550))}" alt="" loading="lazy" decoding="async"></div>
         <b>${esc(p.title)}</b>${cfg.shop.showPrices ? `<span class="num">From ${SL.money(p.from, cfg.shop.currency)}</span>` : ''}
       </button>`).join('')}</div>`;
 };
@@ -735,15 +735,15 @@ function priceOf(p, sel){
   return Math.round(p.from * size.mult + paper.add + fr.add * size.mult);
 }
 function openPrint(id){
-  const p = SL.SHOP.find(x => x.id === id); if (!p) return;
+  const p = SL.shopItems(cfg).find(x => x.id === id); if (!p) return;
   const sel = { size:'a4', paper:'rag', frame:'none', qty:1 };
   const cur = cfg.shop.currency;
   const chips = (group, list, extra) => `<div class="chips" role="radiogroup" aria-label="${group}" style="--n:${list.length}">${list.map(o =>
     `<button class="chip" role="radio" data-g="${group}" data-v="${o.id}" aria-checked="${o.id === sel[group]}" aria-pressed="${o.id === sel[group]}">${extra ? extra(o) : ''}<b>${o.label}</b>${o.note ? `<span>${o.note}</span>` : ''}</button>`).join('')}</div>`;
   openSheet(`
     <div class="sh-head"><h3>${esc(p.title)}</h3><button class="x" data-close aria-label="Close"></button></div>
-    <p class="sh-sub">${esc(p.blurb)}</p>
-    <div class="art" id="art"><div class="fr" id="fr"><img class="fade" src="${SL.pic(p.pid,640,800)}" alt="${esc(p.title)}"></div></div>
+    ${p.blurb ? `<p class="sh-sub">${esc(p.blurb)}</p>` : ''}
+    <div class="art" id="art"><div class="fr" id="fr"><img class="fade" src="${esc(SL.sized(p.img,640,800))}" alt="${esc(p.title)}"></div></div>
     <div class="opt"><b>Size</b>${chips('size', O.sizes)}</div>
     <div class="opt"><b>Paper</b>${chips('paper', O.papers)}</div>
     <div class="opt"><b>Frame <span id="frNote"></span></b>${chips('frame', O.frames, o => o.id === 'none' ? '' : `<i class="sw" style="background:${o.css}"></i>`)}</div>
@@ -777,7 +777,7 @@ function openPrint(id){
 
 /* ---------- Cart (kept for this visit) ---------- */
 let cart = [];
-try { cart = JSON.parse(sessionStorage.getItem('shutterlink:cart') || '[]').filter(x => SL.SHOP.some(p => p.id === x.id)); } catch(_) {}
+try { cart = JSON.parse(sessionStorage.getItem('shutterlink:cart') || '[]'); } catch(_) {}
 function saveCart(){
   try { sessionStorage.setItem('shutterlink:cart', JSON.stringify(cart)); } catch(_) {}
   const n = cart.reduce((a,x) => a + x.qty, 0);
@@ -786,6 +786,7 @@ function saveCart(){
 }
 function openCart(){
   const cur = cfg.shop.currency;
+  const have = SL.shopItems(cfg); cart = cart.filter(x => have.some(p => p.id === x.id)); saveCart();
   if (!cart.length){
     openSheet(`<div class="sh-head"><h3>Your cart</h3><button class="x" data-close aria-label="Close"></button></div>
       <div class="empty">${I.bag}<p>Nothing here yet. Prints you add will show up here.</p></div>
@@ -794,15 +795,15 @@ function openCart(){
     return;
   }
   const rows = cart.map((x,i) => {
-    const p = SL.SHOP.find(q => q.id === x.id);
+    const p = SL.shopItems(cfg).find(q => q.id === x.id);
     const each = priceOf(p, x);
     const lab = [O.sizes.find(s => s.id === x.size).label, O.papers.find(s => s.id === x.paper).label, O.frames.find(s => s.id === x.frame).label].join(', ');
-    return `<li><img src="${SL.pic(p.pid,112,140)}" alt="">
+    return `<li><img src="${esc(SL.sized(p.img,112,140))}" alt="">
       <div class="t"><b>${esc(p.title)}</b><span>${lab}</span></div>
       <div class="r"><b class="num">${SL.money(each * x.qty, cur)}</b>
         <div class="stepper" role="group" aria-label="Quantity of ${esc(p.title)}"><button data-i="${i}" data-d="-1" aria-label="${x.qty === 1 ? 'Remove' : 'One fewer'}">${I.minus}</button><output class="num">${x.qty}</output><button data-i="${i}" data-d="1" aria-label="One more">${I.plus}</button></div></div></li>`;
   }).join('');
-  const sub = cart.reduce((a,x) => a + priceOf(SL.SHOP.find(q => q.id === x.id), x) * x.qty, 0);
+  const sub = cart.reduce((a,x) => a + priceOf(SL.shopItems(cfg).find(q => q.id === x.id), x) * x.qty, 0);
   const ship = sub >= 250 ? 0 : 15;
   openSheet(`<div class="sh-head"><h3>Your cart</h3><button class="x" data-close aria-label="Close"></button></div>
     <ul class="cart">${rows}</ul>
@@ -942,7 +943,7 @@ function toast(m){ const el = $('toast'); el.textContent = m; el.classList.add('
 addEventListener('message', e => {
   if (e.source !== parent || !e.data) return;
   if (e.data.type === 'shutterlink:config'){
-    try { cfg = SL.normalise(e.data.config); render(); } catch(err){ console.warn(err); }
+    try { const next = SL.normalise(e.data.config); SL.preloadImages(next).then(() => { cfg = next; render(); }); } catch(err){ console.warn(err); }
   }
   if (e.data.type === 'shutterlink:focus'){
     const map = { profile:'cover', design:'cover', cover:'cover', buttons:'cover' };
@@ -950,11 +951,10 @@ addEventListener('message', e => {
     if (el) (map[e.data.tab] ? scrollTo({ top:0, behavior: reduce ? 'auto' : 'smooth' }) : el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block:'start' }));
   }
 });
-addEventListener('storage', e => { if (e.key === SL.KEY){ cfg = SL.load(); render(); } });
+addEventListener('storage', e => { if (e.key === SL.KEY){ const next = SL.load(); SL.preloadImages(next).then(() => { cfg = next; render(); }); } });
 
 saveCart();
-render();
-markLoaded(document);
+SL.preloadImages(cfg).then(() => { render(); markLoaded(document); });
 })();
 </script>
 </body>

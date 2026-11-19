@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="assets/core.js?v=2.6"></script>
+<script src="assets/core.js?v=2.8"></script>
 <script>try{const t=localStorage.getItem('shutterlink:ui-theme');if(t)document.documentElement.dataset.ui=t;}catch(_){}</script>
 <style>
 :root{
@@ -288,7 +288,7 @@ select.in{appearance:none;-webkit-appearance:none;padding-right:32px;background-
 <div class="wrap">
   <main class="content" id="content" role="tabpanel"></main>
   <aside class="pv" aria-label="Live preview">
-    <div class="device" id="device"><div class="shell"><span class="island"></span><iframe id="frame" src="index.html?preview&v=2.6" title="Live preview of your link page"></iframe></div></div>
+    <div class="device" id="device"><div class="shell"><span class="island"></span><iframe id="frame" src="index.html?preview&v=2.8" title="Live preview of your link page"></iframe></div></div>
     <div class="pv-bar"><span>Live preview</span><span aria-hidden="true">·</span><a href="index.html" target="_blank" rel="noopener">Open in new tab</a></div>
   </aside>
 </div>
@@ -344,7 +344,7 @@ function changed(opts={}){
     if (r.ok){ s.className = 'saved'; $('savedT').textContent = 'All changes saved'; }
     else {
       s.className = 'saved bad'; $('savedT').textContent = r.full ? 'Storage full' : 'Not saved';
-      toast(r.full ? 'Browser storage is full. Remove an uploaded photo or use an image link instead.' : 'Couldn’t save in this browser.', true);
+      toast(r.full ? 'This browser is out of space for settings. Try removing some links or text.' : 'Couldn’t save in this browser.', true);
     }
     if (current === 'advanced') renderPane('advanced', true);
   }, 250);
@@ -392,7 +392,7 @@ const toggle = (title, sub, path) => `<div class="tg"><div><b>${title}</b>${sub 
 const seg = (path, opts, label) => `<div class="seg" role="group" aria-label="${esc(label)}">${opts.map(([v,l]) => `<button data-seg="${path}" data-v="${v}" aria-pressed="${String(get(path)) === String(v)}">${l}</button>`).join('')}</div>`;
 const range = (path, min, max, step, unit, label) => `<div class="range"><input type="range" data-k="${path}" data-t="num" data-unit="${unit}" min="${min}" max="${max}" step="${step}" value="${get(path)}" aria-label="${esc(label)}"><output class="num" data-out="${path}">${get(path)}${unit}</output></div>`;
 function imgInput(path, label, withThumb){
-  const v = get(path) || '', up = v.startsWith('data:');
+  const v = get(path) || '', up = /^(data|idb):/.test(v);
   return `<div class="img-f">${withThumb ? `<span class="thumb lg" data-thumb="${path}" style="background-image:url('${esc(SL.sized(v,160,160))}')"></span>` : ''}
     <input class="in" data-k="${path}" data-check="url" data-img type="url" value="${up ? '' : esc(v)}" placeholder="${up ? 'Uploaded photo' : 'Paste an image link'}" autocomplete="off" spellcheck="false" aria-label="${esc(label)} link">
     <label class="btn sm up" title="Upload from your device">${ui.upload}<span class="hide-s">Upload</span><input type="file" accept="image/*" data-upload="${path}" aria-label="Upload ${esc(label)}"></label>
@@ -427,6 +427,24 @@ const markOnboarded = () => { try { localStorage.setItem(OB, '1'); } catch(_) {}
 const isMine = p => p && p.key;        // photos the person added themselves
 const myPhotos = () => cfg.gallery.photos.filter(isMine);
 const COVER_MAX = 6, GALLERY_MAX = 18;
+/* Swap every remaining stock photo (profile, film cover, link pictures, prints) for the person's own. */
+function replaceStock(){
+  const mine = myPhotos(); if (!mine.length) return;
+  let n = 0; const next = () => mine[(n++) % mine.length].url;
+  if (SL.isStock(cfg.profile.avatar)) cfg.profile.avatar = mine[0].url;
+  if (SL.isStock(cfg.film.thumb)) cfg.film.thumb = next();
+  cfg.links.forEach(l => { if (SL.isStock(l.thumb)) l.thumb = next(); });
+  const keys = mine.map(p => p.key);
+  cfg.shop.featured = cfg.shop.featured.filter(k => keys.includes(k));
+  if (!cfg.shop.featured.length) cfg.shop.featured = keys.slice(0, 6);
+}
+/* A photo was removed: anything else showing it moves to another of their photos (or back to the demo). */
+function reassign(oldUrl){
+  const mine = myPhotos(), alt = mine.length ? mine[0].url : null;
+  if (cfg.profile.avatar === oldUrl) cfg.profile.avatar = alt || SL.DEFAULTS.profile.avatar;
+  if (cfg.film.thumb === oldUrl) cfg.film.thumb = alt || SL.DEFAULTS.film.thumb;
+  cfg.links.forEach((l,i) => { if (l.thumb === oldUrl) l.thumb = alt || ((SL.DEFAULTS.links[i] || {}).thumb || ''); });
+}
 P.start = () => {
   const mine = myPhotos(), named = cfg.profile.name.trim().length > 0;
   const tick = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
@@ -435,7 +453,7 @@ P.start = () => {
     <label class="f"><span class="lab">As you’d like it on your page<span class="num" data-count="profile.name">${cfg.profile.name.length}/40</span></span>
     <input class="in big-in" data-k="profile.name" value="${esc(cfg.profile.name)}" maxlength="40" autocomplete="name" placeholder="Your name"></label></section>
   <section class="step"><div class="step-h"><span class="n ${mine.length ? 'done' : ''}">${mine.length ? tick : 2}</span><h2>Your photos</h2>${mine.length ? `<span class="hint" style="margin-left:auto">${mine.length} added</span>` : ''}</div>
-    ${mine.length ? `<ul class="mine">${mine.map((p,i) => `<li style="background-image:url('${p.url}')">${i < COVER_MAX && cfg.cover.photos.some(c => c.key === p.key) ? '<span class="cv">Cover</span>' : ''}<button class="rm" data-rm="${p.key}" aria-label="Remove photo ${i+1}">${I.close}</button></li>`).join('')}
+    ${mine.length ? `<ul class="mine">${mine.map((p,i) => `<li style="background-image:url('${SL.sized(p.url,300,300)}')">${i < COVER_MAX && cfg.cover.photos.some(c => c.key === p.key) ? '<span class="cv">Cover</span>' : ''}<button class="rm" data-rm="${p.key}" aria-label="Remove photo ${i+1}">${I.close}</button></li>`).join('')}
         ${mine.length < GALLERY_MAX ? `<li class="more" title="Add more"><span aria-hidden="true">${ui.plus}</span><input type="file" accept="image/*" multiple data-start-pick aria-label="Add more photos"></li>` : ''}</ul>
         <p class="hint" style="margin-top:12px">Your first ${Math.min(COVER_MAX, mine.length)} play full screen on your cover; all of them fill your gallery. Change the order any time under Cover and Gallery.</p>`
       : `<label class="pick" id="pick">${ui.upload}Choose photos<small>Pick your favourites from your photo library. Up to ${GALLERY_MAX}.</small><input type="file" accept="image/*" multiple data-start-pick aria-label="Choose photos from your library"></label>`}
@@ -459,7 +477,7 @@ async function startPick(files, label){
     try {
       const key = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       // the gallery copy is smaller; the cover copy is sharper because it fills the screen
-      const g = await SL.readImage(f, 900, .8);
+      const g = await SL.putImage(f, 1000, .82);
       added.push({ key, g, file:f });
       done++;
     } catch(err){ toast(err.message, true); }
@@ -473,10 +491,11 @@ async function startPick(files, label){
   for (const a of added){
     cfg.gallery.photos.push({ url:a.g, caption:'', key:a.key });
     if (cfg.cover.photos.length < COVER_MAX){
-      try { cfg.cover.photos.push({ url: await SL.readImage(a.file, 1280, .8), caption:'', key:a.key }); } catch(_) {}
+      try { cfg.cover.photos.push({ url: await SL.putImage(a.file, 1600, .82), caption:'', key:a.key }); } catch(_) {}
     }
   }
   if (cfg.cover.style === 'minimal' && firstTime) cfg.cover.style = 'full';
+  replaceStock();
   ['gallery'].forEach(id => { const sct = cfg.sections.find(x => x.id === id); if (sct) sct.on = true; });
   changed({ immediate:true }); renderPane('start', true);
   post({ type:'shutterlink:focus', tab:'cover' });
@@ -572,9 +591,9 @@ P.sections = () => head('Sections', 'What appears when people scroll past the fi
 
 P.shop = () => {
   const f = cfg.shop.featured;
-  return head('Prints', 'Choose which prints from your Sport Shutter shop appear on your link page.') +
-  panel('Featured prints', `<div class="prints">${SL.SHOP.map(p => { const n = f.indexOf(p.id); return `
-      <button class="pr" data-feature="${p.id}" aria-pressed="${n >= 0}" aria-label="${esc(p.title)}${n >= 0 ? ', featured number ' + (n+1) : ''}"><img src="${SL.pic(p.pid,240,300)}" alt="" loading="lazy"><i aria-hidden="true">${n >= 0 ? n + 1 : ''}</i><b>${esc(p.title)}</b><span class="num">From ${SL.money(p.from, cfg.shop.currency)}</span></button>`; }).join('')}</div>
+  return head('Prints', myPhotos().length ? 'Your photos are your prints for now. When this connects to your Sport Shutter shop, your real products appear here.' : 'Choose which prints from your Sport Shutter shop appear on your link page.') +
+  (myPhotos().length ? '' : '') + panel('Featured prints', `<div class="prints">${SL.shopItems(cfg).map(p => { const n = f.indexOf(p.id); return `
+      <button class="pr" data-feature="${p.id}" aria-pressed="${n >= 0}" aria-label="${esc(p.title)}${n >= 0 ? ', featured number ' + (n+1) : ''}"><img src="${esc(SL.sized(p.img,240,300))}" alt="" loading="lazy"><i aria-hidden="true">${n >= 0 ? n + 1 : ''}</i><b>${esc(p.title)}</b><span class="num">From ${SL.money(p.from, cfg.shop.currency)}</span></button>`; }).join('')}</div>
       <p class="hint" style="margin-top:12px">Tap to add or remove. They appear in the order you pick them.</p>`, { sub:`${f.length} featured` }) +
   panel('Pricing', `<div class="fields"><label class="f" style="max-width:220px"><span>Currency</span><select class="in" data-k="shop.currency">${SL.CURRENCIES.map(c => `<option ${c===cfg.shop.currency?'selected':''}>${c}</option>`).join('')}</select></label>
     ${toggle('Show prices', 'Under each print and on the add-to-cart button.', 'shop.showPrices')}</div>`);
@@ -631,9 +650,9 @@ P.advanced = () => {
   const used = SL.bytes(cfg), cap = 5 * 1024 * 1024, pct = Math.min(100, used / cap * 100);
   const kb = n => n > 1048576 ? (n/1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n/1024)) + ' KB';
   return head('Advanced', 'Back up, restore or start again.') +
-  panel('Storage', `<div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;flex-wrap:wrap"><span>Used by your settings and uploads</span><b class="num">${kb(used)} of about ${kb(cap)}</b></div>
+  panel('Storage', `<div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;flex-wrap:wrap"><span>Used by your settings</span><b class="num">${kb(used)} of about ${kb(cap)}</b></div>
     <div class="meter ${pct > 90 ? 'bad' : pct > 70 ? 'warn' : ''}" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct)}" aria-label="Storage used"><div style="width:${Math.max(1,pct).toFixed(1)}%"></div></div>
-    <p class="hint" style="margin-top:10px">For the prototype everything is saved in this browser. Uploaded photos use the most space; image links use almost none.</p>`) +
+    <p class="hint" style="margin-top:10px">Uploaded photos are kept separately in this browser’s photo storage, which has room for hundreds, so they don’t count towards this.</p>`) +
   panel('Backup', `<p class="hint" style="margin-bottom:14px">Download your settings as a file, or load a file you saved earlier.</p>
     <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-act="export">Download settings</button>
     <label class="btn up">Load settings file<input type="file" accept="application/json,.json" id="importFile" aria-label="Load settings file"></label></div>`) +
@@ -690,7 +709,7 @@ content.addEventListener('input', e => {
   if (el.dataset.k){
     const k = el.dataset.k;
     let v = el.dataset.t === 'bool' ? el.checked : el.dataset.t === 'num' ? +el.value : el.value;
-    if (el.dataset.img !== undefined && !v.trim() && String(get(k) || '').startsWith('data:')) return; // empty link field keeps the upload
+    if (el.dataset.img !== undefined && !v.trim() && /^(data|idb):/.test(String(get(k) || ''))) return; // empty link field keeps the upload
     set(k, v);
     const out = content.querySelector(`[data-out="${CSS.escape(k)}"]`); if (out) out.textContent = el.value + (el.dataset.unit || '');
     const cnt = content.querySelector(`[data-count="${CSS.escape(k)}"]`); if (cnt) cnt.textContent = `${el.value.length}/${el.maxLength}`;
@@ -750,10 +769,13 @@ content.addEventListener('click', e => {
   const fo = t.closest('[data-font]');
   if (fo){ cfg.theme.font = fo.dataset.font; changed({ immediate:true }); renderPane('design', true); return; }
   const rmb = t.closest('[data-rm]');
-  if (rmb){ const k = rmb.dataset.rm; cfg.gallery.photos = cfg.gallery.photos.filter(p => p.key !== k); cfg.cover.photos = cfg.cover.photos.filter(p => p.key !== k);
+  if (rmb){ const k = rmb.dataset.rm; const gone = cfg.gallery.photos.filter(p => p.key === k).map(p => p.url).concat(cfg.cover.photos.filter(p => p.key === k).map(p => p.url));
+    cfg.gallery.photos = cfg.gallery.photos.filter(p => p.key !== k); cfg.cover.photos = cfg.cover.photos.filter(p => p.key !== k);
+    gone.forEach(reassign); cfg.shop.featured = cfg.shop.featured.filter(x => x !== k);
     // keep the cover full from their remaining photos
     for (const f of myPhotos()){ if (cfg.cover.photos.length >= COVER_MAX) break; if (!cfg.cover.photos.some(c => c.key === f.key)) cfg.cover.photos.push({ url:f.url, caption:'', key:f.key }); }
-    if (!myPhotos().length){ cfg.gallery.photos = SL.clone(SL.DEFAULTS.gallery.photos); cfg.cover.photos = SL.clone(SL.DEFAULTS.cover.photos); }
+    if (!myPhotos().length){ cfg.gallery.photos = SL.clone(SL.DEFAULTS.gallery.photos); cfg.cover.photos = SL.clone(SL.DEFAULTS.cover.photos); cfg.shop.featured = SL.clone(SL.DEFAULTS.shop.featured); }
+    else replaceStock();
     changed({ immediate:true }); renderPane('start', true); toast('Removed. Undo brings it back.'); return; }
   if (t.closest('[data-finish]')) markOnboarded();
   const fe = t.closest('[data-feature]');
@@ -768,12 +790,7 @@ content.addEventListener('click', e => {
     cfg.theme.preset = 'custom'; changed({ immediate:true }); renderPane('design', true); return;
   }
   if (act === 'start-more'){ markOnboarded(); go('design'); return; }
-  if (act === 'export'){
-    const u = URL.createObjectURL(new Blob([JSON.stringify(cfg, null, 2)], { type:'application/json' }));
-    const l = document.createElement('a'); l.href = u; l.download = 'shutterlink-settings.json';
-    document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(u), 1000);
-    toast('Settings downloaded'); return;
-  }
+  if (act === 'export'){ exportSettings(); return; }
   if (act === 'reset'){ cfg = SL.clone(SL.DEFAULTS); changed({ immediate:true }); renderPane(current, true); toast('Reset to demo content. Undo brings yours back.'); return; }
   const list = a.dataset.list; if (!list) return;
   const arr = get(list), i = +a.dataset.i;
@@ -796,7 +813,7 @@ content.addEventListener('click', e => {
 /* ---------- Uploads & import ---------- */
 async function upload(file, path){
   if (!file) return;
-  try { set(path, await SL.readImage(file, /thumb|avatar/.test(path) ? 600 : 1600)); changed({ immediate:true }); renderPane(current, true); toast('Photo added'); }
+  try { set(path, await SL.putImage(file, /thumb|avatar/.test(path) ? 600 : 1600)); changed({ immediate:true }); renderPane(current, true); toast('Photo added'); }
   catch(err){ toast(err.message, true); }
 }
 async function uploadMany(files, list){
@@ -804,13 +821,20 @@ async function uploadMany(files, list){
   const pick = [...files].slice(0, Math.max(0, cap - arr.length));
   if (!pick.length){ toast(`You can have up to ${cap} photos here.`, true); return; }
   let n = 0;
-  for (const f of pick){ try { arr.push({ url: await SL.readImage(f, 1600), caption:'' }); n++; } catch(err){ toast(err.message, true); } }
+  for (const f of pick){ try { arr.push({ url: await SL.putImage(f, 1600), caption:'' }); n++; } catch(err){ toast(err.message, true); } }
   if (n) toast(files.length > pick.length ? `Added ${n}. That’s the limit of ${cap}.` : `Added ${n} photo${n > 1 ? 's' : ''}`);
   changed({ immediate:true }); renderPane(current, true);
 }
+async function exportSettings(){
+  const full = await SL.embedImages(cfg);   // the file carries your photos too
+  const u = URL.createObjectURL(new Blob([JSON.stringify(full, null, 2)], { type:'application/json' }));
+  const l = document.createElement('a'); l.href = u; l.download = 'shutterlink-settings.json';
+  document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(u), 1000);
+  toast('Settings and photos downloaded');
+}
 async function importFile(file){
   if (!file) return;
-  try { cfg = SL.fromJSON(await file.text()); changed({ immediate:true }); renderPane(current, true); toast('Settings loaded'); }
+  try { cfg = await SL.storeInlineImages(SL.fromJSON(await file.text())); changed({ immediate:true }); renderPane(current, true); toast('Settings loaded'); }
   catch(_){ toast('That file isn’t a ShutterLink settings file.', true); }
 }
 
@@ -819,17 +843,27 @@ function fit(){ $('device').style.setProperty('--k', Math.max(.55, Math.min(1, (
 addEventListener('resize', fit); fit();
 $('frame').addEventListener('load', () => post());
 $('frame2').addEventListener('load', () => post());
-$('fab').onclick = () => { const f = $('frame2'); if (!f.getAttribute('src')) f.src = 'index.html?preview&v=2.6'; else post(); $('mpv').classList.add('open'); $('mpvClose').focus(); };
+$('fab').onclick = () => { const f = $('frame2'); if (!f.getAttribute('src')) f.src = 'index.html?preview&v=2.8'; else post(); $('mpv').classList.add('open'); $('mpvClose').focus(); };
 $('mpvClose').onclick = () => { $('mpv').classList.remove('open'); $('fab').focus(); };
 addEventListener('keydown', e => { if (e.key === 'Escape' && $('mpv').classList.contains('open')) $('mpvClose').click(); });
 // another tab changed settings (e.g. reset elsewhere)
-addEventListener('storage', e => { if (e.key === SL.KEY){ cfg = SL.load(); renderPane(current, true); post(); } });
+addEventListener('storage', async e => { if (e.key === SL.KEY){ cfg = SL.load(); await SL.preloadImages(cfg); renderPane(current, true); post(); } });
 
 let tt;
 function toast(m, bad){ const el = $('toast'); el.textContent = m; el.classList.toggle('bad', !!bad); el.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), bad ? 4500 : 2400); }
 
-renderPane(current);
-histButtons();
+(async () => {
+  // move any photos saved the old way (inside settings) into the photo store, then tidy up
+  const before = JSON.stringify(cfg);
+  cfg = await SL.storeInlineImages(cfg);
+  if (myPhotos().length) replaceStock();   // anyone who already added photos loses the leftover stock ones too
+  if (JSON.stringify(cfg) !== before){ SL.save(cfg); hist = [JSON.stringify(cfg)]; hp = 0; }
+  await SL.preloadImages(cfg);
+  renderPane(current);
+  histButtons();
+  post();
+  SL.cleanImages(SL.refsIn(cfg));
+})();
 })();
 </script>
 </body>

@@ -126,10 +126,103 @@ function applyTheme(cfg, root=document.documentElement, tint){
 const pic = (id, w, h) => `https://picsum.photos/id/${id}/${w}/${h}`;
 /* Resize a picsum placeholder; any other URL (or uploaded photo) is used as-is. */
 function sized(url, w, h){
+  if (typeof url === 'string' && url.startsWith('idb:')) return urlCache.get(url) || '';
   const m = /^https:\/\/picsum\.photos\/id\/(\d+)\//.exec(url || '');
   return m ? pic(m[1], w, h) : (url || '');
 }
-/* Read an uploaded file, shrink it and return a JPEG data URL small enough to store. */
+
+/* ---------- Photo store ----------
+   Uploaded photos live in the browser's IndexedDB (room for hundreds), and settings
+   keep only a short reference like "idb:img_ab12". This is the prototype's version of
+   "upload a photo, get its address back"; with Sport Shutter, putImage() becomes a
+   call to its image upload endpoint and returns a normal https address. */
+const urlCache = new Map();
+const idb = (() => {
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise((res, rej) => {
+    if (!window.indexedDB) return rej(new Error('no indexedDB'));
+    const r = indexedDB.open('shutterlink', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('images');
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  }));
+  const run = (mode, fn) => open().then(db => new Promise((res, rej) => {
+    const t = db.transaction('images', mode), req = fn(t.objectStore('images'));
+    t.oncomplete = () => res(req.result);
+    t.onerror = t.onabort = () => rej(t.error || new Error('storage error'));
+  }));
+  return {
+    put: (id, blob) => run('readwrite', s => s.put(blob, id)),
+    get: id => run('readonly', s => s.get(id)),
+    del: id => run('readwrite', s => s.delete(id)),
+    keys: () => run('readonly', s => s.getAllKeys()),
+  };
+})();
+function walk(o, fn, path=''){
+  if (typeof o === 'string') return fn(o);
+  if (Array.isArray(o)) return o.map(v => walk(v, fn));
+  if (o && typeof o === 'object'){ const out = {}; for (const k in o) out[k] = walk(o[k], fn); return out; }
+  return o;
+}
+function refsIn(cfg){ const s = new Set(); walk(cfg, v => { if (v.startsWith('idb:')) s.add(v); return v; }); return s; }
+/* Load every stored photo the config mentions, so sized() can hand back an address. */
+async function preloadImages(cfg){
+  await Promise.all([...refsIn(cfg)].filter(r => !urlCache.has(r)).map(async r => {
+    try { const b = await idb.get(r.slice(4)); if (b) urlCache.set(r, URL.createObjectURL(b)); } catch(_) {}
+  }));
+}
+function imageBlob(file, max=1600, q=.82){
+  return new Promise((res, rej) => {
+    if (!file || !/^image\//.test(file.type || 'image/')) return rej(new Error('That file is not an image.'));
+    const src = URL.createObjectURL(file), im = new Image();
+    im.onerror = () => { URL.revokeObjectURL(src); rej(new Error('Couldn’t open that photo. Try a JPEG or PNG.')); };
+    im.onload = () => {
+      URL.revokeObjectURL(src);
+      const k = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight));
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(im.naturalWidth * k)); c.height = Math.max(1, Math.round(im.naturalHeight * k));
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      c.toBlob(b => b ? res(b) : rej(new Error('Couldn’t process that photo.')), 'image/jpeg', q);
+    };
+    im.src = src;
+  });
+}
+/* Save a photo and return its reference. Falls back to an inline copy if the store is unavailable. */
+async function putImage(file, max=1600, q=.82){
+  const blob = await imageBlob(file, max, q);
+  try {
+    const id = 'img_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    await idb.put(id, blob);
+    const ref = 'idb:' + id; urlCache.set(ref, URL.createObjectURL(blob));
+    return ref;
+  } catch(_) {
+    return await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(blob); });
+  }
+}
+/* Remove stored photos nothing refers to any more. */
+async function cleanImages(keep){
+  try { const used = new Set([...keep].map(r => r.slice(4))); for (const k of await idb.keys()) if (!used.has(k)) await idb.del(k); } catch(_) {}
+}
+/* Backups carry the photos themselves; loading a backup puts them back in the store. */
+async function embedImages(cfg){
+  const map = new Map();
+  for (const r of refsIn(cfg)){
+    try { const b = await idb.get(r.slice(4)); if (b) map.set(r, await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(b); })); } catch(_) {}
+  }
+  return walk(cfg, v => map.get(v) || v);
+}
+async function storeInlineImages(cfg){
+  const map = new Map();
+  walk(cfg, v => { if (v.startsWith('data:image/')) map.set(v, null); return v; });
+  for (const d of map.keys()){
+    try {
+      const blob = await (await fetch(d)).blob(), id = 'img_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      await idb.put(id, blob); const ref = 'idb:' + id; urlCache.set(ref, URL.createObjectURL(blob)); map.set(d, ref);
+    } catch(_) { map.set(d, d); }
+  }
+  return map.size ? walk(cfg, v => map.get(v) || v) : cfg;
+}
+/* Older helper: returns an inline JPEG. */
 function readImage(file, max=1600, q=.82){
   return new Promise((res, rej) => {
     if (!file || !/^image\//.test(file.type)) return rej(new Error('That file is not an image.'));
@@ -179,6 +272,14 @@ const SHOP = [
   { id:'snow',     pid:1036, title:'First Snow',      blurb:'Kosciuszko the morning after the first fall.', from:90 },
   { id:'coast',    pid:1053, title:'South Coast',     blurb:'Low tide and long shadows near Kiama.', from:65 },
 ];
+/* Prints on the page: once someone adds their own photos, those become the prints
+   (stand-ins for their Sport Shutter shop products); until then, the demo catalogue. */
+const isStock = u => /^https:\/\/picsum\.photos\//.test(u || '');
+function shopItems(cfg){
+  const mine = (cfg.gallery.photos || []).filter(p => p && p.key);
+  if (mine.length) return mine.map((p,i) => ({ id:p.key, img:p.url, title:p.caption || `Print ${String(i+1).padStart(2,'0')}`, blurb:p.caption ? '' : 'Printed on archival paper and shipped ready to hang.', from:65 }));
+  return SHOP.map(p => ({ ...p, img: pic(p.pid, 900, 1125) }));
+}
 const PRINT_OPTIONS = {
   sizes:  [ { id:'a4', label:'A4', note:'21 × 30 cm', mult:1 }, { id:'a3', label:'A3', note:'30 × 42 cm', mult:1.6 }, { id:'a2', label:'A2', note:'42 × 59 cm', mult:2.5 } ],
   papers: [ { id:'rag', label:'Cotton rag', note:'Matte, deep blacks', add:0 }, { id:'lustre', label:'Lustre', note:'Soft sheen', add:-5 } ],
@@ -345,7 +446,7 @@ function youtubeId(u){
   return m ? m[1] : null;
 }
 
-window.SL = { KEY, BRAND, THEMES, FONTS, SHOP, PRINT_OPTIONS, CURRENCIES, ACTIONS, SOCIALS, ICONS, DEFAULTS,
+window.SL = { isStock, shopItems, putImage, preloadImages, refsIn, cleanImages, embedImages, storeInlineImages, KEY, BRAND, THEMES, FONTS, SHOP, PRINT_OPTIONS, CURRENCIES, ACTIONS, SOCIALS, ICONS, DEFAULTS,
   rgb, hex, mix, lum, contrast, isDark, legible, isHex, tokens, applyTheme, loadFont, fontUrl,
   pic, sized, readImage, sampleColour, money, load, save, reset, clone, fromJSON, bytes, esc, href, youtubeId, normalise };
 })();
