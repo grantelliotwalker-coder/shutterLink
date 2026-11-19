@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://picsum.photos">
 <script>
   // Loaded here (not as plain tags) so they always come from this app's folder, even on /@name addresses.
-  document.write('<script src="assets/core.js?v=3.0"><\/script><script src="assets/data.js?v=3.0"><\/script>');
+  document.write('<script src="assets/core.js?v=3.1"><\/script><script src="assets/data.js?v=3.1"><\/script>');
 </script>
 <script>
   /* Paint the saved theme before first render so there's no flash of the wrong colours. */
@@ -524,7 +524,7 @@ S.shop = () => {
   return `<div class="sec-h"><h2>${title('shop')}</h2><a href="#" data-demo="your full Sport Shutter shop">Shop all</a></div>
     <div class="strip">${items.map(p => `
       <button class="print" data-print="${p.id}" aria-label="${esc(p.title)}${cfg.shop.showPrices ? ', from ' + SL.money(p.from, cfg.shop.currency) : ''}">
-        <div class="ph"><img class="fade" src="${esc(SL.sized(p.img,440,550))}" alt="" loading="lazy" decoding="async"></div>
+        <div class="ph"><img class="fade" src="${esc(SL.sized(p.img,440,550))}" alt="" loading="lazy" decoding="async"${p.focus != null ? ` style="object-position:${+p.focus}% 50%"` : ''}></div>
         <b>${esc(p.title)}</b>${cfg.shop.showPrices ? `<span class="num">From ${SL.money(p.from, cfg.shop.currency)}</span>` : ''}
       </button>`).join('')}</div>`;
 };
@@ -533,7 +533,7 @@ S.gallery = () => {
   if (!ph.length) return '';
   return `<div class="sec-h"><h2>${title('gallery')}</h2><button data-lb="0">View all</button></div>
     <div class="grid" style="--cols:${cfg.gallery.columns}">${ph.map((g,i) => `
-      <button data-lb="${i}" aria-label="Open photo ${i+1}${g.caption ? ': ' + esc(g.caption) : ''}"><img class="fade" src="${esc(SL.sized(g.url,400,400))}" alt="" loading="lazy" decoding="async"></button>`).join('')}</div>`;
+      <button data-lb="${i}" aria-label="Open photo ${i+1}${g.caption ? ': ' + esc(g.caption) : ''}"><img class="fade" src="${esc(SL.sized(g.url,400,400))}" alt="" loading="lazy" decoding="async"${g.focus != null ? ` style="object-position:${+g.focus}% 50%"` : ''}></button>`).join('')}</div>`;
 };
 S.film = () => {
   const f = cfg.film, yt = SL.youtubeId(f.url);
@@ -635,6 +635,7 @@ function renderStage(){
     im.className = 'frame'; im.alt = p.caption || ''; im.decoding = 'async';
     if (i > 1) im.loading = 'lazy';
     im.src = SL.sized(p.url, 1080, 1350);
+    if (p.focus != null) im.style.objectPosition = `${+p.focus}% 50%`;   // keep the subject in frame
     stage.insertBefore(im, ticks);
     return im;
   });
@@ -768,7 +769,7 @@ function openPrint(id){
   openSheet(`
     <div class="sh-head"><h3>${esc(p.title)}</h3><button class="x" data-close aria-label="Close"></button></div>
     ${p.blurb ? `<p class="sh-sub">${esc(p.blurb)}</p>` : ''}
-    <div class="art" id="art"><div class="fr" id="fr"><img class="fade" src="${esc(SL.sized(p.img,640,800))}" alt="${esc(p.title)}"></div></div>
+    <div class="art" id="art"><div class="fr" id="fr"><img class="fade" src="${esc(SL.sized(p.img,640,800))}" alt="${esc(p.title)}"${p.focus != null ? ` style="object-position:${+p.focus}% 50%"` : ''}></div></div>
     <div class="opt"><b>Size</b>${chips('size', O.sizes)}</div>
     <div class="opt"><b>Paper</b>${chips('paper', O.papers)}</div>
     <div class="opt"><b>Frame <span id="frNote"></span></b>${chips('frame', O.frames, o => o.id === 'none' ? '' : `<i class="sw" style="background:${o.css}"></i>`)}</div>

@@ -35,6 +35,13 @@ function seedState(){
   Object.assign(mia.profile, { name:'Mia Chen', bio:'Surf and sport photography from Byron Bay.', location:'Byron Bay, NSW', status:{ on:true, text:'Shooting the summer surf series' } });
   mia.theme = Object.assign(mia.theme, { preset:'day', colors:{ ...SL.THEMES[1].colors }, font:'technical', radius:10, photoTint:30 });
   mia.cover.style = 'framed';
+  // Mia is a different photographer: give her the placeholder photos, not Grant's
+  const pic = (id, w, h) => `https://picsum.photos/id/${id}/${w}/${h}`;
+  mia.profile.avatar = pic(64, 400, 400);
+  mia.cover.photos = [1015, 1050, 1053, 1039].map(id => ({ url: pic(id, 1080, 1350), caption:'' }));
+  mia.gallery.photos = [1019, 1021, 1022, 1028, 1033, 1035].map(id => ({ url: pic(id, 900, 900), caption:'' }));
+  mia.film.thumb = pic(1036, 1280, 720);
+  mia.links.forEach((l, i) => { l.thumb = pic([1062, 1043, 1039, 1011][i] || 1011, 160, 160); });
   const t = new Date().toISOString();
   return {
     profiles: {
@@ -43,11 +50,12 @@ function seedState(){
     },
     aliases: { grantwalkerphoto:'u_grant' },
     enquiries: [],
+    seed: 2,
   };
 }
 const read = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(_) { return d; } };
 const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(_) {} };
-function simState(){ let s = read(K.db, null); if (!s){ s = seedState(); write(K.db, s); write(K.session, 'u_grant'); } return s; }
+function simState(){ let s = read(K.db, null); if (!s || s.seed !== 2){ s = seedState(); write(K.db, s); write(K.session, 'u_grant'); } return s; }
 const simConfig = () => Object.assign({ latency:180, offline:false, failNext:false }, read(K.config, {}));
 let simApiP = null;
 function loadScript(src){

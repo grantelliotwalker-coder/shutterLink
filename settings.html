@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="assets/core.js?v=3.0"></script>
-<script src="assets/data.js?v=3.0"></script>
+<script src="assets/core.js?v=3.1"></script>
+<script src="assets/data.js?v=3.1"></script>
 <script>try{const t=localStorage.getItem('shutterlink:ui-theme');if(t)document.documentElement.dataset.ui=t;}catch(_){}</script>
 <style>
 :root{
@@ -784,7 +784,8 @@ function validate(el){
   const kind = el.dataset.check; if (!kind) return true;
   const v = el.value.trim();
   let msg = '';
-  if (v && kind === 'url' && !/^https?:\/\//i.test(SL.href(v))) msg = 'Enter a full web address, like https://example.com';
+  const local = /^(\.\/)?[\w\-/]+\.(jpe?g|png|webp|avif)$/i.test(v);   // a photo that ships with the site
+  if (v && kind === 'url' && !local && !/^https?:\/\//i.test(SL.href(v))) msg = 'Enter a full web address, like https://example.com';
   if (v && kind === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) msg = 'Enter an email address, like you@example.com';
   el.setAttribute('aria-invalid', msg ? 'true' : 'false');
   const er = $('content').querySelector(`[data-err="${CSS.escape(el.dataset.k)}"]`);

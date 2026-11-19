@@ -127,6 +127,8 @@ const pic = (id, w, h) => `https://picsum.photos/id/${id}/${w}/${h}`;
 /* Resize a picsum placeholder; any other URL (or uploaded photo) is used as-is. */
 function sized(url, w, h){
   if (typeof url === 'string' && url.startsWith('idb:')) return urlCache.get(url) || '';
+  // built-in photos ship in two sizes: small ones for thumbnails and grids
+  if (typeof url === 'string' && /^media\/[\w-]+\.jpg$/.test(url) && !/-sm\.jpg$/.test(url) && Math.max(w || 0, h || 0) <= 640) return url.replace(/\.jpg$/, '-sm.jpg');
   const m = /^https:\/\/picsum\.photos\/id\/(\d+)\//.exec(url || '');
   return m ? pic(m[1], w, h) : (url || '');
 }
@@ -266,14 +268,14 @@ function sampleColour(url){
 
 /* ---------- Shop catalogue (comes from the Sport Shutter shop, not settings) ---------- */
 const SHOP = [
-  { id:'grose',    pid:1018, title:'Grose Valley',    blurb:'Last light over the escarpment, shot from Pulpit Rock.', from:65 },
-  { id:'rain',     pid:1015, title:'After the Rain',  blurb:'Coxs River running high the morning after a storm.', from:65 },
-  { id:'redearth', pid:1016, title:'Red Earth',       blurb:'Late afternoon on the ridge line, Flinders Ranges.', from:80 },
-  { id:'bondi',    pid:1050, title:'Bondi Blue',      blurb:'The first swimmers out before sunrise.', from:55 },
-  { id:'falls',    pid:1039, title:'Wentworth Falls', blurb:'A long exposure from the base of the falls.', from:80 },
-  { id:'mist',     pid:1043, title:'Megalong Mist',   blurb:'Fog pooling in the valley at dawn.', from:65 },
-  { id:'snow',     pid:1036, title:'First Snow',      blurb:'Kosciuszko the morning after the first fall.', from:90 },
-  { id:'coast',    pid:1053, title:'South Coast',     blurb:'Low tide and long shadows near Kiama.', from:65 },
+  { id:'red-shirt',  img:'media/red-shirt.jpg',  focus:45, title:'Red Shirt, Green Wall', blurb:'Crouched low and racing the section.', from:85 },
+  { id:'glass-wall', img:'media/glass-wall.jpg', focus:51, title:'Glass and Glitter',     blurb:'Sun on the face of a clean right-hander.', from:85 },
+  { id:'pink-board', img:'media/pink-board.jpg', focus:45, title:'Pink Single Fin',       blurb:'Mid-turn with the spray coming off the rail.', from:85 },
+  { id:'walk-out',   img:'media/walk-out.jpg',   focus:34, title:'Golden Walk Out',       blurb:'Last light, last wave, heading in.', from:95 },
+  { id:'cave',       img:'media/cave.jpg',       focus:56, title:'Cave Exit',             blurb:'Boards under arm, coming back through the rocks.', from:85 },
+  { id:'backside',   img:'media/backside.jpg',   focus:56, title:'Backside Glide',        blurb:'Black wetsuit, red log, white water.', from:75 },
+  { id:'small-day',  img:'media/small-day.jpg',  focus:62, title:'Small Day Trim',        blurb:'Turquoise water and a long, easy line.', from:65 },
+  { id:'red-board',  img:'media/red-board.jpg',  focus:46, title:'Red Board',             blurb:'Out of the water after a good one.', from:75 },
 ];
 /* Prints on the page: once someone adds their own photos, those become the prints
    (stand-ins for their Sport Shutter shop products); until then, the demo catalogue. */
@@ -281,7 +283,7 @@ const isStock = u => /^https:\/\/picsum\.photos\//.test(u || '');
 function shopItems(cfg){
   const mine = (cfg.gallery.photos || []).filter(p => p && p.key);
   if (mine.length) return mine.map((p,i) => ({ id:p.key, img:p.url, title:p.caption || `Print ${String(i+1).padStart(2,'0')}`, blurb:p.caption ? '' : 'Printed on archival paper and shipped ready to hang.', from:65 }));
-  return SHOP.map(p => ({ ...p, img: pic(p.pid, 900, 1125) }));
+  return SHOP.map(p => ({ ...p, img: p.img || pic(p.pid, 900, 1125) }));
 }
 const PRINT_OPTIONS = {
   sizes:  [ { id:'a4', label:'A4', note:'21 × 30 cm', mult:1 }, { id:'a3', label:'A3', note:'30 × 42 cm', mult:1.6 }, { id:'a2', label:'A2', note:'42 × 59 cm', mult:2.5 } ],
@@ -353,20 +355,21 @@ const DEFAULTS = {
   v: 2,
   profile: {
     name: 'Grant Walker',
-    bio: 'Landscapes and weddings from the Blue Mountains, NSW.',
-    location: 'Katoomba, NSW',
-    avatar: pic(64, 400, 400),
-    status: { on: true, text: 'Booking autumn 2027 weddings' },
+    bio: 'Surf and ocean photography, and the people in the water.',
+    location: '',
+    avatar: 'media/avatar.jpg',
+    status: { on: true, text: 'Taking surf shoot bookings' },
   },
   theme: { preset:'night', colors:{ ...THEMES[0].colors }, font:'modern', radius:18, photoTint:65, buttonShape:'circle', linkStyle:'list', align:'left' },
   cover: {
     style: 'full', seconds: 5, captions: true, overlay: 55,
     photos: [
-      { url:pic(1018,1080,1350), caption:'Grose Valley, last light' },
-      { url:pic(1015,1080,1350), caption:'Coxs River after rain' },
-      { url:pic(1016,1080,1350), caption:'Red earth, Flinders Ranges' },
-      { url:pic(1050,1080,1350), caption:'Bondi, 5:42am' },
-      { url:pic(1044,1080,1350), caption:'Ceremony at Leura' },
+      { url:'media/red-shirt.jpg',  caption:'Racing the section',  focus:45 },
+      { url:'media/small-day.jpg',  caption:'Small day, long line', focus:62 },
+      { url:'media/pink-board.jpg', caption:'Pink single fin',      focus:45 },
+      { url:'media/glass-wall.jpg', caption:'Glass and glitter',    focus:51 },
+      { url:'media/backside.jpg',   caption:'Backside on the log',  focus:56 },
+      { url:'media/walk-out.jpg',   caption:'Last light, heading in', focus:34 },
     ],
   },
   quick: [
@@ -384,17 +387,21 @@ const DEFAULTS = {
     { id:'newsletter', on:true,  title:'Field notes' },
     { id:'socials',    on:true,  title:'Follow along' },
   ],
-  shop: { featured:['grose','rain','redearth','bondi','falls'], currency:'AUD', showPrices:true },
-  gallery: { columns:3, photos:[1019,1021,1022,1028,1033,1035,1038,1040,1041].map((id,i) => ({ url:pic(id,900,900), caption:['Wolgan Valley','Sunrise, Narrow Neck','Leura Cascades','Evans Lookout','The Three Sisters','Kanangra Walls','Blackheath','Mount Banks','Hanging Rock'][i] })) },
-  film: { url:'', title:'Chasing first snow at Kosciuszko', meta:'12 min', thumb:pic(1036,1280,720) },
+  shop: { featured:['red-shirt','glass-wall','pink-board','walk-out','cave','backside'], currency:'AUD', showPrices:true },
+  gallery: { columns:3, photos:[
+    ['red-shirt','Racing the section',45],['glass-wall','Glass and glitter',51],['pink-board','Pink single fin',45],
+    ['backside','Backside on the log',56],['red-board','Out of the water',46],['wet-hair','Wet hair, red board',62],
+    ['walk-out','Last light, heading in',34],['cave','Through the cave',56],['small-day','Small day, long line',62],
+  ].map(([n, caption, focus]) => ({ url:`media/${n}.jpg`, caption, focus })) },
+  film: { url:'', title:'Last light session', meta:'', thumb:'media/walk-out.jpg' },
   links: [
-    { title:'Wedding portfolio', sub:'Full galleries from 2025 and 2026', url:'', thumb:pic(1062,160,160), on:true, badge:'' },
-    { title:'Lightroom presets', sub:'The Mountain Light pack, 12 looks', url:'', thumb:pic(1043,160,160), on:true, badge:'New' },
-    { title:'Sunrise workshop, 14 Feb', sub:'6 spots left at Govetts Leap', url:'', thumb:pic(1039,160,160), on:true, badge:'' },
-    { title:'Gear I use', sub:'Cameras, lenses and bags', url:'', thumb:pic(1011,160,160), on:true, badge:'' },
+    { title:'Surf portfolio', sub:'Full sessions from 2025 and 2026', url:'', thumb:'media/glass-wall.jpg', on:true, badge:'' },
+    { title:'Lightroom presets', sub:'The Salt Water pack, 12 looks', url:'', thumb:'media/small-day.jpg', on:true, badge:'New' },
+    { title:'Surf trips', sub:'Where I’m shooting next', url:'', thumb:'media/cave.jpg', on:true, badge:'' },
+    { title:'Gear I use', sub:'Cameras, lenses and bags', url:'', thumb:'media/wet-hair.jpg', on:true, badge:'' },
   ],
-  enquire: { intro:'Tell me a little about your day or project and I’ll get back to you with availability and pricing.', types:'Wedding, Elopement, Portrait, Print commission', reply:'I usually reply within two days.', to:'' },
-  newsletter: { blurb:'One email a month: where I shot, what I used, and first look at new prints.', button:'Subscribe' },
+  enquire: { intro:'Tell me a little about your day or project and I’ll get back to you with availability and pricing.', types:'Surf session, Portrait, Event, Print commission', reply:'I usually reply within two days.', to:'' },
+  newsletter: { blurb:'One email a month: where I surfed and shot, what I used, and first look at new prints.', button:'Subscribe' },
   socials: { instagram:'', tiktok:'', youtube:'', vimeo:'', facebook:'', pinterest:'', website:'', email:'' },
   page: { showGear:true, footer:true },
 };
@@ -421,8 +428,21 @@ function normalise(c){
   for (const k of ['bg','surface','text','accent']) if (!isHex(c.theme.colors[k])) c.theme.colors[k] = DEFAULTS.theme.colors[k];
   return c;
 }
+/* Saved settings from before the built-in photos changed: swap leftover stock photos for the new ones. */
+function freshenStock(c){
+  const D = DEFAULTS, all = l => l.length && l.every(p => isStock(p && p.url));
+  if (all(c.cover.photos)) c.cover.photos = clone(D.cover.photos);
+  if (all(c.gallery.photos)) c.gallery.photos = clone(D.gallery.photos);
+  if (isStock(c.profile.avatar)) c.profile.avatar = D.profile.avatar;
+  if (isStock(c.film.thumb)){ c.film.thumb = D.film.thumb; if (/Kosciuszko/.test(c.film.title)){ c.film.title = D.film.title; c.film.meta = D.film.meta; } }
+  c.links.forEach((l,i) => { if (isStock(l.thumb)) l.thumb = (D.links[i] || D.links[0]).thumb; });
+  if (c.shop.featured.length && !c.shop.featured.some(id => SHOP.some(p => p.id === id) || c.gallery.photos.some(p => p.key === id))) c.shop.featured = clone(D.shop.featured);
+  if (c.profile.bio === 'Landscapes and weddings from the Blue Mountains, NSW.'){ c.profile.bio = D.profile.bio; if (c.profile.location === 'Katoomba, NSW') c.profile.location = ''; }
+  if (c.profile.status.text === 'Booking autumn 2027 weddings') c.profile.status.text = D.profile.status.text;
+  return c;
+}
 function load(){
-  try { const raw = localStorage.getItem(KEY); if (raw) return normalise(merge(clone(DEFAULTS), JSON.parse(raw))); } catch(_) {}
+  try { const raw = localStorage.getItem(KEY); if (raw) return freshenStock(normalise(merge(clone(DEFAULTS), JSON.parse(raw)))); } catch(_) {}
   return clone(DEFAULTS);
 }
 function save(cfg){
@@ -449,7 +469,7 @@ function youtubeId(u){
   return m ? m[1] : null;
 }
 
-window.SL = { imageBlob, isStock, shopItems, putImage, preloadImages, refsIn, cleanImages, embedImages, storeInlineImages, KEY, BRAND, THEMES, FONTS, SHOP, PRINT_OPTIONS, CURRENCIES, ACTIONS, SOCIALS, ICONS, DEFAULTS,
+window.SL = { freshenStock, imageBlob, isStock, shopItems, putImage, preloadImages, refsIn, cleanImages, embedImages, storeInlineImages, KEY, BRAND, THEMES, FONTS, SHOP, PRINT_OPTIONS, CURRENCIES, ACTIONS, SOCIALS, ICONS, DEFAULTS,
   rgb, hex, mix, lum, contrast, isDark, legible, isHex, tokens, applyTheme, loadFont, fontUrl,
   pic, sized, readImage, sampleColour, money, load, save, reset, clone, fromJSON, bytes, esc, href, youtubeId, normalise };
 })();
