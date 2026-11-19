@@ -17,6 +17,7 @@ Branding: the top bar shows the Sport Shutter mark with the ShutterLink name and
 - Share sheet with copy link; works offline-friendly with graceful image fallbacks
 
 **Settings (`settings.html`)**
+- Opens on **Get started** the first time: your name, then “Choose photos” (opens the phone’s photo library). The photos replace the demo ones on the cover and gallery straight away
 - Theme presets plus fully custom colours, with live readability checks
 - Six type pairings, corner roundness, button shape, alignment, link style, photo-colour blend
 - Photo uploads (resized in the browser) or image links, captions, reordering

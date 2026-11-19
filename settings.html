@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="assets/core.js?v=2.5"></script>
+<script src="assets/core.js?v=2.6"></script>
 <script>try{const t=localStorage.getItem('shutterlink:ui-theme');if(t)document.documentElement.dataset.ui=t;}catch(_){}</script>
 <style>
 :root{
@@ -205,6 +205,33 @@ select.in{appearance:none;-webkit-appearance:none;padding-right:32px;background-
 .pr[aria-pressed=true]{border-color:var(--accent-text)}
 .pr[aria-pressed=true] i{background:var(--accent)}
 
+/* Get started */
+.start{max-width:640px}
+.start .pane-h h1{font-size:30px}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;margin-top:16px;box-shadow:var(--shadow)}
+.step-h{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.step-h .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:var(--surface-3);color:var(--dim);flex:none}
+.step-h .n.done{background:var(--accent);color:#fff}
+.step-h .n svg{width:15px;height:15px}
+.step-h h2{font-size:17px;letter-spacing:-.01em}
+.big-in{height:54px;font-size:20px;font-weight:600;letter-spacing:-.01em;padding:0 16px;border-radius:12px}
+.pick{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;min-height:150px;border:2px dashed var(--border-strong);border-radius:14px;color:var(--accent-text);font-weight:700;font-size:16px;text-align:center;padding:20px;cursor:pointer;transition:border-color .15s,background-color .15s}
+.pick:hover,.pick.drag{border-color:var(--accent-text);background:var(--accent-soft)}
+.pick svg{width:30px;height:30px}
+.pick small{font-weight:500;color:var(--faint);font-size:12.5px}
+.pick input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.pick:focus-within{outline:2px solid var(--accent-text);outline-offset:3px}
+.pick.busy{pointer-events:none;color:var(--dim)}
+.mine{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.mine li{list-style:none;position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--surface-3) center/cover no-repeat}
+.mine li .rm{position:absolute;top:5px;right:5px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center}
+.mine li .rm svg{width:13px;height:13px}
+.mine li .cv{position:absolute;left:5px;bottom:5px;font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:6px;background:rgba(0,0,0,.55);color:#fff}
+.mine .more{display:grid;place-items:center;background:var(--surface-2);border:1.5px dashed var(--border-strong);color:var(--accent-text);position:relative;cursor:pointer}
+.mine .more svg{width:22px;height:22px}
+.mine .more input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.finish{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.finish .btn{height:46px;padding:0 20px;font-size:14.5px}
 .meter{height:8px;border-radius:4px;background:var(--surface-3);overflow:hidden;margin-top:10px}
 .meter div{height:100%;border-radius:4px;background:var(--accent);transition:width .3s}
 .meter.warn div{background:var(--warn)} .meter.bad div{background:var(--danger)}
@@ -261,7 +288,7 @@ select.in{appearance:none;-webkit-appearance:none;padding-right:32px;background-
 <div class="wrap">
   <main class="content" id="content" role="tabpanel"></main>
   <aside class="pv" aria-label="Live preview">
-    <div class="device" id="device"><div class="shell"><span class="island"></span><iframe id="frame" src="index.html?preview&v=2.5" title="Live preview of your link page"></iframe></div></div>
+    <div class="device" id="device"><div class="shell"><span class="island"></span><iframe id="frame" src="index.html?preview&v=2.6" title="Live preview of your link page"></iframe></div></div>
     <div class="pv-bar"><span>Live preview</span><span aria-hidden="true">·</span><a href="index.html" target="_blank" rel="noopener">Open in new tab</a></div>
   </aside>
 </div>
@@ -390,9 +417,71 @@ function checks(){
 }
 
 /* ---------- Panes ---------- */
-const TABS = [['profile','Profile'],['design','Design'],['cover','Cover'],['buttons','Quick buttons'],['sections','Sections'],['shop','Prints'],['gallery','Gallery'],['film','Film'],['links','Links'],['contact','Contact'],['socials','Socials'],['advanced','Advanced']];
+const TABS = [['start','Get started'],['profile','Profile'],['design','Design'],['cover','Cover'],['buttons','Quick buttons'],['sections','Sections'],['shop','Prints'],['gallery','Gallery'],['film','Film'],['links','Links'],['contact','Contact'],['socials','Socials'],['advanced','Advanced']];
 const P = {};
 
+/* ---------- Get started ---------- */
+const OB = 'shutterlink:onboarded';
+const onboarded = () => { try { return !!localStorage.getItem(OB); } catch(_) { return true; } };
+const markOnboarded = () => { try { localStorage.setItem(OB, '1'); } catch(_) {} };
+const isMine = p => p && p.key;        // photos the person added themselves
+const myPhotos = () => cfg.gallery.photos.filter(isMine);
+const COVER_MAX = 6, GALLERY_MAX = 18;
+P.start = () => {
+  const mine = myPhotos(), named = cfg.profile.name.trim().length > 0;
+  const tick = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  return `<div class="start">${head('Get started', 'Two quick steps and your page looks like yours. Everything else can wait.')}
+  <section class="step"><div class="step-h"><span class="n ${named ? 'done' : ''}">${named ? tick : 1}</span><h2>Your name</h2></div>
+    <label class="f"><span class="lab">As you’d like it on your page<span class="num" data-count="profile.name">${cfg.profile.name.length}/40</span></span>
+    <input class="in big-in" data-k="profile.name" value="${esc(cfg.profile.name)}" maxlength="40" autocomplete="name" placeholder="Your name"></label></section>
+  <section class="step"><div class="step-h"><span class="n ${mine.length ? 'done' : ''}">${mine.length ? tick : 2}</span><h2>Your photos</h2>${mine.length ? `<span class="hint" style="margin-left:auto">${mine.length} added</span>` : ''}</div>
+    ${mine.length ? `<ul class="mine">${mine.map((p,i) => `<li style="background-image:url('${p.url}')">${i < COVER_MAX && cfg.cover.photos.some(c => c.key === p.key) ? '<span class="cv">Cover</span>' : ''}<button class="rm" data-rm="${p.key}" aria-label="Remove photo ${i+1}">${I.close}</button></li>`).join('')}
+        ${mine.length < GALLERY_MAX ? `<li class="more" title="Add more"><span aria-hidden="true">${ui.plus}</span><input type="file" accept="image/*" multiple data-start-pick aria-label="Add more photos"></li>` : ''}</ul>
+        <p class="hint" style="margin-top:12px">Your first ${Math.min(COVER_MAX, mine.length)} play full screen on your cover; all of them fill your gallery. Change the order any time under Cover and Gallery.</p>`
+      : `<label class="pick" id="pick">${ui.upload}Choose photos<small>Pick your favourites from your photo library. Up to ${GALLERY_MAX}.</small><input type="file" accept="image/*" multiple data-start-pick aria-label="Choose photos from your library"></label>`}
+  </section>
+  ${named && mine.length ? `<div class="finish"><a class="btn primary" href="index.html" data-finish>View my page</a><button class="btn" data-act="start-more">Keep customising</button></div>`
+    : `<p class="hint" style="margin-top:16px">Want to explore first? <button class="btn sm ghost" data-act="start-more" style="color:var(--accent-text)">Skip for now</button></p>`}
+  </div>`;
+};
+async function startPick(files, label){
+  files = [...files].filter(f => /^image\//.test(f.type));
+  if (!files.length) return;
+  const room = GALLERY_MAX - myPhotos().length;
+  const take = files.slice(0, Math.max(0, room));
+  if (!take.length){ toast(`You’ve already added ${GALLERY_MAX} photos.`, true); return; }
+  if (label){ label.classList.add('busy'); }
+  let done = 0;
+  const firstTime = !myPhotos().length;
+  const added = [];
+  for (const f of take){
+    if (label) label.firstChild && (label.querySelector('small') ? label.querySelector('small').textContent = `Adding ${done + 1} of ${take.length}…` : 0);
+    try {
+      const key = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      // the gallery copy is smaller; the cover copy is sharper because it fills the screen
+      const g = await SL.readImage(f, 900, .8);
+      added.push({ key, g, file:f });
+      done++;
+    } catch(err){ toast(err.message, true); }
+  }
+  if (!added.length){ renderPane('start', true); return; }
+  if (firstTime){
+    // swap the demo photos for theirs
+    cfg.gallery.photos = cfg.gallery.photos.filter(isMine);
+    cfg.cover.photos = cfg.cover.photos.filter(isMine);
+  }
+  for (const a of added){
+    cfg.gallery.photos.push({ url:a.g, caption:'', key:a.key });
+    if (cfg.cover.photos.length < COVER_MAX){
+      try { cfg.cover.photos.push({ url: await SL.readImage(a.file, 1280, .8), caption:'', key:a.key }); } catch(_) {}
+    }
+  }
+  if (cfg.cover.style === 'minimal' && firstTime) cfg.cover.style = 'full';
+  ['gallery'].forEach(id => { const sct = cfg.sections.find(x => x.id === id); if (sct) sct.on = true; });
+  changed({ immediate:true }); renderPane('start', true);
+  post({ type:'shutterlink:focus', tab:'cover' });
+  toast(files.length > take.length ? `Added ${done}. That’s the limit of ${GALLERY_MAX}.` : `Added ${done} photo${done > 1 ? 's' : ''}. Your page now shows them.`);
+}
 P.profile = () => head('Profile', 'Who you are. This is the first thing people see after tapping the link in your bio.') +
   panel('About you', `<div class="fields">
     ${field('Name', 'profile.name', { max:40 })}
@@ -552,7 +641,7 @@ P.advanced = () => {
 };
 
 /* ---------- Tabs ---------- */
-const fromHash = () => { const h = location.hash.slice(1); return TABS.some(t => t[0] === h) ? h : 'profile'; };
+const fromHash = () => { const h = location.hash.slice(1); return TABS.some(t => t[0] === h) ? h : (onboarded() ? 'profile' : 'start'); };
 let current = fromHash();
 $('tabs').innerHTML = TABS.map(([id,l]) => `<button class="tab" role="tab" id="tab-${id}" aria-controls="content" data-tab="${id}">${l}</button>`).join('');
 function renderPane(id, keep){
@@ -566,6 +655,7 @@ function renderPane(id, keep){
 }
 function go(id){
   if (id === current) return;
+  if (current === 'start') markOnboarded();
   history.replaceState(null, '', '#' + id);
   renderPane(id); scrollTo({ top:0 });
   $('tab-' + id).scrollIntoView({ block:'nearest', inline:'nearest' });
@@ -639,9 +729,14 @@ content.addEventListener('change', e => {
   if (el.dataset.check) validate(el);
   if (el.dataset.upload) upload(el.files[0], el.dataset.upload);
   if (el.dataset.uploadMany) uploadMany(el.files, el.dataset.uploadMany);
+  if (el.dataset.startPick !== undefined) startPick(el.files, el.closest('.pick'));
   if (el.id === 'importFile') importFile(el.files[0]);
   if (el.dataset.hex){ const k = el.dataset.hex; el.value = cfg.theme.colors[k]; el.removeAttribute('aria-invalid'); }
 });
+// drag photos onto the picker on desktop
+content.addEventListener('dragover', e => { const pk = e.target.closest('.pick, .mine'); if (!pk) return; e.preventDefault(); pk.classList.add('drag'); });
+content.addEventListener('dragleave', e => { const pk = e.target.closest('.pick, .mine'); if (pk) pk.classList.remove('drag'); });
+content.addEventListener('drop', e => { const pk = e.target.closest('.pick, .mine'); if (!pk) return; e.preventDefault(); pk.classList.remove('drag'); startPick(e.dataTransfer.files, pk.classList.contains('pick') ? pk : null); });
 content.addEventListener('focusout', e => { if (e.target.dataset && e.target.dataset.check) validate(e.target); });
 
 content.addEventListener('click', e => {
@@ -654,6 +749,13 @@ content.addEventListener('click', e => {
   if (th){ const p = SL.THEMES.find(x => x.id === th.dataset.theme); cfg.theme.preset = p.id; cfg.theme.colors = { ...p.colors }; changed({ immediate:true }); renderPane('design', true); return; }
   const fo = t.closest('[data-font]');
   if (fo){ cfg.theme.font = fo.dataset.font; changed({ immediate:true }); renderPane('design', true); return; }
+  const rmb = t.closest('[data-rm]');
+  if (rmb){ const k = rmb.dataset.rm; cfg.gallery.photos = cfg.gallery.photos.filter(p => p.key !== k); cfg.cover.photos = cfg.cover.photos.filter(p => p.key !== k);
+    // keep the cover full from their remaining photos
+    for (const f of myPhotos()){ if (cfg.cover.photos.length >= COVER_MAX) break; if (!cfg.cover.photos.some(c => c.key === f.key)) cfg.cover.photos.push({ url:f.url, caption:'', key:f.key }); }
+    if (!myPhotos().length){ cfg.gallery.photos = SL.clone(SL.DEFAULTS.gallery.photos); cfg.cover.photos = SL.clone(SL.DEFAULTS.cover.photos); }
+    changed({ immediate:true }); renderPane('start', true); toast('Removed. Undo brings it back.'); return; }
+  if (t.closest('[data-finish]')) markOnboarded();
   const fe = t.closest('[data-feature]');
   if (fe){ const f = cfg.shop.featured, i = f.indexOf(fe.dataset.feature); if (i >= 0) f.splice(i, 1); else f.push(fe.dataset.feature); changed({ immediate:true }); renderPane('shop', true); return; }
   const a = t.closest('[data-act]'); if (!a) return;
@@ -665,6 +767,7 @@ content.addEventListener('click', e => {
       : { bg: SL.mix(c.text, '#000000', .3), surface: SL.mix(c.text, '#000000', .12), text: SL.mix(c.bg, '#ffffff', .5), accent: c.accent };
     cfg.theme.preset = 'custom'; changed({ immediate:true }); renderPane('design', true); return;
   }
+  if (act === 'start-more'){ markOnboarded(); go('design'); return; }
   if (act === 'export'){
     const u = URL.createObjectURL(new Blob([JSON.stringify(cfg, null, 2)], { type:'application/json' }));
     const l = document.createElement('a'); l.href = u; l.download = 'shutterlink-settings.json';
@@ -716,7 +819,7 @@ function fit(){ $('device').style.setProperty('--k', Math.max(.55, Math.min(1, (
 addEventListener('resize', fit); fit();
 $('frame').addEventListener('load', () => post());
 $('frame2').addEventListener('load', () => post());
-$('fab').onclick = () => { const f = $('frame2'); if (!f.getAttribute('src')) f.src = 'index.html?preview&v=2.5'; else post(); $('mpv').classList.add('open'); $('mpvClose').focus(); };
+$('fab').onclick = () => { const f = $('frame2'); if (!f.getAttribute('src')) f.src = 'index.html?preview&v=2.6'; else post(); $('mpv').classList.add('open'); $('mpvClose').focus(); };
 $('mpvClose').onclick = () => { $('mpv').classList.remove('open'); $('fab').focus(); };
 addEventListener('keydown', e => { if (e.key === 'Escape' && $('mpv').classList.contains('open')) $('mpvClose').click(); });
 // another tab changed settings (e.g. reset elsewhere)
