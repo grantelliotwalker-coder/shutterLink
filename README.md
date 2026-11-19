@@ -25,6 +25,15 @@ Branding: the top bar shows the Sport Shutter mark with the ShutterLink name and
 - Live phone preview that follows the tab you're on; full-screen preview on mobile
 - Light and dark mode for the settings app itself
 
+## For Sport Shutter's developers
+
+- **`brief.html`**: the design brief and build guide. The idea, how it fits Sport Shutter, the API, the settings file, security, links, hosting and rollout.
+- **`simulator.html`**: Sport Shutter's side running in the browser, with the real settings page and public page connected to it. It has logins, a server you can break, a request log, the database, events, an inbox and an API console.
+- **`server/shutterlink-api.js`**: the one file Sport Shutter adds to its server (no dependencies). `server/memory-store.js` is a reference store; `node server/test.js` runs 38 checks.
+- **`assets/data.js`**: the only code in the pages that reads or saves data. Modes: `local` (this browser), `sim` (`?backend=sim`, the simulator) and `live` (the real API; automatic on sportshutter.com).
+
+The `</>` button in the settings top bar opens the developer pages.
+
 ## How it fits together
 
 - `assets/core.js` holds everything shared: the colour system (four colours in, a full accessible palette out), themes, fonts, default content, the shop catalogue and storage.

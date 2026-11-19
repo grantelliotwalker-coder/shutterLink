@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Design brief · ShutterLink for Sport Shutter</title>
+<meta name="description" content="A proposal and build guide for ShutterLink: a link-in-bio page for every Sport Shutter photographer.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="assets/core.js?v=3.0"></script>
+<script>try{const t=localStorage.getItem('shutterlink:ui-theme');if(t)document.documentElement.dataset.ui=t;}catch(_){}</script>
+<link rel="stylesheet" href="assets/dev.css?v=3.0">
+<style>
+.doc{max-width:1240px;margin:0 auto;padding:28px 20px 100px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px}
+.toc{position:sticky;top:82px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;padding-right:6px}
+.toc b{display:block;font-size:13px;margin-bottom:10px}
+.toc ol{list-style:none;counter-reset:t;display:grid;gap:1px}
+.toc li{counter-increment:t}
+.toc a{display:flex;gap:8px;padding:5px 8px;border-radius:7px;color:var(--dim);text-decoration:none;font-size:13.5px;font-weight:500}
+.toc a::before{content:counter(t);min-width:16px;color:var(--faint);font-variant-numeric:tabular-nums}
+.toc a:hover{background:var(--surface-2);color:var(--text)}
+.toc a.on{background:var(--accent-soft);color:var(--accent-text)}
+.toc a.on::before{color:var(--accent-text)}
+@media (max-width:980px){ .doc{grid-template-columns:1fr;gap:0} .toc{display:none} }
+article{max-width:780px;min-width:0}
+.ch{padding:36px 0 8px;border-top:1px solid var(--border)}
+.ch:first-child{border-top:0;padding-top:4px}
+.eyebrow{font-size:12.5px;font-weight:700;color:var(--accent-text);margin-bottom:12px}
+.title{font-size:40px;line-height:1.08;letter-spacing:-.03em}
+.lede{font-size:18px;line-height:1.55;color:var(--dim);margin-top:14px}
+h2{font-size:24px;letter-spacing:-.02em;line-height:1.2;margin-bottom:10px}
+h3{font-size:16.5px;letter-spacing:-.01em;margin:26px 0 8px}
+article p{margin-top:10px}
+article ul,article ol{margin:10px 0 0 22px;display:grid;gap:6px}
+article li::marker{color:var(--faint)}
+.callout{margin-top:18px;padding:14px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent-text);font-size:14px}
+.callout.good{border-left-color:var(--ok)}
+.callout.warn{border-left-color:var(--warn)}
+.callout b:first-child{display:block;margin-bottom:2px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.cta .btn{height:42px;padding:0 18px;font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.stat b{display:block;font-size:26px;letter-spacing:-.02em;line-height:1.1}
+.stat span{font-size:13px;color:var(--dim)}
+@media (max-width:640px){ .stats{grid-template-columns:1fr} .title{font-size:32px} }
+.feat-wrap{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:24px;align-items:start;margin-top:16px}
+@media (max-width:760px){ .feat-wrap{grid-template-columns:1fr} .mini-phone{display:none} }
+.feats{display:grid;gap:10px}
+.feat{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+.feat i{width:30px;height:30px;border-radius:8px;background:var(--accent-soft);color:var(--accent-text);display:grid;place-items:center}
+.feat i svg{width:17px;height:17px}
+.feat b{display:block;font-size:14px}
+.feat span{font-size:13.5px;color:var(--dim)}
+.mini-phone{width:260px;height:540px;border-radius:36px;background:#0b0c12;padding:8px;box-shadow:0 0 0 1px #2a2c38,0 20px 50px -20px rgba(16,18,40,.5);position:sticky;top:90px;overflow:hidden}
+.mini-phone iframe{width:390px;height:786px;border:0;border-radius:42px;transform:scale(.626);transform-origin:0 0;display:block}
+figure.dia{margin-top:18px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px}
+figure.dia svg{width:100%;height:auto;display:block}
+figure.dia figcaption{font-size:13px;color:var(--faint);margin-top:10px}
+.dia .box{fill:var(--surface-2);stroke:var(--border-strong)}
+.dia .ss{fill:color-mix(in srgb,var(--accent) 10%,var(--surface));stroke:var(--accent-text)}
+.dia .sl{fill:color-mix(in srgb,var(--ok) 10%,var(--surface));stroke:var(--ok)}
+.dia text{fill:var(--text);font-family:var(--font);font-size:13px}
+.dia .tb{font-weight:700;font-size:14px}
+.dia .ts{fill:var(--faint);font-size:12px}
+.dia .ln{stroke:var(--border-strong);stroke-width:1.5;fill:none}
+.dia .lnA{stroke:var(--accent-text);stroke-width:1.5;fill:none}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--dim);margin-top:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.steps{list-style:none!important;margin:16px 0 0!important;counter-reset:s;display:grid;gap:12px!important}
+.steps > li{counter-increment:s;display:grid;grid-template-columns:30px 1fr;gap:12px}
+.steps > li::before{content:counter(s);width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:13px;display:grid;place-items:center}
+.steps > li > div > b{display:block;font-size:15px}
+.steps > li > div > span{color:var(--dim)}
+.code{position:relative;margin-top:12px}
+.code pre{font-family:var(--mono);font-size:12.5px;line-height:1.6;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;overflow:auto;max-height:520px}
+.code .cp{position:absolute;top:8px;right:8px;height:28px;padding:0 10px;font-size:12px}
+.fn{display:block;font-family:var(--mono);font-size:12px;color:var(--faint);margin:22px 0 -6px}
+.tc{color:var(--faint)} .tk{color:var(--accent-text)} .ts2{color:var(--ok)}
+table.t{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px}
+table.t th{text-align:left;font-size:12.5px;color:var(--faint);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--border)}
+table.t td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+table.t td:first-child{white-space:nowrap}
+.tw{overflow-x:auto}
+.ep{margin-top:14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);overflow:hidden}
+.ep header{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.ep header code{background:none;padding:0;font-size:13.5px;font-weight:500}
+.ep header .who{margin-left:auto;font-size:12px;font-weight:600;padding:2px 8px;border-radius:7px}
+.who.auth{background:var(--accent-soft);color:var(--accent-text)}
+.who.pub{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}
+.m{font-family:var(--mono);font-size:12px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--surface-3)}
+.m.GET{color:var(--ok)} .m.PUT{color:var(--warn)} .m.POST{color:var(--accent-text)}
+.ep .bd{padding:12px 14px;font-size:13.5px;display:grid;gap:6px}
+.ep .bd .r{display:grid;grid-template-columns:90px 1fr;gap:10px}
+.ep .bd .r > span:first-child{color:var(--faint);font-size:12.5px;padding-top:1px}
+.ep .bd code{font-size:12px}
+details.faq{border-bottom:1px solid var(--border);padding:12px 0}
+details.faq summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px}
+details.faq summary::-webkit-details-marker{display:none}
+details.faq summary::after{content:"+";color:var(--faint);font-weight:500}
+details.faq[open] summary::after{content:"–"}
+details.faq p{color:var(--dim)}
+.foot{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);color:var(--faint);font-size:13px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="bar">
+    <a class="brand" href="https://sportshutter.com/" aria-label="ShutterLink by Sport Shutter"><span class="mk" id="mk"></span><span>ShutterLink</span></a>
+    <span class="crumb">Developer</span>
+    <nav class="seg devnav" aria-label="Developer pages"><a href="simulator.html">Simulator</a><a href="brief.html" aria-current="page">Design brief</a></nav>
+    <span class="sp"></span>
+    <button class="btn ghost icon" id="uiTheme" aria-label="Switch between light and dark" title="Light or dark"></button>
+    <a class="btn" href="settings.html">Back to settings</a>
+  </div>
+</header>
+
+<div class="doc">
+  <aside class="toc" aria-label="Contents">
+    <b>Design brief</b>
+    <ol>
+      <li><a href="#idea">The idea</a></li>
+      <li><a href="#product">What photographers get</a></li>
+      <li><a href="#fit">How it fits Sport Shutter</a></li>
+      <li><a href="#add">What Sport Shutter adds</a></li>
+      <li><a href="#api">API reference</a></li>
+      <li><a href="#file">The settings file</a></li>
+      <li><a href="#security">Sign-in and security</a></li>
+      <li><a href="#links">Personal links</a></li>
+      <li><a href="#hosting">Hosting and releases</a></li>
+      <li><a href="#events">Events</a></li>
+      <li><a href="#try">Try it</a></li>
+      <li><a href="#rollout">Rollout</a></li>
+      <li><a href="#faq">Questions</a></li>
+    </ol>
+  </aside>
+
+  <article>
+    <section class="ch" id="top">
+      <div class="eyebrow">Proposal · ShutterLink for Sport Shutter</div>
+      <h1 class="title">A link page for every Sport Shutter photographer</h1>
+      <p class="lede">Photographers send their Instagram followers to Linktree. ShutterLink gives them a better page on <b>sportshutter.com/@theirname</b>: their photos, prints from their Sport Shutter shop, bookings and links. Every visit lands on Sport Shutter instead of someone else’s site.</p>
+      <div class="callout"><b>How to read this brief.</b> Short on time? Read <a href="#idea">The idea</a> and <a href="#fit">How it fits</a>, then open the <a href="simulator.html">simulator</a> and use it. Building it? Chapters 4 to 10 are the spec, and the code is ready in <code>server/</code>.</div>
+      <div class="cta"><a class="btn primary" href="simulator.html">Open the simulator</a><a class="btn" href="index.html?backend=sim&u=grantwalker" target="_blank" rel="noopener">See a live page</a><a class="btn" href="settings.html">Try the settings</a></div>
+    </section>
+
+    <section class="ch">
+      <h2 id="idea">1. The idea</h2>
+      <p>Instagram allows one link in a bio. Most photographers fill it with a link-in-bio service, so their audience leaves Instagram for a generic page with no shop, no bookings and nothing to do with Sport Shutter.</p>
+      <p>ShutterLink replaces that page with one built for photographers and powered by Sport Shutter. It looks like their work, sells their prints through the Sport Shutter shop, takes bookings into their Sport Shutter inbox, and carries the Sport Shutter name to every person who taps the link.</p>
+      <div class="stats">
+        <div class="stat"><b>One link</b><span>in every photographer’s bio points at sportshutter.com</span></div>
+        <div class="stat"><b>Two steps</b><span>to a finished page: name, then photos from their phone</span></div>
+        <div class="stat"><b>One file</b><span>plus one table and one proxy rule on Sport Shutter’s side</span></div>
+      </div>
+      <h3>Why it’s worth doing</h3>
+      <ul>
+        <li><b>Traffic.</b> Followers who tap the bio link arrive on Sport Shutter, not a third party.</li>
+        <li><b>Sales.</b> Prints sell from the page and check out through the existing Sport Shutter shop.</li>
+        <li><b>Growth.</b> Every page says “Powered by Sport Shutter” to an audience that already likes photography.</li>
+        <li><b>Retention.</b> A page photographers use daily is a reason to keep their Sport Shutter account.</li>
+      </ul>
+    </section>
+
+    <section class="ch">
+      <h2 id="product">2. What photographers get</h2>
+      <p>The page and its settings are built and working today. Use them in the <a href="simulator.html">simulator</a>; the phone on the right is a live page.</p>
+      <div class="feat-wrap">
+        <div class="feats">
+          <div class="feat"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 18.5h3"/></svg></i><div><b>A first screen that fits any phone</b><span>Their photos full screen, name, availability and four quick buttons. Nothing cut off, no scrolling needed.</span></div></div>
+          <div class="feat"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><rect x="7" y="6" width="10" height="9"/></svg></i><div><b>Prints from their shop</b><span>Size, paper and frame with a live framed preview, a cart, then checkout on Sport Shutter.</span></div></div>
+          <div class="feat"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></i><div><b>Bookings to their inbox</b><span>An enquiry form that delivers to Sport Shutter. Their email address never appears on the page.</span></div></div>
+          <div class="feat"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg></i><div><b>Gallery, film and links</b><span>A full-screen gallery, a featured video that plays in place, and their other links, in the order they choose.</span></div></div>
+          <div class="feat"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18"/></svg></i><div><b>Their look, not a template</b><span>Eight themes or their own colours with readability checks, six type pairings, three cover styles, corner and button shapes.</span></div></div>
+          <div class="feat"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i><div><b>Set up in two steps</b><span>Their name, then photos straight from their phone’s library. Everything else can wait.</span></div></div>
+        </div>
+        <div class="mini-phone" aria-hidden="true"><iframe src="index.html?backend=sim&u=grantwalker&preview" title="A live ShutterLink page" tabindex="-1" loading="lazy"></iframe></div>
+      </div>
+    </section>
+
+    <section class="ch">
+      <h2 id="fit">3. How it fits Sport Shutter</h2>
+      <p>Sport Shutter keeps everything that matters: logins, data, photos, the shop and security. ShutterLink is only the front end: two web pages that ask Sport Shutter for data and send changes back. It lives at <code>sportshutter.com/shutterlink/</code> through a proxy, so to visitors and photographers it is simply part of Sport Shutter.</p>
+      <figure class="dia">
+        <svg viewBox="0 0 760 360" role="img" aria-labelledby="diaT diaD"><title id="diaT">How ShutterLink fits Sport Shutter</title><desc id="diaD">Photographers and visitors use the ShutterLink pages on sportshutter.com. The pages call Sport Shutter's API, where shutterlink-api.js checks the login and reads or writes the photographer's settings in Sport Shutter's database. The ShutterLink pages are hosted separately and reached through a proxy.</desc>
+          <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+          <rect class="box" x="20" y="24" width="190" height="64" rx="10"/><text class="tb" x="115" y="50" text-anchor="middle">Photographer</text><text class="ts" x="115" y="70" text-anchor="middle">signed in to Sport Shutter</text>
+          <rect class="box" x="20" y="272" width="190" height="64" rx="10"/><text class="tb" x="115" y="298" text-anchor="middle">Visitor</text><text class="ts" x="115" y="318" text-anchor="middle">taps the link in a bio</text>
+          <rect class="sl" x="270" y="24" width="210" height="312" rx="14"/><text class="tb" x="375" y="52" text-anchor="middle">ShutterLink pages</text><text class="ts" x="375" y="70" text-anchor="middle">hosted separately, static files</text>
+          <rect class="box" x="292" y="92" width="166" height="56" rx="9"/><text x="375" y="116" text-anchor="middle">settings.html</text><text class="ts" x="375" y="134" text-anchor="middle">edit your page</text>
+          <rect class="box" x="292" y="250" width="166" height="56" rx="9"/><text x="375" y="274" text-anchor="middle">index.html</text><text class="ts" x="375" y="292" text-anchor="middle">sportshutter.com/@name</text>
+          <rect class="box" x="292" y="170" width="166" height="58" rx="9"/><text x="375" y="194" text-anchor="middle">assets/data.js</text><text class="ts" x="375" y="212" text-anchor="middle">talks to the API</text>
+          <rect class="ss" x="540" y="24" width="200" height="312" rx="14"/><text class="tb" x="640" y="52" text-anchor="middle">Sport Shutter</text><text class="ts" x="640" y="70" text-anchor="middle">owns logins, data, security</text>
+          <rect class="box" x="560" y="92" width="160" height="56" rx="9"/><text x="640" y="116" text-anchor="middle">Login session</text><text class="ts" x="640" y="134" text-anchor="middle">already exists</text>
+          <rect class="box" x="560" y="170" width="160" height="58" rx="9"/><text x="640" y="194" text-anchor="middle">shutterlink-api.js</text><text class="ts" x="640" y="212" text-anchor="middle">the one new file</text>
+          <rect class="box" x="560" y="250" width="160" height="56" rx="9"/><text x="640" y="274" text-anchor="middle">Database</text><text class="ts" x="640" y="292" text-anchor="middle">+ one table</text>
+          <g style="color:var(--border-strong)"><path class="ln" d="M210 56 H286" marker-end="url(#ar)"/><path class="ln" d="M210 304 H286" marker-end="url(#ar)"/><path class="ln" d="M375 148 V166" marker-end="url(#ar)"/><path class="ln" d="M375 250 V232" marker-end="url(#ar)"/><path class="ln" d="M640 228 V246" marker-end="url(#ar)"/><path class="ln" d="M640 148 V166" marker-end="url(#ar)"/></g>
+          <g style="color:var(--accent-text)"><path class="lnA" d="M458 199 H556" marker-end="url(#ar)" marker-start="url(#ar)"/></g>
+          <text class="ts" x="507" y="190" text-anchor="middle">/api</text>
+        </svg>
+        <figcaption>The pages never touch Sport Shutter’s database or code. Everything goes through seven API calls, answered by one file.</figcaption>
+        <div class="legend"><span><i style="background:color-mix(in srgb,var(--ok) 25%,transparent);border:1px solid var(--ok)"></i>Built and run by the ShutterLink team</span><span><i style="background:color-mix(in srgb,var(--accent) 20%,transparent);border:1px solid var(--accent-text)"></i>Sport Shutter</span></div>
+      </figure>
+      <h3>Principles</h3>
+      <ul>
+        <li><b>Sport Shutter owns the data.</b> Settings live in the photographer’s Sport Shutter profile. ShutterLink stores nothing.</li>
+        <li><b>No new login.</b> The pages use the existing Sport Shutter session. ShutterLink never sees passwords or tokens.</li>
+        <li><b>One contract.</b> The seven endpoints and the settings file format in this brief are the whole agreement. Each team works to it independently.</li>
+        <li><b>Nothing shared but the API.</b> Separate code, separate hosting, separate releases.</li>
+      </ul>
+    </section>
+
+    <section class="ch">
+      <h2 id="add">4. What Sport Shutter adds</h2>
+      <p>Most of this is wiring, not new logic. The validation, rules and responses are already written and tested in <code>server/shutterlink-api.js</code>; Sport Shutter connects it to its own database, storage and login.</p>
+      <ol class="steps">
+        <li><div><b>Copy one file into the server.</b><span><code>server/shutterlink-api.js</code>. No dependencies; Node 18 or later. Run <code>node server/test.js</code> to check it (38 checks).</span></div></li>
+        <li><div><b>Add one table, and two small ones.</b><span>Settings per photographer, old link names, and enquiries. SQL below.</span></div></li>
+        <li><div><b>Write the store: five functions against that table.</b><span>A PostgreSQL version is below; <code>server/memory-store.js</code> shows the exact behaviour.</span></div></li>
+        <li><div><b>Mount it after the session middleware.</b><span>Three lines in Express. It answers only <code>/api/shutterlink/*</code> and <code>/api/public/pages/*</code>.</span></div></li>
+        <li><div><b>Route the pages through a proxy.</b><span><code>/shutterlink/*</code> and <code>/@*</code> go to ShutterLink’s hosting. See <a href="#hosting">Hosting</a>.</span></div></li>
+        <li><div><b>Add a button to the dashboard.</b><span>“Edit my link page”, linking to <code>/shutterlink/settings.html</code>.</span></div></li>
+      </ol>
+
+      <span class="fn">migrations/shutterlink.sql</span>
+      <div class="code"><button class="btn sm cp" data-copy="c-sql">Copy</button><pre id="c-sql"><code>create table shutterlink_profiles (
+  user_id     bigint primary key references users(id) on delete cascade,
+  handle      text unique,                 -- sportshutter.com/@handle
+  settings    jsonb,                       -- the settings file, up to 64 KB
+  revision    integer not null default 0,  -- goes up by one with every save
+  updated_at  timestamptz
+);
+
+create table shutterlink_handle_aliases ( -- old names keep redirecting
+  handle   text primary key,
+  user_id  bigint not null references users(id) on delete cascade
+);
+
+create table shutterlink_enquiries (
+  id          bigserial primary key,
+  user_id     bigint not null references users(id) on delete cascade,
+  name text, email text, type text, date text, msg text,
+  received_at timestamptz not null default now()
+);</code></pre></div>
+
+      <span class="fn">server/shutterlink-store.js</span>
+      <div class="code"><button class="btn sm cp" data-copy="c-store">Copy</button><pre id="c-store"><code><span class="tc">// The five functions the API needs, backed by PostgreSQL (node-postgres).</span>
+const { Pool } = require('pg');
+const pool = new Pool();
+
+const store = {
+  async getProfile(userId) {
+    const { rows } = await pool.query(
+      'select handle, settings, revision, updated_at from shutterlink_profiles where user_id = $1', [userId]);
+    const r = rows[0];
+    return r ? { handle: r.handle, settings: r.settings, revision: r.revision, updatedAt: r.updated_at } : null;
+  },
+
+  <span class="tc">// Saves only if nobody else saved since this person loaded (revision check).</span>
+  async saveSettings(userId, settings, expected) {
+    const { rows } = await pool.query(
+      `insert into shutterlink_profiles (user_id, settings, revision, updated_at)
+       values ($1, $2, 1, now())
+       on conflict (user_id) do update
+         set settings = $2, revision = shutterlink_profiles.revision + 1, updated_at = now()
+         where $3::int is null or shutterlink_profiles.revision = $3
+       returning revision, updated_at`, [userId, settings, expected]);
+    if (!rows[0]) {
+      const cur = await store.getProfile(userId);
+      throw Object.assign(new Error('conflict'), { code: 'conflict', revision: cur.revision });
+    }
+    return { revision: rows[0].revision, updatedAt: rows[0].updated_at };
+  },
+
+  async findByHandle(handle) {
+    const { rows } = await pool.query(
+      `select user_id, handle from shutterlink_profiles where handle = $1
+       union all
+       select a.user_id, p.handle from shutterlink_handle_aliases a
+         join shutterlink_profiles p using (user_id) where a.handle = $1
+       limit 1`, [handle]);
+    return rows[0] ? { userId: String(rows[0].user_id), handle: rows[0].handle } : null;
+  },
+
+  <span class="tc">// Claim a new name; the old one becomes a redirect.</span>
+  async setHandle(userId, handle) {
+    const c = await pool.connect();
+    try {
+      await c.query('begin');
+      const taken = await c.query(
+        'select 1 from shutterlink_handle_aliases where handle = $1 and user_id &lt;&gt; $2', [handle, userId]);
+      if (taken.rowCount) { await c.query('rollback'); return { taken: true }; }
+      const old = await c.query('select handle from shutterlink_profiles where user_id = $1 for update', [userId]);
+      await c.query(`insert into shutterlink_profiles (user_id, handle) values ($1, $2)
+                     on conflict (user_id) do update set handle = $2`, [userId, handle]);
+      const prev = old.rows[0] &amp;&amp; old.rows[0].handle;
+      if (prev &amp;&amp; prev !== handle)
+        await c.query('insert into shutterlink_handle_aliases (handle, user_id) values ($1, $2) on conflict do nothing', [prev, userId]);
+      await c.query('delete from shutterlink_handle_aliases where handle = $1 and user_id = $2', [handle, userId]);
+      await c.query('commit');
+      return { ok: true };
+    } catch (e) {
+      await c.query('rollback');
+      if (e.code === '23505') return { taken: true };   <span class="tc">// unique violation: someone else has it</span>
+      throw e;
+    } finally { c.release(); }
+  },
+
+  async addEnquiry(userId, e) {
+    const { rows } = await pool.query(
+      `insert into shutterlink_enquiries (user_id, name, email, type, date, msg)
+       values ($1, $2, $3, $4, $5, $6) returning id`, [userId, e.name, e.email, e.type, e.date, e.msg]);
+    return { id: String(rows[0].id) };
+  },
+};
+
+module.exports = store;</code></pre></div>
+
+      <span class="fn">server/app.js</span>
+      <div class="code"><button class="btn sm cp" data-copy="c-mount">Copy</button><pre id="c-mount"><code>const express = require('express');
+const { createShutterLinkApi, expressHandler } = require('./shutterlink-api');
+const store = require('./shutterlink-store');
+
+const api = createShutterLinkApi({
+  store,
+  images: {
+    <span class="tc">// Put the photo wherever Sport Shutter keeps images; return its public address.</span>
+    async put(userId, body, contentType) {
+      const key = `shutterlink/${userId}/${Date.now()}.${contentType.split('/')[1]}`;
+      await storage.upload(key, body, contentType);          <span class="tc">// your S3, GCS or similar</span>
+      return { url: `https://images.sportshutter.com/${key}` };
+    },
+  },
+  onEvent(type, payload) {
+    if (type === 'settings.saved') cdn.purge(`/api/public/pages/${payload.handle}`);
+    if (type === 'enquiry.received') notify.enquiry(payload.userId, payload.enquiryId);
+  },
+});
+
+<span class="tc">// After your session middleware, which sets req.user = { id, name }.</span>
+app.use('/api/shutterlink/images', express.raw({ type: 'image/*', limit: '8mb' }));
+app.use(['/api/shutterlink', '/api/public/pages'], express.json({ limit: '100kb' }));
+app.use(expressHandler(api));</code></pre></div>
+      <div class="callout"><b>Not on Express?</b> <code>createShutterLinkApi(...).handle(req)</code> takes a plain object <code>{ method, path, headers, body, user, ip }</code> and returns <code>{ status, headers, body }</code>, so it fits any framework or a serverless function in a few lines.</div>
+    </section>
+
+    <section class="ch">
+      <h2 id="api">5. API reference</h2>
+      <p>Seven calls. All bodies are JSON except photo uploads. Errors always look like <code>{ "error": { "code", "message" } }</code>, and the message is written to show to the photographer.</p>
+      <div class="tw"><table class="t"><thead><tr><th>Call</th><th>Who</th><th>What it does</th></tr></thead><tbody>
+        <tr><td><span class="m GET">GET</span> <code>/api/shutterlink/me</code></td><td>Signed in</td><td>Who is signed in and their link name</td></tr>
+        <tr><td><span class="m GET">GET</span> <code>/api/shutterlink/settings</code></td><td>Signed in</td><td>Their settings file and revision</td></tr>
+        <tr><td><span class="m PUT">PUT</span> <code>/api/shutterlink/settings</code></td><td>Signed in</td><td>Save the whole settings file</td></tr>
+        <tr><td><span class="m PUT">PUT</span> <code>/api/shutterlink/handle</code></td><td>Signed in</td><td>Change their link name</td></tr>
+        <tr><td><span class="m POST">POST</span> <code>/api/shutterlink/images</code></td><td>Signed in</td><td>Upload a photo, get its address</td></tr>
+        <tr><td><span class="m GET">GET</span> <code>/api/public/pages/:handle</code></td><td>Anyone</td><td>A page’s public settings, cacheable</td></tr>
+        <tr><td><span class="m POST">POST</span> <code>/api/public/pages/:handle/enquiries</code></td><td>Anyone</td><td>Send an enquiry to the photographer</td></tr>
+      </tbody></table></div>
+
+      <div class="ep"><header><span class="m GET">GET</span><code>/api/shutterlink/me</code><span class="who auth">Signed in</span></header><div class="bd">
+        <div class="r"><span>Returns</span><span><code>200 { userId, name, handle, suggestedHandle }</code>. <code>handle</code> is null until the first save; <code>suggestedHandle</code> is a free name based on theirs.</span></div>
+        <div class="r"><span>Errors</span><span><code>401 signed_out</code>: the pages show a sign-in screen.</span></div></div></div>
+      <div class="ep"><header><span class="m GET">GET</span><code>/api/shutterlink/settings</code><span class="who auth">Signed in</span></header><div class="bd">
+        <div class="r"><span>Returns</span><span><code>200 { settings, revision, updatedAt, handle }</code>. <code>settings</code> is null the first time; the pages then start from defaults with the person’s name.</span></div></div></div>
+      <div class="ep"><header><span class="m PUT">PUT</span><code>/api/shutterlink/settings</code><span class="who auth">Signed in</span></header><div class="bd">
+        <div class="r"><span>Send</span><span><code>{ settings, revision }</code> with header <code>X-ShutterLink: 1</code>. <code>revision</code> is the one they loaded.</span></div>
+        <div class="r"><span>Returns</span><span><code>200 { revision, updatedAt, handle }</code>. The first save also claims a link name.</span></div>
+        <div class="r"><span>Errors</span><span><code>409 conflict</code> saved elsewhere since loading (the page asks which to keep) · <code>422 invalid_settings</code> with <code>errors: [{ path, message }]</code> · <code>403 csrf</code> · <code>429</code></span></div></div></div>
+      <div class="ep"><header><span class="m PUT">PUT</span><code>/api/shutterlink/handle</code><span class="who auth">Signed in</span></header><div class="bd">
+        <div class="r"><span>Send</span><span><code>{ handle }</code> with <code>X-ShutterLink: 1</code></span></div>
+        <div class="r"><span>Returns</span><span><code>200 { handle }</code>. The old name becomes a redirect.</span></div>
+        <div class="r"><span>Errors</span><span><code>409 taken</code> · <code>422 invalid_handle</code> (rules in <a href="#links">Personal links</a>)</span></div></div></div>
+      <div class="ep"><header><span class="m POST">POST</span><code>/api/shutterlink/images</code><span class="who auth">Signed in</span></header><div class="bd">
+        <div class="r"><span>Send</span><span>The photo itself as the body, <code>Content-Type: image/jpeg</code> (or png, webp), with <code>X-ShutterLink: 1</code>. The pages shrink photos before sending.</span></div>
+        <div class="r"><span>Returns</span><span><code>201 { url }</code>, which the settings then refer to.</span></div>
+        <div class="r"><span>Errors</span><span><code>413 too_large</code> (over 8 MB) · <code>415 unsupported_type</code></span></div></div></div>
+      <div class="ep"><header><span class="m GET">GET</span><code>/api/public/pages/:handle</code><span class="who pub">Anyone</span></header><div class="bd">
+        <div class="r"><span>Returns</span><span><code>200 { handle, settings, revision, updatedAt }</code> with private fields removed. <code>Cache-Control: public, max-age=60, stale-while-revalidate=600</code>.</span></div>
+        <div class="r"><span>Errors</span><span><code>301 { movedTo }</code> an old name: the page follows it · <code>404 not_found</code></span></div></div></div>
+      <div class="ep"><header><span class="m POST">POST</span><code>/api/public/pages/:handle/enquiries</code><span class="who pub">Anyone</span></header><div class="bd">
+        <div class="r"><span>Send</span><span><code>{ name, email, type, date, msg }</code></span></div>
+        <div class="r"><span>Returns</span><span><code>202 { ok: true }</code>. A hidden <code>website</code> field catches bots: if it’s filled in, the message is quietly dropped.</span></div>
+        <div class="r"><span>Errors</span><span><code>422 invalid_enquiry</code> · <code>404</code> · <code>429</code> (rate limit by IP, via the <code>rateLimit</code> hook)</span></div></div></div>
+    </section>
+
+    <section class="ch">
+      <h2 id="file">6. The settings file</h2>
+      <p>Each photographer has one settings file: a JSON document holding everything about their page. The pages load it, change it, and send the whole file back to save. It’s small, about 4 KB, because photos are uploaded separately and the file holds only their addresses.</p>
+      <span class="fn">An example, shortened</span>
+      <div class="code"><button class="btn sm cp" data-copy="c-json">Copy</button><pre id="c-json"><code>{
+  "v": 2,
+  "profile":  { "name": "Grant Walker", "bio": "Landscapes and weddings from the Blue Mountains.",
+                "location": "Katoomba, NSW", "avatar": "https://images.sportshutter.com/…",
+                "status": { "on": true, "text": "Booking autumn 2027 weddings" } },
+  "theme":    { "preset": "night", "colors": { "bg": "#0f1120", "surface": "#181b2e", "text": "#eef0fb", "accent": "#2326D3" },
+                "font": "modern", "radius": 18, "photoTint": 65, "buttonShape": "circle", "linkStyle": "list", "align": "left" },
+  "cover":    { "style": "full", "seconds": 5, "captions": true, "overlay": 55,
+                "photos": [ { "url": "https://images.sportshutter.com/…", "caption": "Grose Valley, last light" } ] },
+  "quick":    [ { "type": "shop", "label": "Prints" }, { "type": "enquire", "label": "Book" } ],
+  "sections": [ { "id": "shop", "on": true, "title": "Prints" }, { "id": "gallery", "on": true, "title": "Recent work" } ],
+  "shop":     { "featured": ["grose", "rain"], "currency": "AUD", "showPrices": true },
+  "gallery":  { "columns": 3, "photos": [ … ] },
+  "film":     { "url": "https://youtu.be/…", "title": "Chasing first snow", "meta": "12 min" },
+  "links":    [ { "title": "Wedding portfolio", "url": "https://…", "on": true } ],
+  "enquire":  { "intro": "…", "types": "Wedding, Portrait", "to": "private: never sent to visitors" },
+  "socials":  { "instagram": "https://instagram.com/…" },
+  "page":     { "footer": true }
+}</code></pre></div>
+      <h3>Rules the server enforces</h3>
+      <ul>
+        <li><b>Version.</b> <code>v</code> must be <code>2</code>. A future format change bumps it, so old and new pages can tell files apart.</li>
+        <li><b>Size.</b> Up to 64 KB, text fields up to 2,000 characters, and lists capped (10 cover photos, 24 gallery photos, 20 links, 4 quick buttons).</li>
+        <li><b>Links.</b> No <code>javascript:</code>, <code>vbscript:</code> or <code>file:</code> addresses, and no embedded <code>data:</code> photos.</li>
+        <li><b>New fields are allowed.</b> The pages can add features without a server change; the size limit keeps it honest.</li>
+        <li><b>Private fields stay private.</b> The public call removes <code>enquire.to</code> (the photographer’s email) before anything leaves the server.</li>
+      </ul>
+      <p>To see a real one, download a backup from Settings → Advanced, or open a row in the simulator’s Database tab.</p>
+    </section>
+
+    <section class="ch">
+      <h2 id="security">7. Sign-in and security</h2>
+      <p>Because the pages are served from sportshutter.com, the browser sends the photographer’s normal Sport Shutter login cookie with every API call. There are no tokens to issue, no passwords to handle and no cross-site permissions to configure.</p>
+      <ul>
+        <li><b>Whose data it is comes from the session, never from the request.</b> The API reads <code>req.user.id</code> from Sport Shutter’s own middleware, so a page can only ever read or change the signed-in person’s settings.</li>
+        <li><b>Saves can’t be forged from another site.</b> Every change needs the <code>X-ShutterLink: 1</code> header, which browsers won’t let another site add. Keep session cookies <code>SameSite=Lax</code> as well.</li>
+        <li><b>Everything sent is checked.</b> Shape, sizes and links in the settings; type and size of photos; length and format of enquiries.</li>
+        <li><b>Visitors only read.</b> The public call is read-only and strips private fields. Enquiries are the only public write, with a bot trap and a rate-limit hook.</li>
+        <li><b>The pages escape everything they show</b>, so text in settings can never become code on the page. A strict Content-Security-Policy on <code>/shutterlink/</code> adds a second layer.</li>
+        <li><b>Revisions stop lost changes.</b> If the same settings are saved from two places, the second save gets <code>409</code> and the photographer chooses which to keep.</li>
+      </ul>
+      <div class="callout good"><b>Nothing new to secure.</b> ShutterLink adds no login, no tokens and no storage. The attack surface is seven endpoints behind Sport Shutter’s existing session, all in one reviewable file.</div>
+    </section>
+
+    <section class="ch">
+      <h2 id="links">8. Personal links</h2>
+      <p>Every photographer gets <code>sportshutter.com/@name</code>, the address they put in their Instagram bio.</p>
+      <ul>
+        <li><b>Chosen, not random.</b> The first save claims a name made from theirs (<code>grantwalker</code>), adding a number if it’s taken. They can change it under Profile.</li>
+        <li><b>Rules.</b> 3 to 30 characters: lowercase letters, numbers, dots, hyphens and underscores, starting and ending with a letter or number. Words like <code>admin</code>, <code>api</code>, <code>settings</code> and <code>shop</code> are reserved.</li>
+        <li><b>Renames never break links.</b> The old name keeps working and sends visitors to the new one, so links already shared on Instagram stay good.</li>
+        <li><b>Behind the name is the user ID.</b> Everything is filed under the permanent Sport Shutter user ID; the name is just a label pointing to it.</li>
+      </ul>
+    </section>
+
+    <section class="ch">
+      <h2 id="hosting">9. Hosting and releases</h2>
+      <p>The pages are static files. They can stay on GitHub Pages, move to any static host, or be served by Sport Shutter itself. A proxy rule makes them part of sportshutter.com:</p>
+      <span class="fn">nginx</span>
+      <div class="code"><button class="btn sm cp" data-copy="c-nginx">Copy</button><pre id="c-nginx"><code>location = /shutterlink { return 301 /shutterlink/; }
+
+location /shutterlink/ {
+    proxy_pass https://grantelliotwalker-coder.github.io/shutterLink/;
+    proxy_set_header Host grantelliotwalker-coder.github.io;
+    proxy_ssl_server_name on;
+}
+
+<span class="tc"># Personal links: /@name serves the page, which reads the name from the address.</span>
+location ~ ^/@[a-z0-9._-]+/?$ {
+    proxy_pass https://grantelliotwalker-coder.github.io/shutterLink/index.html;
+    proxy_set_header Host grantelliotwalker-coder.github.io;
+    proxy_ssl_server_name on;
+}</code></pre></div>
+      <p>Settings for Cloudflare, Vercel and Netlify are in <code>DEPLOY.md</code>. On sportshutter.com the pages switch to the real API automatically.</p>
+      <h3>Speed</h3>
+      <p>A visitor’s page is static files plus one small cached API call. Cache the public call at the CDN for a minute and clear it on the <code>settings.saved</code> event, and changes still show within seconds.</p>
+      <h3>Independent releases</h3>
+      <p>Sport Shutter deploys the API once. After that the ShutterLink team ships the pages on its own schedule, and no change to them needs a Sport Shutter release unless the API itself changes. The settings version number keeps the two in step.</p>
+    </section>
+
+    <section class="ch">
+      <h2 id="events">10. Events</h2>
+      <p>The API announces what happens through the <code>onEvent</code> hook. Sport Shutter decides what each one does.</p>
+      <div class="tw"><table class="t"><thead><tr><th>Event</th><th>Carries</th><th>Suggested use</th></tr></thead><tbody>
+        <tr><td><code>settings.saved</code></td><td><code>userId, handle, revision</code></td><td>Clear the CDN cache for that page</td></tr>
+        <tr><td><code>handle.changed</code></td><td><code>userId, from, to</code></td><td>Clear both names; update links Sport Shutter shows elsewhere</td></tr>
+        <tr><td><code>enquiry.received</code></td><td><code>userId, handle, enquiryId</code></td><td>Notify the photographer in the app and by email</td></tr>
+      </tbody></table></div>
+    </section>
+
+    <section class="ch">
+      <h2 id="try">11. Try it</h2>
+      <p>The <a href="simulator.html">simulator</a> runs <code>server/shutterlink-api.js</code> in the browser against a pretend database, with the real settings page and the real public page connected to it. Every request appears in its log.</p>
+      <ol class="steps">
+        <li><div><b>Change your name in the settings.</b><span>Watch the <code>PUT</code> appear in Requests and the visitor’s page update a moment later.</span></div></li>
+        <li><div><b>Switch to Mia Chen.</b><span>The settings reload with her page: each account only sees its own.</span></div></li>
+        <li><div><b>Sign out.</b><span>The settings ask you to sign in, and the gear disappears from the public page.</span></div></li>
+        <li><div><b>Turn the server off, then edit.</b><span>Changes are kept and save on their own when it comes back.</span></div></li>
+        <li><div><b>Press “Save from another device”, then edit.</b><span>The settings ask which version to keep.</span></div></li>
+        <li><div><b>Send an enquiry from the visitor’s page.</b><span>It arrives in the Inbox tab; the photographer’s email never reaches the page.</span></div></li>
+        <li><div><b>Open “Try the API”.</b><span>Send any call yourself, including a bad one, to see the checks.</span></div></li>
+      </ol>
+      <div class="cta"><a class="btn primary" href="simulator.html">Open the simulator</a></div>
+    </section>
+
+    <section class="ch">
+      <h2 id="rollout">12. Rollout</h2>
+      <ol class="steps">
+        <li><div><b>Staff only.</b><span>Deploy the API behind a feature flag. The Sport Shutter team makes their own pages and tries to break them.</span></div></li>
+        <li><div><b>Invited photographers.</b><span>Twenty active photographers put their link in their bio. Watch visits, print sales and enquiries from link pages.</span></div></li>
+        <li><div><b>Everyone.</b><span>“Create your link” in the dashboard, with the two-step setup.</span></div></li>
+      </ol>
+      <h3>How we’ll know it’s working</h3>
+      <ul><li>Photographers with a page, and how many put it in their bio</li><li>Visits arriving from Instagram</li><li>Print orders and enquiries started from link pages</li><li>New sign-ups from “Powered by Sport Shutter”</li></ul>
+    </section>
+
+    <section class="ch">
+      <h2 id="faq">13. Questions</h2>
+      <details class="faq"><summary>Does this touch our login system?</summary><p>No. It reads the signed-in user that your existing middleware already sets. There’s no new login, token or password handling.</p></details>
+      <details class="faq"><summary>Why not build the pages inside the main app?</summary><p>You can, later. Keeping them separate lets the ShutterLink team iterate on design without Sport Shutter releases. The API is the same either way, and the pages are plain files Sport Shutter can take over at any time.</p></details>
+      <details class="faq"><summary>Why the same domain instead of a subdomain?</summary><p>On sportshutter.com the browser sends the existing login cookie automatically. A subdomain would need cookie, cross-origin and token changes for no benefit.</p></details>
+      <details class="faq"><summary>What happens to the shop and checkout?</summary><p>Prints on the page are Sport Shutter products, and checkout hands over to the existing Sport Shutter checkout with the product IDs. Orders and payments never leave Sport Shutter.</p></details>
+      <details class="faq"><summary>What if a photographer’s settings get large or strange?</summary><p>The server caps the size, checks every link, and rejects embedded photos. The pages are built to cope with missing or extra fields.</p></details>
+      <details class="faq"><summary>How do we test our side?</summary><p>Run <code>node server/test.js</code> for the API, then point the pages at a staging server with <code>?backend=live</code>. The simulator shows the exact requests and responses to expect.</p></details>
+    </section>
+
+    <p class="foot">ShutterLink for Sport Shutter · design brief and build guide. Code: <code>server/shutterlink-api.js</code>, <code>server/memory-store.js</code>, <code>server/test.js</code>, <code>assets/data.js</code>.</p>
+  </article>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="assets/dev.js?v=3.0"></script>
+<script>
+// highlight the chapter you're reading in the contents
+(function(){
+  const links = [...document.querySelectorAll('.toc a')];
+  const heads = links.map(a => document.querySelector(a.getAttribute('href')));
+  const on = () => {
+    let i = 0; heads.forEach((h, k) => { if (h && h.getBoundingClientRect().top < 140) i = k; });
+    links.forEach((a, k) => a.classList.toggle('on', k === i));
+  };
+  addEventListener('scroll', on, { passive:true }); on();
+})();
+</script>
+</body>
+</html>

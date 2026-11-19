@@ -1,0 +1,43 @@
+// Tests for the ShutterLink API. Run: node server/test.js (Node 18+, no installs needed).
+const assert = require('assert');
+const { createShutterLinkApi, expressHandler } = require('./shutterlink-api.js');
+const { createMemoryStore } = require('./memory-store.js');
+const events = [];
+const store = createMemoryStore();
+const api = createShutterLinkApi({ store, images: { put: async (u, b, t, n) => ({ url: `https://cdn.sportshutter.com/u/${u}/${n}.jpg` }) }, onEvent: (t, p) => events.push(t) });
+const grant = { id: 'u1', name: 'Grant Walker' }, mia = { id: 'u2', name: 'Mia Chen' };
+const H = { 'X-ShutterLink': '1' };
+const settings = name => ({ v: 2, profile: { name, bio: 'hi' }, enquire: { to: 'secret@x.com' }, page: { showGear: true }, links: [{ url: 'https://ok.com' }] });
+const call = (method, path, body, user, headers) => api.handle({ method, path, body, user, headers: headers || H, ip: '1.2.3.4' });
+(async () => {
+  let r;
+  r = await call('GET', '/api/shutterlink/me', null, null); assert.equal(r.status, 401);
+  r = await call('GET', '/api/shutterlink/me', null, grant); assert.equal(r.status, 200); assert.equal(r.body.handle, null); assert.equal(r.body.suggestedHandle, 'grantwalker');
+  r = await call('GET', '/api/shutterlink/settings', null, grant); assert.equal(r.body.settings, null);
+  r = await call('PUT', '/api/shutterlink/settings', { settings: settings('Grant Walker'), revision: 0 }, grant, {}); assert.equal(r.status, 403, 'csrf');
+  r = await call('PUT', '/api/shutterlink/settings', { settings: { v: 1 } }, grant); assert.equal(r.status, 422);
+  r = await call('PUT', '/api/shutterlink/settings', { settings: Object.assign(settings('G'), { links: [{ url: 'javascript:alert(1)' }] }) }, grant); assert.equal(r.status, 422); assert.equal(r.body.errors[0].path, 'links.0.url');
+  r = await call('PUT', '/api/shutterlink/settings', { settings: Object.assign(settings('G'), { x: 'data:image/png;base64,AAAA' }) }, grant); assert.equal(r.status, 422);
+  r = await call('PUT', '/api/shutterlink/settings', { settings: settings('Grant Walker'), revision: 0 }, grant); assert.equal(r.status, 200); assert.equal(r.body.revision, 1); assert.equal(r.body.handle, 'grantwalker');
+  r = await call('PUT', '/api/shutterlink/settings', { settings: settings('Grant Walker'), revision: 0 }, grant); assert.equal(r.status, 409, 'stale revision');
+  r = await call('GET', '/api/public/pages/grantwalker', null, null); assert.equal(r.status, 200); assert.equal(r.body.settings.enquire.to, undefined, 'email private'); assert.ok(/max-age/.test(r.headers['cache-control']));
+  r = await call('PUT', '/api/shutterlink/settings', { settings: settings('Grant Walker'), revision: 0 }, mia); assert.equal(r.status, 200); assert.equal(r.body.handle, 'grantwalker2', 'name clash gets a number');
+  r = await call('PUT', '/api/shutterlink/handle', { handle: 'grantwalker' }, mia); assert.equal(r.status, 409);
+  r = await call('PUT', '/api/shutterlink/handle', { handle: 'admin' }, mia); assert.equal(r.status, 422);
+  r = await call('PUT', '/api/shutterlink/handle', { handle: 'miachen' }, mia); assert.equal(r.status, 200);
+  r = await call('GET', '/api/public/pages/grantwalker2', null, null); assert.equal(r.status, 301); assert.equal(r.body.movedTo, 'miachen');
+  r = await call('GET', '/api/public/pages/nobody', null, null); assert.equal(r.status, 404);
+  r = await call('POST', '/api/shutterlink/images', { size: 9e6 }, grant, Object.assign({ 'content-type': 'image/jpeg' }, H)); assert.equal(r.status, 413);
+  r = await call('POST', '/api/shutterlink/images', { size: 1000 }, grant, Object.assign({ 'content-type': 'image/gif' }, H)); assert.equal(r.status, 415);
+  r = await call('POST', '/api/shutterlink/images', Buffer.alloc(2048), grant, Object.assign({ 'content-type': 'image/jpeg' }, H)); assert.equal(r.status, 201); assert.ok(r.body.url.startsWith('https://'));
+  r = await call('POST', '/api/public/pages/grantwalker/enquiries', { name: 'Sam', email: 'bad', msg: 'x' }, null, {}); assert.equal(r.status, 422);
+  r = await call('POST', '/api/public/pages/grantwalker/enquiries', { name: 'Sam', email: 'sam@x.com', msg: 'Wedding?' }, null, {}); assert.equal(r.status, 202); assert.equal(store.state.enquiries.length, 1);
+  r = await call('POST', '/api/public/pages/grantwalker/enquiries', { name: 'Bot', email: 'b@x.com', msg: 'spam', website: 'x' }, null, {}); assert.equal(r.status, 202); assert.equal(store.state.enquiries.length, 1, 'honeypot dropped');
+  r = await call('DELETE', '/api/shutterlink/settings', null, grant); assert.equal(r.status, 405);
+  // Express adapter
+  const res = { h: {}, status(s) { this.s = s; return this; }, setHeader(k, v) { this.h[k] = v; }, end(b) { this.b = b; } };
+  await expressHandler(api)({ method: 'GET', path: '/api/public/pages/grantwalker', headers: {}, user: null }, res, () => {});
+  assert.equal(res.s, 200); assert.equal(JSON.parse(res.b).handle, 'grantwalker');
+  let passed = false; await expressHandler(api)({ method: 'GET', path: '/other', headers: {} }, res, () => { passed = true; }); assert.ok(passed);
+  console.log('all server tests passed; events:', [...new Set(events)].join(', '));
+})().catch(e => { console.error('FAIL', e); process.exit(1); });

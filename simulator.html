@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulator · ShutterLink for Sport Shutter</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>window.SHUTTERLINK_BACKEND = 'sim';</script>
+<script src="assets/core.js?v=3.0"></script>
+<script src="assets/data.js?v=3.0"></script>
+<script>try{const t=localStorage.getItem('shutterlink:ui-theme');if(t)document.documentElement.dataset.ui=t;}catch(_){}</script>
+<link rel="stylesheet" href="assets/dev.css?v=3.0">
+<style>
+.sim{max-width:1520px;margin:0 auto;padding:22px 20px 60px}
+.sim-grid{display:grid;grid-template-columns:290px minmax(0,1fr) 412px;gap:16px;align-items:start;margin-top:18px}
+@media (max-width:1280px){ .sim-grid{grid-template-columns:290px minmax(0,1fr)} .col-page{grid-column:1 / -1;justify-self:center} }
+@media (max-width:820px){ .sim-grid{grid-template-columns:1fr} }
+.frame-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;min-width:0}
+.frame-card header{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 16px;border-bottom:1px solid var(--border);min-height:52px}
+.frame-card header h2{font-size:14px;font-weight:700}
+.frame-card header .sub{font-size:12.5px;color:var(--faint)}
+.frame-card header .act{margin-left:auto;display:flex;gap:6px;align-items:center}
+.frame-card iframe{display:block;width:100%;border:0;background:var(--bg)}
+#setFrame{height:820px}
+.phone{width:390px;height:780px;margin:16px auto;border-radius:44px;background:#0b0c12;padding:10px;box-shadow:0 0 0 1px #2a2c38,0 20px 50px -20px rgba(16,18,40,.5)}
+.phone iframe{width:100%;height:100%;border-radius:34px;background:#0f1120}
+@media (max-width:440px){ .phone{width:100%;height:720px;border-radius:30px} }
+.ctl .panel{margin-top:0}
+.ctl .panel + .panel{margin-top:16px}
+.who{display:grid;gap:6px}
+.who button{display:flex;align-items:center;gap:10px;padding:9px 10px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface-2);text-align:left;font-weight:600;font-size:13.5px}
+.who button:hover{border-color:var(--border-strong)}
+.who button[aria-pressed=true]{border-color:var(--accent-text);background:var(--accent-soft)}
+.who .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--surface-3);font-size:12px;font-weight:700;flex:none}
+.who button[aria-pressed=true] .av{background:var(--accent);color:#fff}
+.who small{display:block;font-weight:500;color:var(--faint);font-size:12px}
+.handle-pick{display:flex;gap:6px}
+.handle-pick select{flex:1}
+.log-wrap{margin-top:16px}
+.tabs-s{display:flex;gap:2px;border-bottom:1px solid var(--border);padding:0 8px;overflow-x:auto;scrollbar-width:none}
+.tabs-s button{padding:12px 12px 11px;font-weight:600;font-size:13.5px;color:var(--dim);border-bottom:2px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tabs-s button[aria-selected=true]{color:var(--text);border-bottom-color:var(--accent-text)}
+.tabs-s .n{min-width:20px;height:18px;padding:0 6px;border-radius:9px;background:var(--surface-3);font-size:11px;display:inline-grid;place-items:center}
+.pane{padding:14px 16px 18px}
+.reqs{width:100%;border-collapse:collapse;font-size:13px}
+.reqs th{text-align:left;font-size:12px;color:var(--faint);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border)}
+.reqs td{padding:8px;border-bottom:1px solid var(--border);vertical-align:top}
+.reqs tr.row-r{cursor:pointer}
+.reqs tr.row-r:hover td{background:var(--surface-2)}
+.reqs tr.fresh td{animation:flash 1.2s ease}
+@keyframes flash{0%{background:var(--accent-soft)}100%{background:transparent}}
+.m{font-family:var(--mono);font-size:12px;font-weight:600}
+.m.GET{color:var(--ok)} .m.PUT{color:var(--warn)} .m.POST{color:var(--accent-text)} .m.DELETE{color:var(--danger)}
+.st{display:inline-block;min-width:36px;text-align:center;padding:1px 6px;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:600}
+.st.s2{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.st.s3{background:var(--surface-3);color:var(--dim)}
+.st.s4{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.st.s5,.st.s0{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)}
+.path{font-family:var(--mono);font-size:12.5px;word-break:break-all}
+.detail td{background:var(--surface-2);padding:12px}
+.io{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:820px){ .io{grid-template-columns:1fr} }
+.io b{display:block;font-size:12px;color:var(--faint);margin-bottom:6px}
+pre.code{margin:0;font-family:var(--mono);font-size:12px;line-height:1.55;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 12px;max-height:340px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.empty-s{color:var(--faint);padding:18px 4px;font-size:13.5px}
+.db{display:grid;gap:12px}
+.db-row{border:1px solid var(--border);border-radius:10px;background:var(--surface-2)}
+.db-row summary{display:flex;align-items:center;gap:12px;padding:10px 12px;cursor:pointer;list-style:none;font-size:13px;flex-wrap:wrap}
+.db-row summary::-webkit-details-marker{display:none}
+.db-row summary b{font-weight:700}
+.db-row summary .kv{color:var(--faint);font-family:var(--mono);font-size:12px}
+.db-row pre{margin:0 12px 12px}
+.ev{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.ev:last-child{border-bottom:0}
+.ev code{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--accent-text)}
+.ev .t{color:var(--faint);font-size:12px;white-space:nowrap}
+.ev p{color:var(--dim);margin-top:2px}
+.console{display:grid;gap:10px}
+.console .line{display:flex;gap:8px;flex-wrap:wrap}
+.console select{width:110px}
+.console .path-in{flex:1;min-width:220px;font-family:var(--mono);font-size:13px}
+.console textarea{font-family:var(--mono);font-size:12.5px;min-height:110px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{font-family:var(--mono);font-size:11.5px;padding:4px 8px;border-radius:7px;border:1px solid var(--border);background:var(--surface-2);color:var(--dim)}
+.chips button:hover{border-color:var(--accent-text);color:var(--text)}
+.mail{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--surface-2);font-size:13.5px}
+.mail + .mail{margin-top:8px}
+.mail .h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.mail .h b{font-weight:700}
+.mail .h span{color:var(--faint);font-size:12px}
+.mail p{margin-top:6px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="bar">
+    <a class="brand" href="https://sportshutter.com/" aria-label="ShutterLink by Sport Shutter"><span class="mk" id="mk"></span><span>ShutterLink</span></a>
+    <span class="crumb">Developer</span>
+    <nav class="seg devnav" aria-label="Developer pages"><a href="simulator.html" aria-current="page">Simulator</a><a href="brief.html">Design brief</a></nav>
+    <span class="sp"></span>
+    <button class="btn ghost icon" id="uiTheme" aria-label="Switch between light and dark" title="Light or dark"></button>
+    <a class="btn" href="settings.html">Back to settings</a>
+  </div>
+</header>
+
+<main class="sim">
+  <div class="pane-h">
+    <h1>Simulator</h1>
+    <p>Sport Shutter’s side of ShutterLink, running in your browser. The settings and the public page below talk to it exactly as they would to the real server: the same requests, handled by the same file, <code>server/shutterlink-api.js</code>, with a pretend database and pretend logins.</p>
+  </div>
+
+  <div class="sim-grid">
+    <div class="ctl">
+      <section class="panel">
+        <div class="ph"><h2>Signed in to Sport Shutter</h2><button class="help-b" aria-expanded="false" aria-controls="hSess" aria-label="About signing in">?</button></div>
+        <div class="help" id="hSess" hidden>This stands in for Sport Shutter’s own login. ShutterLink never sees passwords: every request carries the normal Sport Shutter login, and the server decides whose settings it is from that alone. Switch people and watch the settings page change; sign out and it asks you to sign in.</div>
+        <div class="who" id="who"></div>
+      </section>
+      <section class="panel">
+        <div class="ph"><h2>Server</h2><button class="help-b" aria-expanded="false" aria-controls="hSrv" aria-label="About the server controls">?</button></div>
+        <div class="help" id="hSrv" hidden>Try the bad days too. The settings page keeps your changes and retries when the server is down, asks what to do when the same settings were saved somewhere else, and shows clear messages for everything else.</div>
+        <div class="fields">
+          <div class="f"><span class="lab">Response time<span class="num" id="latOut"></span></span><div class="range"><input type="range" id="lat" min="0" max="2000" step="50" aria-label="Simulated response time"></div></div>
+          <div class="tg"><div><b>Server offline</b><span>Every request fails to connect</span></div><label class="sw"><input type="checkbox" id="offline" aria-label="Server offline"><i></i></label></div>
+          <div style="display:grid;gap:8px">
+            <button class="btn" id="failNext">Fail the next request</button>
+            <button class="btn" id="elsewhere">Save from another device</button>
+            <button class="btn danger" id="reset">Reset the pretend database</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="frame-card col-set">
+      <header><div><h2>Photographer</h2><span class="sub">ShutterLink settings, signed in</span></div><div class="act"><a class="btn sm" id="openSet" href="settings.html?backend=sim" target="_blank" rel="noopener">Open in new tab</a></div></header>
+      <iframe id="setFrame" title="ShutterLink settings using the simulated server"></iframe>
+    </section>
+
+    <section class="frame-card col-page">
+      <header><div><h2>Visitor</h2><span class="sub">The public page, from Instagram</span></div>
+        <div class="act handle-pick"><select class="in" id="handleSel" aria-label="Which page to view" style="height:32px;font-size:13px"></select><a class="btn sm" id="openPage" target="_blank" rel="noopener">Open</a></div></header>
+      <div class="phone"><iframe id="pageFrame" title="Public ShutterLink page using the simulated server"></iframe></div>
+    </section>
+  </div>
+
+  <section class="frame-card log-wrap">
+    <nav class="tabs-s" role="tablist" aria-label="What the server is doing">
+      <button role="tab" data-t="reqs" aria-selected="true">Requests <span class="n num" id="nReqs">0</span></button>
+      <button role="tab" data-t="db" aria-selected="false">Database</button>
+      <button role="tab" data-t="events" aria-selected="false">Events <span class="n num" id="nEvents">0</span></button>
+      <button role="tab" data-t="inbox" aria-selected="false">Inbox <span class="n num" id="nInbox">0</span></button>
+      <button role="tab" data-t="try" aria-selected="false">Try the API</button>
+    </nav>
+    <div class="pane" id="pane"></div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/dev.js?v=3.0"></script>
+<script>
+(function(){
+'use strict';
+const $ = id => document.getElementById(id), esc = SL.esc, D = SLData;
+const sim = D.sim;
+const reqs = [], events = [];
+let tab = 'reqs', open = null;
+
+/* ---------- Session ---------- */
+function renderWho(){
+  const cur = sim.session(), st = sim.state();
+  const people = Object.values(sim.users).map(u => ({ id:u.id, name:u.name, sub:'@' + ((st.profiles[u.id] || {}).handle || '…') }));
+  people.push({ id:'', name:'Signed out', sub:'A visitor, or logged out' });
+  $('who').innerHTML = people.map(p => `<button data-u="${p.id}" aria-pressed="${(cur || '') === p.id}"><span class="av">${p.id ? esc(p.name.split(' ').map(w => w[0]).join('')) : '–'}</span><span>${esc(p.name)}<small>${esc(p.sub)}</small></span></button>`).join('');
+}
+$('who').onclick = e => {
+  const b = e.target.closest('[data-u]'); if (!b) return;
+  sim.signIn(b.dataset.u); renderWho();
+  const st = sim.state(), h = b.dataset.u && st.profiles[b.dataset.u] && st.profiles[b.dataset.u].handle;
+  if (h){ $('handleSel').value = h; loadPage(); }
+  toast(b.dataset.u ? `Signed in as ${sim.users[b.dataset.u].name}` : 'Signed out');
+};
+
+/* ---------- Server controls ---------- */
+const c = sim.config();
+$('lat').value = c.latency; $('latOut').textContent = c.latency + ' ms'; $('offline').checked = c.offline;
+$('lat').oninput = () => { $('latOut').textContent = $('lat').value + ' ms'; sim.setConfig({ latency: +$('lat').value }); };
+$('offline').onchange = () => { sim.setConfig({ offline: $('offline').checked }); toast($('offline').checked ? 'Server offline. Try editing a setting.' : 'Server back online'); };
+$('failNext').onclick = () => { sim.setConfig({ failNext:true }); toast('The next request will fail with a server error'); };
+$('elsewhere').onclick = () => {
+  const u = sim.session(); if (!u) return toast('Sign someone in first');
+  sim.editElsewhere(u); refreshDb(); toast('Saved from another device. Now change something in the settings.');
+};
+$('reset').onclick = () => { sim.reset(); reqs.length = 0; events.length = 0; renderWho(); fillHandles(); loadPage(); render(); toast('Pretend database reset'); };
+
+/* ---------- Frames ---------- */
+$('setFrame').src = 'settings.html?backend=sim&embed#profile';
+function fillHandles(){
+  const st = sim.state(), cur = $('handleSel').value;
+  const hs = Object.values(st.profiles).map(p => p.handle).filter(Boolean);
+  const opts = hs.map(h => `<option value="${esc(h)}">@${esc(h)}</option>`).concat(Object.keys(st.aliases).map(a => `<option value="${esc(a)}">@${esc(a)} (old name)</option>`), '<option value="nobody">@nobody (no page)</option>');
+  $('handleSel').innerHTML = opts.join('');
+  $('handleSel').value = hs.includes(cur) || st.aliases[cur] || cur === 'nobody' ? cur : (st.profiles[sim.session()] || {}).handle || hs[0];
+}
+function loadPage(){
+  const u = D.link('index.html', { u: $('handleSel').value });
+  $('pageFrame').src = u; $('openPage').href = u;
+}
+$('handleSel').onchange = loadPage;
+fillHandles(); loadPage();
+
+/* ---------- Live feed from the pages ---------- */
+D.channel.onmessage = e => {
+  const d = e.data || {};
+  if (d.kind === 'request'){ reqs.unshift(d); if (reqs.length > 300) reqs.pop(); $('nReqs').textContent = reqs.length; if (tab === 'reqs') renderReqs(d.id); }
+  if (d.kind === 'event'){ events.unshift(d); $('nEvents').textContent = events.length; if (tab === 'events') renderEvents();
+    if (d.type === 'handle.changed'){ renderWho(); fillHandles(); if (d.payload.from && $('handleSel').value === d.payload.from) { $('handleSel').value = d.payload.to; } } }
+  if (d.kind === 'event' || (d.kind === 'request' && d.method !== 'GET')) refreshDb();
+};
+function refreshDb(){ $('nInbox').textContent = sim.state().enquiries.length; if (tab === 'db') renderDb(); if (tab === 'inbox') renderInbox(); }
+
+/* ---------- Panels ---------- */
+const stCls = s => 'st s' + String(s)[0];
+const pretty = v => v == null ? '—' : typeof v === 'string' ? v : JSON.stringify(v, (k, x) => typeof x === 'string' && x.length > 160 ? x.slice(0, 160) + '…' : x, 2);
+const time = t => new Date(t).toLocaleTimeString('en-AU', { hour:'numeric', minute:'2-digit', second:'2-digit' });
+function renderReqs(fresh){
+  if (!reqs.length){ $('pane').innerHTML = '<p class="empty-s">Requests appear here as the settings and the public page talk to the server. Try editing your name.</p>'; return; }
+  $('pane').innerHTML = `<div style="overflow-x:auto"><table class="reqs"><thead><tr><th>Time</th><th>From</th><th>Request</th><th>Status</th><th>Time taken</th></tr></thead><tbody>${reqs.map(r => `
+    <tr class="row-r ${r.id === fresh ? 'fresh' : ''}" data-id="${r.id}" tabindex="0" aria-expanded="${open === r.id}"><td class="num" style="white-space:nowrap;color:var(--faint)">${time(r.at)}</td><td style="white-space:nowrap">${esc(r.from)}</td>
+      <td><span class="m ${r.method}">${r.method}</span> <span class="path">${esc(r.path)}</span></td><td><span class="${stCls(r.status)}">${r.status || '—'}</span></td><td class="num" style="color:var(--faint)">${r.ms} ms</td></tr>
+    ${open === r.id ? `<tr class="detail"><td colspan="5"><div class="io"><div><b>Sent${r.signedIn ? ` · signed in as ${esc((sim.users[r.signedIn] || {}).name || r.signedIn)}` : ' · not signed in'}</b><pre class="code">${esc(pretty(r.req))}</pre></div><div><b>Received</b><pre class="code">${esc(pretty(r.res))}</pre></div></div></td></tr>` : ''}`).join('')}</tbody></table></div>`;
+}
+function renderDb(){
+  const st = sim.state();
+  const rows = Object.entries(st.profiles).map(([id, p]) => `<details class="db-row"><summary><b>${esc((sim.users[id] || {}).name || id)}</b><span class="kv">user_id=${esc(id)}</span><span class="kv">handle=${esc(p.handle)}</span><span class="kv">revision=${p.revision}</span><span class="kv">${(new Blob([JSON.stringify(p.settings)]).size / 1024).toFixed(1)} KB</span><span class="kv">updated ${p.updatedAt ? time(p.updatedAt) : '—'}</span></summary><pre class="code">${esc(pretty(p.settings))}</pre></details>`).join('');
+  const al = Object.entries(st.aliases);
+  $('pane').innerHTML = `<p class="hint" style="margin-bottom:12px">One row per photographer in Sport Shutter’s database: the link name, a revision number that goes up with every save, and the settings file itself. Open a row to read it.</p>
+    <div class="db">${rows}</div>
+    <h3 style="font-size:13.5px;margin:18px 0 8px">Old link names (redirects)</h3>
+    ${al.length ? `<div class="db">${al.map(([h, id]) => `<div class="db-row"><div style="padding:10px 12px;font-size:13px"><span class="kv" style="font-family:var(--mono)">@${esc(h)} → @${esc((st.profiles[id] || {}).handle)}</span></div></div>`).join('')}</div>` : '<p class="empty-s">None yet. Change a link name under Profile to see one.</p>'}`;
+}
+const EV_INFO = {
+  'settings.saved': 'Sport Shutter would clear its cache for this page so visitors see the change straight away.',
+  'handle.changed': 'The old name keeps redirecting. Sport Shutter could also update links it shows elsewhere.',
+  'enquiry.received': 'Sport Shutter would drop it in the photographer’s inbox and send a notification.',
+};
+function renderEvents(){
+  $('pane').innerHTML = events.length ? events.map(e => `<div class="ev"><code>${esc(e.type)}</code><div><span class="path">${esc(JSON.stringify(e.payload))}</span><p>${esc(EV_INFO[e.type] || '')}</p></div><span class="t num">${time(e.at)}</span></div>`).join('')
+    : '<p class="empty-s">The server announces things that happen: a save, a new link name, an enquiry. Sport Shutter decides what to do with each, such as clearing its cache or sending a notification.</p>';
+}
+function renderInbox(){
+  const st = sim.state();
+  $('pane').innerHTML = st.enquiries.length ? st.enquiries.map(m => `<div class="mail"><div class="h"><b>${esc(m.name)} · ${esc(m.email)}</b><span>to ${esc((sim.users[m.userId] || {}).name || m.userId)} · ${time(m.receivedAt)}</span></div>${m.type || m.date ? `<p style="color:var(--faint)">${esc([m.type, m.date].filter(Boolean).join(' · '))}</p>` : ''}<p>${esc(m.msg)}</p></div>`).join('')
+    : '<p class="empty-s">Send an enquiry from the public page and it arrives here, in the photographer’s Sport Shutter inbox. The photographer’s email address never reaches the page.</p>';
+}
+const EXAMPLES = [
+  ['GET', '/api/shutterlink/me', ''],
+  ['GET', '/api/shutterlink/settings', ''],
+  ['PUT', '/api/shutterlink/handle', '{ "handle": "grant.walker" }'],
+  ['GET', '/api/public/pages/grantwalker', ''],
+  ['GET', '/api/public/pages/grantwalkerphoto', ''],
+  ['POST', '/api/public/pages/miachen/enquiries', '{ "name": "Sam", "email": "sam@example.com", "msg": "Are you free in March?" }'],
+  ['PUT', '/api/shutterlink/settings', '{ "settings": { "v": 2, "profile": { "name": "" }, "links": [ { "url": "javascript:alert(1)" } ] } }'],
+];
+let tryState = { m:'GET', p:'/api/shutterlink/me', b:'', out:null };
+function renderTry(){
+  $('pane').innerHTML = `<div class="console">
+    <p class="hint">Send any request to the simulated server as whoever is signed in. These are the same calls the pages make.</p>
+    <div class="chips">${EXAMPLES.map((x,i) => `<button data-ex="${i}">${x[0]} ${esc(x[1].replace('/api/', ''))}</button>`).join('')}</div>
+    <div class="line"><select class="in" id="tm" aria-label="Method">${['GET','PUT','POST','DELETE'].map(m => `<option ${m === tryState.m ? 'selected' : ''}>${m}</option>`).join('')}</select>
+      <input class="in path-in" id="tp" value="${esc(tryState.p)}" aria-label="Path" spellcheck="false"><button class="btn primary" id="send">Send</button></div>
+    <textarea class="in" id="tb" placeholder="JSON body (for PUT and POST)" aria-label="Request body" spellcheck="false">${esc(tryState.b)}</textarea>
+    ${tryState.out ? `<div><b style="font-size:12px;color:var(--faint)">Response <span class="${stCls(tryState.out.status)}">${tryState.out.status}</span></b><pre class="code" style="margin-top:6px">${esc(pretty(tryState.out.body))}</pre></div>` : ''}
+  </div>`;
+}
+$('pane').addEventListener('click', async e => {
+  const row = e.target.closest('.row-r'); if (row){ open = open === row.dataset.id ? null : row.dataset.id; renderReqs(); return; }
+  const ex = e.target.closest('[data-ex]'); if (ex){ const x = EXAMPLES[+ex.dataset.ex]; tryState = { m:x[0], p:x[1], b:x[2], out:null }; renderTry(); return; }
+  if (e.target.closest('#send')){
+    tryState.m = $('tm').value; tryState.p = $('tp').value.trim(); tryState.b = $('tb').value;
+    let body; if (tryState.b.trim()){ try { body = JSON.parse(tryState.b); } catch(_) { toast('The body isn’t valid JSON', true); return; } }
+    const btn = $('send'); btn.disabled = true; btn.textContent = 'Sending…';
+    tryState.out = await sim.call(tryState.m, tryState.p, body);
+    reqs.unshift({ id:'c' + Date.now(), from:'Console', method:tryState.m, path:tryState.p, status:tryState.out.status, ms:0, req:body || null, res:tryState.out.body, signedIn:sim.session(), at:Date.now() }); $('nReqs').textContent = reqs.length;
+    renderTry(); refreshDb(); renderWho(); fillHandles();
+  }
+});
+$('pane').addEventListener('keydown', e => { const row = e.target.closest('.row-r'); if (row && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); row.click(); } });
+document.querySelector('.tabs-s').onclick = e => {
+  const b = e.target.closest('[data-t]'); if (!b) return;
+  tab = b.dataset.t; document.querySelectorAll('.tabs-s [data-t]').forEach(x => x.setAttribute('aria-selected', x === b)); render();
+};
+function render(){ ({ reqs:renderReqs, db:renderDb, events:renderEvents, inbox:renderInbox, try:renderTry })[tab](); }
+
+renderWho(); render(); refreshDb();
+})();
+</script>
+</body>
+</html>

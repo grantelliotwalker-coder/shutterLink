@@ -5,7 +5,11 @@
 <script>
   /* Served from a sub-path (e.g. sportshutter.com/shutterlink)? Make sure the address ends in "/"
      so relative files load from this app, not the main site. Runs before anything else loads. */
-  (function(l){ if (!/\/$|\.[a-z0-9]+$/i.test(l.pathname)) l.replace(l.pathname + '/' + l.search + l.hash); })(location);
+  (function(l){
+    // A personal link (sportshutter.com/@name): load this app's files from its own folder.
+    if (/\/@[a-z0-9._-]+\/?$/i.test(l.pathname)){ document.write('<base href="' + (window.SHUTTERLINK_BASE || '/shutterlink/') + '">'); return; }
+    if (!/\/$|\.[a-z0-9]+$/i.test(l.pathname)) l.replace(l.pathname + '/' + l.search + l.hash);
+  })(location);
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Grant Walker · Photography</title>
@@ -26,10 +30,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://picsum.photos">
-<script src="assets/core.js?v=2.8"></script>
+<script>
+  // Loaded here (not as plain tags) so they always come from this app's folder, even on /@name addresses.
+  document.write('<script src="assets/core.js?v=3.0"><\/script><script src="assets/data.js?v=3.0"><\/script>');
+</script>
 <script>
   /* Paint the saved theme before first render so there's no flash of the wrong colours. */
-  try { SL.applyTheme(SL.load()); } catch(_) {}
+  try {
+    if (SLData.remote){ SL.applyTheme(SL.DEFAULTS); document.documentElement.classList.add('loading'); }
+    else SL.applyTheme(SL.load());
+  } catch(_) {}
 </script>
 <style>
 /* safe areas; the settings preview fakes an iPhone's so the layout matches a real phone */
@@ -55,6 +65,15 @@ img{display:block;max-width:100%}
 img.fade{opacity:0;transition:opacity .5s ease}
 img.fade.ready{opacity:1}
 img.broken{opacity:0!important}
+/* while a photographer's page loads from Sport Shutter */
+html.loading .page,html.loading .topbar .ib{visibility:hidden}
+html.loading body::after{content:"";position:fixed;left:50%;top:50%;width:26px;height:26px;margin:-13px;border-radius:50%;border:2.5px solid var(--border-strong);border-top-color:var(--accent-text);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.missing{min-height:100vh;display:grid;place-items:center;text-align:center;padding:100px 28px 60px}
+.missing h1{font-family:var(--font-display);font-weight:var(--display-weight);letter-spacing:var(--display-tracking);font-size:34px;line-height:1.1}
+.missing p{color:var(--text-dim);margin:10px auto 0;max-width:30ch}
+.missing .btn{margin-top:24px}
+.hp{position:absolute!important;left:-9999px;width:1px;height:1px;opacity:0}
 
 /* ---------- Page column (phone width; desktop gets a soft backdrop) ---------- */
 .page{max-width:480px;margin:0 auto;position:relative}
@@ -416,7 +435,8 @@ const PREVIEW = new URLSearchParams(location.search).has('preview');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (PREVIEW) document.documentElement.classList.add('preview');
 
-let cfg = SL.load();
+let cfg = SLData.remote ? SL.clone(SL.DEFAULTS) : SL.load();
+let handle = SLData.handleFromLocation(), viewer = null;
 const tintCache = new Map();
 
 /* static chrome */
@@ -467,7 +487,9 @@ function render(){
   $('quick').innerHTML = cfg.quick.map(q =>
     `<a ${quickAttrs(q)}><i>${I[q.type] || I.link}</i><span>${esc(q.label || SL.ACTIONS[q.type].label)}</span></a>`).join('');
   $('quick').hidden = !cfg.quick.length;
-  $('gear').hidden = !cfg.page.showGear;
+  // On Sport Shutter only the page's owner sees the settings button
+  $('gear').hidden = SLData.remote ? !(viewer && viewer.handle && viewer.handle === handle) : !cfg.page.showGear;
+  $('gear').href = SLData.link('settings.html');
 
   renderSections();
   renderStage();
@@ -548,7 +570,9 @@ S.enquire = () => {
           <label class="fl">Date <input class="in" name="date" type="date"></label>
         </div>
         <label class="fl">Message<textarea class="in" name="msg" rows="3" required></textarea><span class="err" hidden>Add a short message</span></label>
+        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
         <button class="btn btn-accent btn-block" type="submit">Send enquiry</button>
+        <p class="err" id="enqErr" hidden></p>
         ${e.reply ? `<p class="fine">${esc(e.reply)}</p>` : ''}
       </form>
     </div>`;
@@ -882,12 +906,22 @@ function wireForms(){
     };
     // errors clear as soon as the field is fixed, so nothing shifts under a tap
     f.querySelectorAll('[required]').forEach(el => el.addEventListener('input', () => { if (el.getAttribute('aria-invalid') === 'true') check(el); }));
-    f.onsubmit = e => {
+    f.onsubmit = async e => {
       e.preventDefault();
       const bad = [...f.querySelectorAll('[required]')].filter(el => !check(el));
       if (bad.length){ bad[0].focus(); return; }
       const d = Object.fromEntries(new FormData(f));
       const first = d.name.trim().split(/\s+/)[0];
+      if (SLData.remote){
+        if (PREVIEW){ toast('Enquiries are sent from your live page'); return; }
+        const btn = f.querySelector('button[type=submit]'), er = $('enqErr');
+        btn.disabled = true; btn.textContent = 'Sending…'; er.hidden = true;
+        const r = await SLData.sendEnquiry(handle, d);
+        if (!r.ok){ btn.disabled = false; btn.textContent = 'Send enquiry'; er.textContent = (r.errors && r.errors[0] ? r.errors[0].message : r.message); er.hidden = false; return; }
+        f.outerHTML = `<div class="sent" tabindex="-1" id="enqDone"><i>${I.check}</i><div><b>Sent. Thanks, ${esc(first)}.</b>
+          <span>${esc(cfg.profile.name)} will get it in their Sport Shutter inbox. ${esc(cfg.enquire.reply || '')}</span></div></div>`;
+        $('enqDone').focus(); return;
+      }
       const to = SL.href(cfg.enquire.to);
       const mail = to.startsWith('mailto:') ? `${to}?subject=${encodeURIComponent((d.type || 'Enquiry') + ' enquiry from ' + d.name)}&body=${encodeURIComponent(`${d.msg}\n\n${d.date ? 'Date: ' + d.date + '\n' : ''}Reply to: ${d.email}`)}` : '';
       f.outerHTML = `<div class="sent" tabindex="-1" id="enqDone"><i>${I.check}</i><div><b>Thanks, ${esc(first)}. Your enquiry is ready.</b>
@@ -909,10 +943,10 @@ function wireForms(){
 }
 
 /* ---------- Share ---------- */
-const pageUrl = () => location.href.split(/[?#]/)[0].replace(/index\.html$/, '');
+const pageUrl = () => SLData.remote ? SLData.publicUrl(handle) : location.href.split(/[?#]/)[0].replace(/index\.html$/, '');
 $('shareBtn').onclick = () => {
   openSheet(`<div class="sh-head"><h3>Share this page</h3><button class="x" data-close aria-label="Close"></button></div>
-    <div class="urlbox"><span id="shareUrl">${esc(pageUrl().replace(/^https?:\/\//,''))}</span><button class="btn btn-accent" id="copy" data-focus>${I.copy}Copy</button></div>
+    <div class="urlbox"><span id="shareUrl">${esc(SLData.remote ? SLData.prettyUrl(handle) : pageUrl().replace(/^https?:\/\//,''))}</span><button class="btn btn-accent" id="copy" data-focus>${I.copy}Copy</button></div>
     ${navigator.share ? `<button class="btn btn-line btn-block" id="native" style="margin-top:10px">${I.share}More ways to share</button>` : ''}
     <p class="tip">${I.instagram}<span>Paste this link into the website field of your Instagram profile so it shows in your bio.</span></p>`, 'Share');
   $('copy').onclick = async () => {
@@ -951,10 +985,52 @@ addEventListener('message', e => {
     if (el) (map[e.data.tab] ? scrollTo({ top:0, behavior: reduce ? 'auto' : 'smooth' }) : el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block:'start' }));
   }
 });
-addEventListener('storage', e => { if (e.key === SL.KEY){ const next = SL.load(); SL.preloadImages(next).then(() => { cfg = next; render(); }); } });
+addEventListener('storage', e => { if (!SLData.remote && e.key === SL.KEY){ const next = SL.load(); SL.preloadImages(next).then(() => { cfg = next; render(); }); } });
 
 saveCart();
-SL.preloadImages(cfg).then(() => { render(); markLoaded(document); });
+/* ---------- Loading a photographer's page from Sport Shutter ---------- */
+async function loadRemote(){
+  const r = await SLData.loadPublic(handle);
+  if (r.movedTo){
+    // an old link name: carry on to the new one and fix the address bar
+    const old = handle; handle = r.movedTo;
+    const url = /\/@/.test(location.pathname) ? location.pathname.replace('/@' + old, '/@' + handle) + location.search : SLData.link('index.html', { u: handle, preview: PREVIEW ? '' : null });
+    history.replaceState(null, '', url);
+    return loadRemote();
+  }
+  if (r.notFound || r.error){ if (!PREVIEW) missing(r.notFound ? r.message : 'Couldn’t load this page. ' + r.error); return false; }
+  cfg = r.cfg; return true;
+}
+function missing(text){
+  document.documentElement.classList.remove('loading');
+  document.title = 'Page not found · ShutterLink';
+  $('page').innerHTML = `<div class="missing"><div><h1>No page here yet</h1><p>${esc(text)}</p><a class="btn btn-accent" href="${SL.BRAND.home}">Go to ${SL.BRAND.name}</a></div></div>`;
+  ['shareBtn','cartBtn','gear'].forEach(id => $(id).hidden = true);
+}
+async function boot(){
+  if (SLData.remote){
+    const ok = await loadRemote();
+    try { viewer = await SLData.me(); } catch(_) {}
+    if (!ok && !PREVIEW) return;
+  }
+  await SL.preloadImages(cfg);
+  render(); markLoaded(document);
+  document.documentElement.classList.remove('loading');
+}
+// Simulator: a save or a new link name is published straight away (the real site purges its cache).
+if (SLData.mode === 'sim' && SLData.channel && !PREVIEW) SLData.channel.addEventListener('message', async e => {
+  const d = e.data || {};
+  if (d.kind === 'event' && d.type === 'settings.saved' && d.payload.handle === handle && !d.payload.note){
+    if (await loadRemote()){ await SL.preloadImages(cfg); render(); markLoaded(document); }
+  }
+  if (d.kind === 'event' && d.type === 'handle.changed' && d.payload.from === handle){ handle = d.payload.to; history.replaceState(null, '', SLData.link('index.html', { u: handle })); }
+  if (d.kind === 'session' || d.kind === 'reset'){
+    if (d.kind === 'reset' && !(await loadRemote())) return;
+    try { viewer = await SLData.me(); } catch(_) { viewer = null; }
+    await SL.preloadImages(cfg); render(); markLoaded(document);
+  }
+});
+boot();
 })();
 </script>
 </body>

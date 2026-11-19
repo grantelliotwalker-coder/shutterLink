@@ -201,7 +201,10 @@ async function putImage(file, max=1600, q=.82){
 }
 /* Remove stored photos nothing refers to any more. */
 async function cleanImages(keep){
-  try { const used = new Set([...keep].map(r => r.slice(4))); for (const k of await idb.keys()) if (!used.has(k)) await idb.del(k); } catch(_) {}
+  try {
+    // photos the simulated server holds are in use too
+    try { const sim = JSON.parse(localStorage.getItem('shutterlink:sim:db') || 'null'); if (sim) refsIn(sim).forEach(r => keep.add(r)); } catch(_) {}
+    const used = new Set([...keep].map(r => r.slice(4))); for (const k of await idb.keys()) if (!used.has(k)) await idb.del(k); } catch(_) {}
 }
 /* Backups carry the photos themselves; loading a backup puts them back in the store. */
 async function embedImages(cfg){
@@ -446,7 +449,7 @@ function youtubeId(u){
   return m ? m[1] : null;
 }
 
-window.SL = { isStock, shopItems, putImage, preloadImages, refsIn, cleanImages, embedImages, storeInlineImages, KEY, BRAND, THEMES, FONTS, SHOP, PRINT_OPTIONS, CURRENCIES, ACTIONS, SOCIALS, ICONS, DEFAULTS,
+window.SL = { imageBlob, isStock, shopItems, putImage, preloadImages, refsIn, cleanImages, embedImages, storeInlineImages, KEY, BRAND, THEMES, FONTS, SHOP, PRINT_OPTIONS, CURRENCIES, ACTIONS, SOCIALS, ICONS, DEFAULTS,
   rgb, hex, mix, lum, contrast, isDark, legible, isHex, tokens, applyTheme, loadFont, fontUrl,
   pic, sized, readImage, sampleColour, money, load, save, reset, clone, fromJSON, bytes, esc, href, youtubeId, normalise };
 })();
