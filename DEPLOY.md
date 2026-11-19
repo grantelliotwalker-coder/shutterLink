@@ -1,7 +1,7 @@
 # Putting ShutterLink on sportshutter.com
 
 ShutterLink is a separate static app (this repo, hosted on GitHub Pages at
-`https://grantelliotwalker-coder.github.io/shutterLink/`). It can appear as part of
+`https://shutterlink.gwstudio.com.au/`). It can appear as part of
 sportshutter.com while being built and deployed independently.
 
 The app uses only relative paths, so it works at any address: the site root, a
@@ -38,18 +38,17 @@ Two rules, whichever platform:
 - **Redirect `/shutterlink` to `/shutterlink/`** (trailing slash). The main site already
   uses `/assets/`, and without the slash the browser would look there for ShutterLink's
   files. (The page also corrects this itself, but the redirect avoids a wasted request.)
-- **Forward `/shutterlink/*` to `https://grantelliotwalker-coder.github.io/shutterLink/*`**.
-  Note the capital `L` in `shutterLink` on GitHub's side.
+- **Forward `/shutterlink/*` to `https://shutterlink.gwstudio.com.au/*`**.
 
 ### Nginx
 ```nginx
 location = /shutterlink { return 301 /shutterlink/$is_args$args; }
 
 location /shutterlink/ {
-    proxy_pass https://grantelliotwalker-coder.github.io/shutterLink/;
-    proxy_set_header Host grantelliotwalker-coder.github.io;
+    proxy_pass https://shutterlink.gwstudio.com.au/;
+    proxy_set_header Host shutterlink.gwstudio.com.au;
     proxy_ssl_server_name on;
-    proxy_redirect https://grantelliotwalker-coder.github.io/shutterLink/ /shutterlink/;
+    proxy_redirect https://shutterlink.gwstudio.com.au/ /shutterlink/;
 }
 ```
 
@@ -62,7 +61,7 @@ export default {
       return Response.redirect(`${url.origin}/shutterlink/${url.search}`, 301);
     }
     const rest = url.pathname.slice('/shutterlink/'.length);
-    const target = `https://grantelliotwalker-coder.github.io/shutterLink/${rest}${url.search}`;
+    const target = `https://shutterlink.gwstudio.com.au/${rest}${url.search}`;
     return fetch(target, { method: request.method, headers: { 'Accept': request.headers.get('Accept') || '*/*' } });
   },
 };
@@ -72,14 +71,14 @@ export default {
 ```json
 {
   "redirects": [{ "source": "/shutterlink", "destination": "/shutterlink/", "permanent": true }],
-  "rewrites":  [{ "source": "/shutterlink/:path*", "destination": "https://grantelliotwalker-coder.github.io/shutterLink/:path*" }]
+  "rewrites":  [{ "source": "/shutterlink/:path*", "destination": "https://shutterlink.gwstudio.com.au/:path*" }]
 }
 ```
 
 ### Netlify (`_redirects` on the main site)
 ```
 /shutterlink     /shutterlink/   301
-/shutterlink/*   https://grantelliotwalker-coder.github.io/shutterLink/:splat   200
+/shutterlink/*   https://shutterlink.gwstudio.com.au/:splat   200
 ```
 
 ---

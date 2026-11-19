@@ -446,20 +446,20 @@ app.use(expressHandler(api));</code></pre></div>
 
     <section class="ch">
       <h2 id="hosting">9. Hosting and releases</h2>
-      <p>The pages are static files. They can stay on GitHub Pages, move to any static host, or be served by Sport Shutter itself. A proxy rule makes them part of sportshutter.com:</p>
+      <p>The pages are static files. Today they’re at <code>shutterlink.gwstudio.com.au</code>; they can stay there, move to any static host, or be served by Sport Shutter itself. A proxy rule makes them part of sportshutter.com:</p>
       <span class="fn">nginx</span>
       <div class="code"><button class="btn sm cp" data-copy="c-nginx">Copy</button><pre id="c-nginx"><code>location = /shutterlink { return 301 /shutterlink/; }
 
 location /shutterlink/ {
-    proxy_pass https://grantelliotwalker-coder.github.io/shutterLink/;
-    proxy_set_header Host grantelliotwalker-coder.github.io;
+    proxy_pass https://shutterlink.gwstudio.com.au/;
+    proxy_set_header Host shutterlink.gwstudio.com.au;
     proxy_ssl_server_name on;
 }
 
 <span class="tc"># Personal links: /@name serves the page, which reads the name from the address.</span>
 location ~ ^/@[a-z0-9._-]+/?$ {
-    proxy_pass https://grantelliotwalker-coder.github.io/shutterLink/index.html;
-    proxy_set_header Host grantelliotwalker-coder.github.io;
+    proxy_pass https://shutterlink.gwstudio.com.au/index.html;
+    proxy_set_header Host shutterlink.gwstudio.com.au;
     proxy_ssl_server_name on;
 }</code></pre></div>
       <p>Settings for Cloudflare, Vercel and Netlify are in <code>DEPLOY.md</code>. On sportshutter.com the pages switch to the real API automatically.</p>

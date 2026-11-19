@@ -48,4 +48,4 @@ See [DEPLOY.md](DEPLOY.md): either a subdomain (`shutterlink.sportshutter.com`) 
 
 ## Viewing
 
-GitHub Pages: Settings → Pages → Deploy from branch → `main` / root.
+Live at **https://shutterlink.gwstudio.com.au** (GitHub Pages, custom domain set by the `CNAME` file; DNS is a CNAME record at Crazy Domains: `shutterlink` → `grantelliotwalker-coder.github.io`).
